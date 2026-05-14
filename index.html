@@ -1,0 +1,1924 @@
+```html
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Viaggi nel mondo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-dark: #0a0a08; 
+            --card-bg: #26241d; 
+            --accent-gold: #e8b84b; 
+            --accent-blue: #4a9ebb; 
+            --accent-green: #2ecc71; 
+            --text-main: #f5efe0; 
+            --border: rgba(232, 184, 75, 0.4); 
+        }
+        
+        /* TEMA CHIARO */
+        body.light-theme {
+            --bg-dark: #f0f0f0; 
+            --card-bg: #ffffff; 
+            --text-main: #1a1a1a; 
+            --border: rgba(0, 0, 0, 0.15);
+        }
+        body.light-theme header { background: #e8e8e8; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        body.light-theme .wallet-input, body.light-theme .note-box, body.light-theme .search-input { background: #fafafa; color: #000; border-color: #ccc; }
+        body.light-theme .note-area { color: #000; }
+        body.light-theme .card { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        body.light-theme .desc-preview { color: #666; }
+        body.light-theme .pill { border-color: #ccc; color: #333; }
+        body.light-theme .pill.selected { background: rgba(232, 184, 75, 0.3); border-color: var(--accent-gold); color: #000; }
+        body.light-theme #addModalSelect option { background: #fff; color: #000; }
+
+        body { margin: 0; font-family: 'Jost', sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
+        header { background: #1a1914; padding: 15px 20px 10px; border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: 0.3s; }
+        .nav-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { flex: 1; padding: 12px 8px; border: none; background: transparent; color: #8a7a62; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap; transition: 0.3s; }
+        .tab-btn.active { background: rgba(232, 184, 75, 0.15); color: var(--accent-gold); }
+        
+        #map-container { height: 32vh; width: 100%; position: relative; border-bottom: 1px solid var(--border); transition: height 0.4s ease; flex-shrink: 0; }
+        #map { height: 100%; width: 100%; background: #ffffff; }
+        .map-control-btn { position: absolute; bottom: 15px; right: 15px; z-index: 1000; background: var(--card-bg); border: 2px solid var(--accent-gold); color: var(--accent-gold); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; }
+        
+        /* MAPPA A SCHERMO INTERO */
+        body.map-fullscreen #map-container { position: fixed; top: 65px; left: 0; width: 100vw; height: calc(100vh - 65px); z-index: 9000; }
+        body.map-fullscreen main { display: none !important; }
+        body.map-fullscreen .nav-dashboard { display: none !important; }
+
+        main { flex: 1; overflow-y: auto; padding: 15px 15px 100px 15px; transition: 0.3s; }
+        .view-content { display: none; animation: fadeIn 0.4s ease; }
+        .view-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 8px 16px rgba(0,0,0,0.6); transition: 0.3s; }
+        
+        /* MANIGLIA DRAG & DROP E HIGHLIGHT */
+        .highlight-card { border-color: var(--accent-gold) !important; box-shadow: 0 0 20px rgba(232, 184, 75, 0.5) !important; background-color: rgba(232, 184, 75, 0.1) !important; }
+        .highlight-marker-inner { border-color: var(--accent-gold) !important; box-shadow: 0 0 25px var(--accent-gold) !important; transform: scale(1.5) !important; }
+        
+        .drag-handle { cursor: grab; font-size: 20px; color: var(--accent-gold); display: inline-block; padding-right: 10px; vertical-align: middle; }
+        .drag-handle:active { cursor: grabbing; }
+        .sortable-ghost { opacity: 0.4; border: 2px dashed var(--accent-gold); }
+
+        .card-title { font-family: 'Playfair Display'; font-size: 19px; color: var(--accent-gold); margin: 0 0 5px 0; }
+        .rating { color: #ffcc00; font-size: 14px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .desc-preview { font-size: 13px; color: #bbb; line-height: 1.5; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .btn-action { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 11px 12px; border-radius: 8px; cursor: pointer; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex: 1; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: 0.2s; }
+        .btn-action.primary { background: var(--accent-gold); color: #000; border: none; font-size: 12px; padding: 14px;}
+        .btn-action.btn-maps-alt { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .btn-action:active { transform: scale(0.97); }
+        
+        .wallet-box { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .wallet-row { display: flex; gap: 8px; align-items: stretch; width: 100%; }
+        
+        .wallet-input { flex: 1; background: #13120e; border: 1px solid rgba(232, 184, 75, 0.5); color: #ffffff; padding: 12px 10px; border-radius: 8px; font-family: 'Jost'; font-size: 14px; outline: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
+        .wallet-input::placeholder { color: #a59781; opacity: 1; font-weight: 400; }
+        .wallet-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px rgba(232, 184, 75, 0.6); }
+        
+        .wallet-input[type="time"] { flex: 0 0 95px; text-align: center; color: var(--accent-blue); font-weight: 600; background: rgba(74, 158, 187, 0.1); border-color: rgba(74, 158, 187, 0.5); }
+        .wallet-input[type="number"] { flex: 0 0 95px; text-align: center; color: var(--accent-green); font-weight: 600; background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.5); }
+        .wallet-input[type="number"]::placeholder { color: rgba(46, 204, 113, 0.7); }
+        
+        .photo-btn { flex: 0 0 45px; background: rgba(74, 158, 187, 0.15); border: 1px solid rgba(74, 158, 187, 0.6); color: var(--accent-blue); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
+        .photo-btn:hover, .photo-btn:active { background: rgba(74, 158, 187, 0.3); transform: scale(0.95); }
+
+        .note-box { background: #13120e; border: 1px solid rgba(232, 184, 75, 0.4); border-radius: 8px; padding: 10px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: 0.3s; }
+        .note-box:focus-within { border-color: var(--accent-gold); box-shadow: 0 0 8px rgba(232, 184, 75, 0.6); }
+        .note-area { width: 100%; background: transparent; border: none; color: #ffffff; font-family: 'Jost', sans-serif; font-size: 14px; resize: vertical; min-height: 45px; outline: none; line-height: 1.5; letter-spacing: 0.3px; }
+        .note-area::placeholder { color: #a59781; opacity: 0.8; font-style: italic; }
+
+        .badge-time { background: var(--accent-blue); color: #fff; padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 6px; vertical-align: middle; }
+        .badge-cost { background: rgba(46, 204, 113, 0.2); color: var(--accent-green); padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 6px; vertical-align: middle; border: 1px solid var(--accent-green); }
+        .ticket-btn { background: #27ae60; color: #fff; font-weight: 700; border: none; padding: 12px; border-radius: 8px; font-size: 11px; cursor: pointer; text-decoration: none; display: block; text-align: center; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
+
+        .photo-preview-container { position: relative; margin-top: 12px; width: 100%; height: 160px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .photo-preview-container.active { display: block; }
+        .photo-preview { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .remove-photo-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; border: 1px solid var(--accent-gold); border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+        .search-input { width: 100%; padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px; color: white; margin-bottom: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000; padding: 30px; overflow-y: auto; }
+        
+        .day-label { color: var(--accent-gold); font-size: 11px; font-weight: 700; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
+        .day-ctrl { display: flex; align-items: center; gap: 6px; }
+        .day-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: var(--text-main); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+        .day-btn:active { background: rgba(255,255,255,0.3); }
+
+        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--accent-gold); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .distance-tag { font-size: 11px; color: var(--accent-blue); font-weight: 600; margin-left: auto; }
+
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; width: 90%; max-width: 400px; }
+        .toast { background: #2c2a24; color: #fff; border-left: 4px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); font-size: 14px; font-weight: 500; animation: slideDown 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards; }
+        .toast.error { border-left-color: #e74c3c; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #8a7a62; }
+        
+        .trip-selector { background: rgba(255,255,255,0.1); color: var(--accent-gold); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; max-width: 150px; font-family: 'Jost'; font-weight: 600; outline: none; cursor: pointer; }
+        .trip-selector option { background: var(--bg-dark); color: var(--text-main); }
+        .trip-stats { font-size: 14px; color: var(--text-main); opacity: 0.9; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border-left: 3px solid var(--accent-blue); display: none; margin-bottom: 10px; line-height: 1.6; }
+
+        .weather-widget { display: none; justify-content: space-between; align-items: center; background: rgba(74, 158, 187, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(74, 158, 187, 0.3); margin-bottom: 15px; font-size: 13px; flex-direction: column; gap: 8px;}
+        .weather-row { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+        .weather-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .weather-label { font-size: 10px; color: #8a7a62; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .weather-val { font-size: 16px; font-weight: bold; }
+        
+        /* STILI WIZARD E PROPOSTE */
+        .wizard-section { margin-bottom: 25px; }
+        .wizard-label { color: #8a7a62; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pill { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; user-select: none; }
+        .pill.selected { background: rgba(232, 184, 75, 0.15); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 600; }
+        .pill:active { transform: scale(0.95); }
+
+        body.nav-active header { transform: translateY(-100%); position: absolute; }
+        body.nav-active main { display: none; }
+        body.nav-active #map-container { height: 55vh; border-bottom: 4px solid var(--accent-gold); }
+        body.nav-active .map-control-btn { bottom: 46vh; }
+        
+        .nav-dashboard { position: fixed; bottom: 0; left: 0; width: 100%; height: 45vh; background: var(--bg-dark); z-index: 2000; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 -10px 30px rgba(0,0,0,0.8); overflow-y: auto;}
+        .nav-dashboard.active { transform: translateY(0); }
+        
+        .nav-stop { margin-bottom: 12px; border-left: 3px solid transparent; padding-left: 15px; position: relative; }
+        .nav-stop::before { content: ''; position: absolute; left: -6px; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: #555; }
+        .active-stop { border-left-color: var(--accent-gold); }
+        .active-stop::before { background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold); }
+        .active-stop .stop-name { font-size: 22px; color: var(--accent-gold); font-family: 'Playfair Display'; font-weight: bold; line-height: 1.2; display: block;}
+        .upcoming-stop { border-left-color: #444; opacity: 0.7; }
+        .upcoming-stop .stop-name { font-size: 16px; color: var(--text-main); display: block; }
+        
+        .stop-note { font-size: 13px; color: #ccc; margin-top: 6px; line-height: 1.4; }
+        .nav-dash-dist { background: rgba(231, 76, 60, 0.2); color: #e74c3c; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 5px; display: inline-block;}
+        .nav-controls { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div id="loader" class="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; color: var(--accent-gold); font-weight: 600;" id="loader-text">AI all'opera...</p>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<header>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-family: 'Playfair Display'; font-size: 24px; color: var(--accent-gold); line-height: 1.1; margin-top: -2px;">Viaggi nel mondo</div>
+            <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: #8a7a62; font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema">🌓</button>
+            <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero">🗺️</button>
+        </div>
+    </div>
+    <div class="nav-tabs">
+        <button id="tab-btn-wizard" class="tab-btn" onclick="switchTab('wizard', event)">🪄 AI Wizard</button>
+        <button id="tab-btn-scopri" class="tab-btn active" onclick="switchTab('scopri', event)">Esplora</button>
+        <button id="tab-btn-itinerario" class="tab-btn" onclick="switchTab('itinerario', event)">Il Mio Piano</button>
+    </div>
+</header>
+
+<div id="map-container">
+    <div id="map"></div>
+    <button class="map-control-btn" onclick="forceGPS()">🎯</button>
+</div>
+
+<div id="nav-dashboard" class="nav-dashboard">
+    <div style="font-size: 10px; color: #8a7a62; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;" id="nav-dash-step">NAVIGAZIONE IN CORSO</div>
+    <div id="nav-stop-1" class="nav-stop active-stop">
+        <span class="stop-name" id="name-stop-1">--</span>
+        <span class="nav-dash-dist" id="nav-dist-1">Ricalcolo distanza...</span>
+        <div class="stop-note" id="note-stop-1"></div>
+    </div>
+    <div id="nav-stop-2" class="nav-stop upcoming-stop"><span class="stop-name" id="name-stop-2">--</span></div>
+    <div id="nav-stop-3" class="nav-stop upcoming-stop"><span class="stop-name" id="name-stop-3">--</span></div>
+    <div class="nav-controls">
+        <button class="btn-action primary" style="background: #e74c3c; flex: 0.5;" onclick="stopNavigation()">ESCI</button>
+        <button class="btn-action primary" style="flex: 1; font-size: 14px;" onclick="nextNavStep()">📍 PROSSIMA ➔</button>
+    </div>
+</div>
+
+<main>
+    <div id="view-wizard" class="view-content">
+        <div style="margin-bottom: 25px;">
+            <h2 style="font-family: 'Playfair Display'; color: var(--accent-blue); font-size: 28px; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
+                ✈️ Pianifica il tuo viaggio
+            </h2>
+            <p style="color: #bbb; font-size: 14px; margin: 0;">Dimmi cosa ti piace e l'AI creerà un itinerario su misura.</p>
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">DESTINAZIONE</span>
+            <input type="text" id="wizDest" class="search-input" placeholder="Es: Firenze, Sicilia, Roma..." autocomplete="off">
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">DATA DI PARTENZA</span>
+            <input type="date" id="wizDate" class="search-input" style="color: var(--accent-blue); font-weight: 600;">
+            <div style="font-size:11px; color:#8a7a62; margin-top:4px;">Aiuta l'AI a segnalare festività locali ed eventi stagionali</div>
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">NUMERO DI GIORNI</span>
+            <div class="pill-group" id="wizDays">
+                <div class="pill" onclick="toggleWiz('days', this, '1')">1 giorno</div>
+                <div class="pill selected" onclick="toggleWiz('days', this, '2')">2 giorni</div>
+                <div class="pill" onclick="toggleWiz('days', this, '3')">3 giorni</div>
+                <div class="pill" onclick="toggleWiz('days', this, '5')">5 giorni</div>
+                <div class="pill" onclick="toggleWiz('days', this, '7')">1 settimana</div>
+            </div>
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">CHI VIAGGIA</span>
+            <div class="pill-group" id="wizWho">
+                <div class="pill" onclick="toggleWiz('who', this, 'Solo')">Solo/a</div>
+                <div class="pill selected" onclick="toggleWiz('who', this, 'Coppia')">Coppia</div>
+                <div class="pill" onclick="toggleWiz('who', this, 'Famiglia')">Famiglia</div>
+                <div class="pill" onclick="toggleWiz('who', this, 'Amici')">Amici</div>
+            </div>
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">INTERESSI (anche più di uno)</span>
+            <div class="pill-group" id="wizInterests">
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Arte')">🎨 Arte</div>
+                <div class="pill multi selected" onclick="toggleWizMulti(this, 'Gastronomia')">🍝 Gastronomia</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Natura')">🌲 Natura</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Storia')">🏛️ Storia</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Shopping')">🛍️ Shopping</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Nightlife')">🌙 Nightlife</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Relax')">🧘 Relax</div>
+                <div class="pill multi" onclick="toggleWizMulti(this, 'Avventura')">🧗 Avventura</div>
+            </div>
+        </div>
+
+        <div class="wizard-section">
+            <span class="wizard-label">BUDGET</span>
+            <div class="pill-group" id="wizBudget">
+                <div class="pill" onclick="toggleWiz('budget', this, 'Economico')">💰 Economico</div>
+                <div class="pill selected" onclick="toggleWiz('budget', this, 'Medio')">💳 Medio</div>
+                <div class="pill" onclick="toggleWiz('budget', this, 'Alto')">💎 Alto</div>
+            </div>
+        </div>
+
+        <button class="btn-action primary" style="width: 100%; font-size: 14px; padding: 18px; margin-top: 10px; box-shadow: 0 4px 15px rgba(232, 184, 75, 0.3);" onclick="generateWizardItinerary()">
+            🤖 GENERA ITINERARIO CON AI
+        </button>
+        
+        <button class="btn-action" style="width: 100%; border: none; color: #8a7a62; margin-top: 10px;" onclick="switchTab('scopri')">
+            ESPLORA MANUALMENTE ➔
+        </button>
+    </div>
+
+    <div id="view-scopri" class="view-content active">
+        <div class="card" style="border: 1px solid var(--accent-blue); background: rgba(74, 158, 187, 0.05);">
+            <div style="color: var(--accent-blue); font-size: 10px; font-weight: 700; margin-bottom: 8px;">AI ASSISTANT</div>
+            <input type="text" id="aiQuery" class="search-input" placeholder="Chiedi all'IA (es: storia, tradizioni, piatti tipici...)">
+            <button class="btn-action" style="background: var(--accent-blue); color: white; border: none; width: 100%;" onclick="askAI()">CHIEDI CONSIGLIO</button>
+        </div>
+
+        <input type="text" id="cityInput" class="search-input" placeholder="Cerca Comune (es: Modena)">
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button class="btn-action primary" style="flex: 1;" onclick="searchCity()">ESPLORA</button>
+            <button class="btn-action primary" style="flex: 1; background: var(--accent-blue); color: white;" onclick="exploreNearby()">DINTORNI</button>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button class="btn-action" style="flex: 1; border-style: dashed;" onclick="toggleManual()">+ AGGIUNGI LUOGO</button>
+            <button class="btn-action btn-maps-alt" style="flex: 1;" onclick="openGeneralMaps()">GOOGLE MAPS</button>
+        </div>
+        
+        <div id="manBox" style="display:none; margin-bottom: 20px;" class="card">
+            <input type="text" id="mSearch" class="search-input" placeholder="Cerca luogo o indirizzo">
+            <button class="btn-action primary" style="width: 100%; margin-bottom: 10px;" onclick="searchAndSaveManual()">CERCA E SALVA</button>
+            <input type="text" id="mName" class="search-input" placeholder="Nome manuale">
+            <button class="btn-action" style="width: 100%; border-color: var(--accent-gold);" onclick="saveManual()">SALVA POSIZIONE MAPPA</button>
+        </div>
+        
+        <div style="display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
+            <button class="btn-action" onclick="setFilter('monument')">🏛️ Monumenti</button>
+            <button class="btn-action" onclick="setFilter('food')">🍴 Ristoranti</button>
+            <button class="btn-action" onclick="setFilter('hotel')">🏨 Hotel</button>
+            <button class="btn-action" onclick="setFilter('nature')">🌲 Natura</button>
+        </div>
+
+        <button id="sort-dist-btn" class="btn-action" style="width:100%; margin-bottom: 15px; border-color: var(--accent-blue); color: var(--accent-blue); display: none;" onclick="sortByDistance()">ORDINA PER DISTANZA</button>
+        
+        <div id="sug-list"></div>
+    </div>
+
+    <div id="view-itinerario" class="view-content">
+        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="font-family: 'Playfair Display'; margin: 0; font-size: 22px;">Itinerario</h2>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <select id="tripSelector" class="trip-selector" onchange="changeActiveTrip()" style="display:none;"></select>
+                    <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:#8a7a62; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario">⚙️</button>
+                </div>
+            </div>
+            
+            <div id="tripStats" class="trip-stats"></div>
+            
+            <div id="survivalWidget" style="display:none;"></div>
+
+            <div id="weatherWidget" class="weather-widget"></div>
+            
+            <div style="display: flex; gap: 6px; margin-bottom: 5px;" id="ai-actions-box">
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <button class="btn-action" onclick="organizeDaysAI()" style="color: var(--accent-blue); border-color: var(--accent-blue); font-size:10px; padding: 10px 5px; width:100%;">DIVIDI GIORNI</button>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI distribuisce le tappe sui giorni</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <button class="btn-action" onclick="optimizeItinerary()" style="color: var(--accent-gold); border-color: var(--accent-gold); font-size:10px; padding: 10px 5px; width:100%;">OTTIMIZZA AI</button>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI riordina per logica e semantica</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <button class="btn-action" onclick="analyzeWeatherAI()" style="color: #fff; background: var(--accent-blue); border: none; font-size:10px; padding: 10px 5px; width:100%;">🌤️ METEO AI</button>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI consiglia in base alle previsioni</span>
+                </div>
+            </div>
+            <div style="font-size:10px; color:#8a7a62; text-align:center; margin-bottom:12px; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius:6px; line-height:1.5;">
+                💡 <b style="color:var(--accent-gold)">Ottimizza AI</b> = prima della partenza, ragiona sul senso delle tappe &nbsp;|&nbsp; <b style="color:var(--accent-gold)">🧭 Ottimizza Giornata</b> = in viaggio, usa GPS e ora corrente
+            </div>
+
+            <div id="routing-toggle-box" style="display: flex; gap: 8px; margin-top: 15px; justify-content: center; display: none;">
+                <button id="route-mode-driving" class="btn-action primary" style="flex:1;" onclick="setRoutingMode('driving')">🚗 IN AUTO</button>
+                <button id="route-mode-foot" class="btn-action" style="flex:1; background: transparent;" onclick="setRoutingMode('foot')">🚶 A PIEDI</button>
+            </div>
+
+            <button id="btn-start-nav" class="btn-action primary" style="background: var(--accent-gold); color: #000; width: 100%; font-size: 14px; padding: 15px; margin-top: 10px; display: none;" onclick="startNavigation()">🧭 INIZIA NAVIGAZIONE LIVE</button>
+
+        </div>
+        
+        <div id="myList"></div>
+        
+        <div id="itinerary-actions" style="display: none; gap: 8px; margin-top: 20px;">
+            <button class="btn-action primary" style="flex:1; background:#25d366;" onclick="shareItinerary()">WHATSAPP</button>
+            <button class="btn-action primary" style="flex:1; background:var(--accent-blue);" onclick="downloadPDF()">SCARICA PDF</button>
+        </div>
+
+        <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; padding-bottom: 90px;">
+            <div style="font-size: 11px; color: #8a7a62; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Motore Intelligenza Artificiale</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                <input type="text" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini..." style="flex: 2; border-color: var(--accent-gold);">
+                <button class="btn-action primary" style="flex: 1;" onclick="saveUserApiKey()">SALVA CHIAVE</button>
+            </div>
+            <div style="font-size: 11px; color: #8a7a62; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Gestione Dati</div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="backupData()">💾 BACKUP</button>
+                <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('restoreFile').click()">📂 RIPRISTINA</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<input type="file" id="restoreFile" style="display:none" accept=".json" onchange="handleRestore(event)">
+
+<div id="descModal" class="modal">
+    <div style="max-width: 600px; margin: auto;">
+        <h2 id="modalTitle" style="color: var(--accent-gold); font-family: 'Playfair Display'"></h2>
+        <div id="modalRating" class="rating" style="font-size: 18px;"></div>
+        <div id="modalHours" style="color: var(--accent-blue); font-size: 14px; margin-bottom: 15px; font-weight: 600;"></div>
+        <p id="modalBody" style="line-height: 1.8; color: #ccc; font-size: 16px;"></p>
+        <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('descModal').style.display='none'">CHIUDI</button>
+    </div>
+</div>
+
+<div id="addPlaceModal" class="modal" style="display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="width: 100%; max-width: 400px; background: var(--bg-dark); padding: 25px; border-radius: 16px; border: 1px solid var(--accent-gold); box-shadow: 0 10px 30px rgba(0,0,0,0.8); box-sizing: border-box;">
+        <h3 style="color: var(--accent-gold); font-family: 'Playfair Display'; margin-top: 0; font-size: 22px;">Dove vuoi salvarlo?</h3>
+        <p id="addModalPlaceName" style="color: var(--text-main); font-weight: 600; margin-bottom: 15px; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></p>
+        
+        <select id="addModalSelect" class="search-input" style="width: 100%; margin-bottom: 10px; background: rgba(255,255,255,0.06); color: var(--text-main); font-family: 'Jost';" onchange="handleAddModalChange()">
+        </select>
+        
+        <input type="text" id="addModalNewInput" class="search-input" placeholder="Nome nuovo itinerario..." style="width: 100%; display: none; margin-bottom: 15px; background: rgba(255,255,255,0.06); color: var(--text-main); font-family: 'Jost';">
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn-action" style="flex: 1; border-color: #666; color: #aaa;" onclick="closeAddModal()">ANNULLA</button>
+            <button class="btn-action primary" style="flex: 1;" onclick="confirmAddPlace()">SALVA TAPPA</button>
+        </div>
+    </div>
+</div>
+
+<div id="tripManagerModal" class="modal" style="display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="width: 100%; max-width: 400px; background: var(--bg-dark); padding: 25px; border-radius: 16px; border: 1px solid var(--accent-gold); box-shadow: 0 10px 30px rgba(0,0,0,0.8); box-sizing: border-box;">
+        <h3 style="color: var(--accent-gold); font-family: 'Playfair Display'; margin-top: 0; font-size: 22px;">⚙️ Gestione Itinerario</h3>
+        <p id="tripManagerName" style="color: var(--text-main); font-weight: 700; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></p>
+
+        <div style="margin-bottom: 20px;">
+            <span style="font-size:11px; color:#8a7a62; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Rinomina</span>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="tripRenameInput" class="search-input" placeholder="Nuovo nome..." style="flex:1; margin:0;">
+                <button class="btn-action primary" style="flex:0 0 auto; padding: 12px 14px;" onclick="confirmRenameTrip()">OK</button>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button class="btn-action" style="flex:1; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="confirmDuplicateTrip()">📋 DUPLICA</button>
+            <button class="btn-action" style="flex:1; border-color:#e74c3c; color:#e74c3c;" onclick="confirmDeleteTrip()">🗑️ ELIMINA</button>
+        </div>
+
+        <button class="btn-action" style="width:100%; border-color:#666; color:#aaa; margin-top:5px;" onclick="closeTripManager()">CHIUDI</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    const apiKey = ""; 
+    let userPersonalApiKey = "";
+
+    function safeLocalStorageSave(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            if (e.name === 'QuotaExceededError' || e.code === 22) {
+                showToast("⚠️ Spazio di archiviazione esaurito! Scarica un backup e libera spazio.", "error");
+            } else {
+                console.error("Errore localStorage:", e);
+            }
+        }
+    }
+
+    let dynamicallySelectedModel = "";
+    let database = {};
+    let tripMeta = {};
+    let map = null;
+    let routingProfile = 'driving'; 
+
+    try { 
+        userPersonalApiKey = localStorage.getItem('travel_api_key_v1') || "";
+    } catch(e) { console.error("Memoria API protetta"); }
+
+    try { 
+        database = JSON.parse(localStorage.getItem('travel_db_v18')) || {}; 
+    } catch(e) { 
+        console.error("Database resettato per corruzione dati precedenti.");
+        database = {}; 
+        safeLocalStorageSave('travel_db_v18', JSON.stringify({}));
+    }
+
+    try { 
+        tripMeta = JSON.parse(localStorage.getItem('travel_meta_v1')) || {}; 
+    } catch(e) { 
+        tripMeta = {}; 
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify({}));
+    }
+
+    let currentActiveCity = "", currentActiveTrip = "", currentSuggestions = [], activeMarkers = [], routeLines = []; 
+    let userCoords = null, myPosMarker = null, navPlaces = [], navIndex = 0, gpsWatchId = null, liveUserLine = null; 
+    let currentWeatherForecast = null, lastWeatherTrip = "";
+    
+    let reachedDestinationAlerted = false;
+    let lastRouteUserCoords = null;
+    let lastRouteDest = null;
+    let pendingPlaceToAdd = null;
+    let osrmAbortController = null;
+
+    let wizardData = { days: '2', who: 'Coppia', interests: ['Gastronomia'], budget: 'Medio', date: '' };
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function toggleMapFullscreen() {
+        document.body.classList.toggle('map-fullscreen');
+        setTimeout(() => { if(map) map.invalidateSize(); }, 300);
+    }
+
+    function toggleWiz(category, element, value) {
+        document.querySelectorAll(`#wiz${category.charAt(0).toUpperCase() + category.slice(1)} .pill`).forEach(p => p.classList.remove('selected'));
+        element.classList.add('selected');
+        wizardData[category] = value;
+    }
+
+    function toggleWizMulti(element, value) {
+        element.classList.toggle('selected');
+        if (element.classList.contains('selected')) {
+            if (!wizardData.interests.includes(value)) wizardData.interests.push(value);
+        } else {
+            wizardData.interests = wizardData.interests.filter(i => i !== value);
+        }
+    }
+
+    function setRoutingMode(mode) {
+        routingProfile = mode;
+        const btnDrive = document.getElementById('route-mode-driving');
+        const btnFoot = document.getElementById('route-mode-foot');
+        
+        btnDrive.style.background = mode === 'driving' ? 'var(--accent-gold)' : 'transparent';
+        btnDrive.style.color = mode === 'driving' ? '#000' : 'var(--accent-gold)';
+        
+        btnFoot.style.background = mode === 'foot' ? 'var(--accent-gold)' : 'transparent';
+        btnFoot.style.color = mode === 'foot' ? '#000' : 'var(--accent-gold)';
+        
+        showItineraryMarkers();
+        if (document.body.classList.contains('nav-active')) renderNavStep();
+        showToast("Modalità percorso: " + (mode === 'driving' ? "Auto" : "A piedi"));
+    }
+
+    async function generateWizardItinerary() {
+        const dest = document.getElementById('wizDest').value.trim();
+        if (!dest) { showToast("⚠️ Inserisci una destinazione!", "error"); return; }
+        if (wizardData.interests.length === 0) { showToast("⚠️ Seleziona almeno un interesse!", "error"); return; }
+        wizardData.date = document.getElementById('wizDate').value || '';
+        const dateInfo = wizardData.date ? `- Data di partenza: ${wizardData.date} (segnala festività locali, alta stagione, eventi speciali in quella data)` : '';
+
+        showLoader("L'Intelligenza Artificiale sta creando il tuo viaggio su misura...");
+
+        const prompt = `Agisci da Travel Planner esperto. Genera un itinerario dettagliato per la destinazione: "${dest}".
+Parametri:
+- Durata: ${wizardData.days} giorni
+- Viaggiatori: ${wizardData.who}
+- Interessi: ${wizardData.interests.join(', ')}
+- Budget: ${wizardData.budget}
+${dateInfo}
+Restituisci ESATTAMENTE E SOLO un file JSON valido con questa struttura esatta:
+{
+  "survival": {
+    "currency": "Moneta locale e se accettano carta",
+    "tips": "Regole o abitudini sulle mance in questo luogo",
+    "plugs": "Tipo di prese elettriche",
+    "emergency": "Numeri di emergenza o info sanitarie base"
+  },
+  "places": [
+    {
+      "n": "Nome del luogo o ristorante",
+      "lt": latitudine_numerica,
+      "ln": longitudine_numerica,
+      "day": giorno_numerico_da_1_a_${wizardData.days},
+      "time": "HH:MM",
+      "cost": numero_intero_costo_in_euro,
+      "type": "monument|food|hotel|nature|other",
+      "note": "Breve nota sul perché andarci"
+    }
+  ]
+}
+Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln siano reali.`;
+
+        try {
+            const data = await callAI(prompt);
+            if (!data || !data.places || data.places.length === 0) throw new Error("Dati vuoti");
+
+            let tripName = dest.charAt(0).toUpperCase() + dest.slice(1);
+
+            const isValidCoord = (lt, ln) => {
+                if (isNaN(lt) || isNaN(ln)) return false;
+                if (lt === 0 && ln === 0) return false; // Atlantico
+                if (lt < -90 || lt > 90) return false;
+                if (ln < -180 || ln > 180) return false;
+                return true;
+            };
+
+            const allPlaces = data.places.map(p => ({
+                n: p.n || "Tappa",
+                lt: parseFloat(p.lt),
+                ln: parseFloat(p.ln),
+                day: parseInt(p.day) || 1,
+                time: p.time || "",
+                cost: p.cost || "",
+                type: p.type || "other",
+                note: p.note || "",
+                link: "",
+                photo: ""
+            }));
+
+            const formattedPlaces = allPlaces.filter(p => isValidCoord(p.lt, p.ln));
+            const skipped = allPlaces.length - formattedPlaces.length;
+            if (formattedPlaces.length === 0) throw new Error("Nessuna coordinata valida restituita dall'AI");
+            if (skipped > 0) showToast(`⚠️ ${skipped} tappa/e scartata/e: coordinate non valide.`, "error");
+
+            database[tripName] = formattedPlaces;
+            
+            if (data.survival) {
+                if(!tripMeta[tripName]) tripMeta[tripName] = {};
+                tripMeta[tripName].survival = data.survival;
+            }
+
+            safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+            safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+            currentActiveTrip = tripName;
+            
+            if(formattedPlaces[0] && formattedPlaces[0].lt && map) {
+                map.flyTo([formattedPlaces[0].lt, formattedPlaces[0].ln], 13);
+            }
+
+            hideLoader();
+            showToast("✨ Itinerario creato con successo!");
+            switchTab('itinerario');
+
+        } catch (e) {
+            hideLoader();
+            showToast("⚠️ Errore durante la generazione. Riprova tra poco.", "error");
+            console.error(e);
+        }
+    }
+
+    function saveUserApiKey() {
+        const val = document.getElementById('userApiKeyInput').value.trim();
+        if(val) {
+            if(val.includes("http") || val.includes("family=") || val.includes(" ")) {
+                showToast("⚠️ Formato non valido. Assicurati di copiare SOLO la chiave (es. AIzaSy...)", "error");
+                document.getElementById('userApiKeyInput').value = ""; 
+                return;
+            }
+            localStorage.setItem('travel_api_key_v1', val);
+            userPersonalApiKey = val; dynamicallySelectedModel = ""; showToast("🔑 Chiave API Personale salvata!");
+        } else {
+            localStorage.removeItem('travel_api_key_v1');
+            userPersonalApiKey = ""; dynamicallySelectedModel = ""; showToast("Chiave rimossa. Ritorno al sistema base.");
+        }
+    }
+
+    function getCustomIcon(type, sequenceNumber = null, isNavActive = false, idx = null) {
+        if(typeof L === 'undefined') return null;
+        let emoji = '📍'; let color = isNavActive ? '#e74c3c' : '#4a9ebb'; 
+        if (!isNavActive) {
+            if (type === 'food') { emoji = '🍴'; color = '#e74c3c'; } 
+            else if (type === 'hotel') { emoji = '🏨'; color = '#2ecc71'; } 
+            else if (type === 'monument') { emoji = '🏛️'; color = '#e8b84b'; } 
+            else if (type === 'nature') { emoji = '🌲'; color = '#27ae60'; } 
+        }
+        let badgeHtml = sequenceNumber !== null ? `<div style="position: absolute; top: -8px; right: -8px; background: #12110d; color: #fff; font-size: 11px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #e8b84b; display: flex; align-items: center; justify-content: center; z-index: 10;">${sequenceNumber}</div>` : '';
+        
+        let customClass = `custom-pin ${idx !== null ? 'marker-idx-' + idx : ''}`;
+        
+        return L.divIcon({ 
+            className: customClass, 
+            html: `<div class="marker-inner" style="position: relative; background-color: ${color}; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.5); transition: 0.4s; ${isNavActive ? 'transform: scale(1.3); border: 3px solid #fff;' : ''}">${emoji}${badgeHtml}</div>`, 
+            iconSize: [32, 32], 
+            iconAnchor: [16, 16], 
+            popupAnchor: [0, -16] 
+        });
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container'); const toast = document.createElement('div');
+        toast.className = `toast ${type}`; toast.innerHTML = message; container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function showLoader(text) { document.getElementById('loader-text').innerText = text; document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+
+    async function callAI(prompt) {
+        const activeKey = userPersonalApiKey || apiKey;
+        if (!activeKey) { hideLoader(); showToast("⚠️ API Key mancante! Inseriscila nelle impostazioni in basso.", "error"); throw new Error("API Key mancante"); }
+        let modelToUse = 'gemini-2.5-flash-preview-09-2025';
+        if (userPersonalApiKey) {
+            if (!dynamicallySelectedModel) {
+                try {
+                    const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${activeKey}`);
+                    if (!listRes.ok) throw new Error("Fetch models failed");
+                    const listData = await listRes.json();
+                    const availableModels = listData.models.map(m => m.name.replace('models/', ''));
+                    const preferredModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                    for (let pref of preferredModels) { if (availableModels.includes(pref)) { dynamicallySelectedModel = pref; break; } }
+                    if (!dynamicallySelectedModel) { dynamicallySelectedModel = availableModels.find(m => m.includes('flash')) || 'gemini-1.5-flash'; }
+                } catch (e) { dynamicallySelectedModel = 'gemini-1.5-flash'; }
+            }
+            modelToUse = dynamicallySelectedModel;
+        }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+        let lastErrorMsg = "⚠️ Errore di connessione."; let delay = 1000; 
+        for (let i = 0; i < 3; i++) { 
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({})); const googleMsg = errorData?.error?.message || "Errore sconosciuto";
+                    if (response.status === 400) { lastErrorMsg = `⚠️ Errore Google (400): ${googleMsg.substring(0, 70)}...`; throw new Error("FATAL"); }
+                    if (response.status === 403 || response.status === 401) { lastErrorMsg = "⚠️ Chiave API negata."; throw new Error("FATAL"); }
+                    if (response.status === 429) { lastErrorMsg = "⚠️ Troppe richieste. Attendi qualche istante..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
+                    if (response.status >= 500) { lastErrorMsg = "⚠️ Server Google offline. Riprovo..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
+                    lastErrorMsg = `⚠️ Errore HTTP ${response.status}: ${googleMsg.substring(0,50)}`; throw new Error("FATAL");
+                }
+                const result = await response.json(); let textResult = result.candidates[0].content.parts[0].text;
+                const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) { lastErrorMsg = "⚠️ L'IA ha risposto, ma il formato del testo è errato."; throw new Error("PARSE_ERROR"); }
+                return JSON.parse(jsonMatch[0]);
+            } catch (e) { 
+                if (e.message === "FATAL") { showToast(lastErrorMsg, "error"); throw e; }
+                if (e.message === "PARSE_ERROR" || e.name === "SyntaxError") { showToast("⚠️ Il server Google sta restituendo testo illeggibile.", "error"); throw e; }
+                await new Promise(r => setTimeout(r, delay)); delay *= 2; 
+            }
+        }
+        showToast(lastErrorMsg, "error"); throw new Error(lastErrorMsg);
+    }
+
+    function switchTab(t, event) {
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('view-' + t).classList.add('active');
+        const btn = event ? event.currentTarget : document.getElementById('tab-btn-' + t);
+        if (btn) btn.classList.add('active');
+        setTimeout(() => { if(map) map.invalidateSize(); if(t === 'itinerario') { refreshList(); showItineraryMarkers(); } }, 100);
+    }
+
+    function forceGPS() {
+        if (!navigator.geolocation || !map) return; showLoader("Localizzazione...");
+        navigator.geolocation.getCurrentPosition(p => {
+            userCoords = { lat: p.coords.latitude, lon: p.coords.longitude };
+            if (myPosMarker) map.removeLayer(myPosMarker);
+            myPosMarker = L.circleMarker([userCoords.lat, userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
+            map.flyTo([userCoords.lat, userCoords.lon], 15); document.getElementById('sort-dist-btn').style.display = 'block';
+            hideLoader(); showToast("📍 Posizione trovata!");
+            updateSuggestionsDistance();
+            updateItineraryDistance();
+            if(document.body.classList.contains('nav-active')) updateLiveGPS({coords: {latitude: userCoords.lat, longitude: userCoords.lon}});
+        }, () => { hideLoader(); showToast("⚠️ Errore GPS.", "error"); });
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        if(!lat1 || !lon1 || !lat2 || !lon2) return "--"; const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+    }
+
+    async function fetchRoute(lat1, lon1, lat2, lon2, signal) {
+        try {
+            const res = await fetch(`https://router.project-osrm.org/route/v1/${routingProfile}/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`, { signal });
+            const data = await res.json();
+            if (data.routes && data.routes[0]) {
+                return data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            }
+        } catch (e) {
+            if (e.name === 'AbortError') return null;
+            console.warn("Errore OSRM routing, uso fallback rettilineo:", e);
+        }
+        return null; 
+    }
+
+    function sortByDistance() { if(!userCoords) return; currentSuggestions.forEach(s => s.dist = parseFloat(calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon))); currentSuggestions.sort((a,b) => a.dist - b.dist); renderSuggestions(); }
+    
+    // OTTIMIZZA GIORNATA: ordina rispettando orari fissi + nearest neighbor per le tappe libere + ora corrente
+    function optimizeDayOrder(city, day) {
+        let arr = database[city];
+        if (!arr) return;
+
+        let dayItems = arr.filter(i => (i.day || 1) == day);
+        if (dayItems.length <= 1) { showToast("ℹ️ Servono almeno 2 tappe per ottimizzare.", "error"); return; }
+
+        // Ora corrente come stringa "HH:MM" per confronto con gli orari delle tappe
+        const now = new Date();
+        const nowTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+        // Punto di partenza: GPS se disponibile, altrimenti prima tappa futura ancorata, altrimenti prima tappa
+        let startLat, startLon;
+        if (userCoords) {
+            startLat = userCoords.lat;
+            startLon = userCoords.lon;
+        } else {
+            const firstFutureAnchored = dayItems.find(i => i.time && i.time >= nowTime);
+            const fallback = firstFutureAnchored || dayItems[0];
+            startLat = fallback.lt;
+            startLon = fallback.ln;
+        }
+
+        // Separa in tre gruppi:
+        // - passate: ancorate con orario già trascorso → vanno in fondo invariate
+        // - future: ancorate con orario ancora da venire → posizione fissa nella sequenza
+        // - libere: senza orario → ottimizzate con nearest neighbor tra le future
+        const past = dayItems.filter(i => i.time && i.time < nowTime).sort((a, b) => a.time.localeCompare(b.time));
+        const future = dayItems.filter(i => i.time && i.time >= nowTime).sort((a, b) => a.time.localeCompare(b.time));
+        let free = dayItems.filter(i => !i.time);
+
+        // Costruisce la sequenza: start virtuale → future ancorate con libere negli slot → passate in coda
+        const anchors = [{ lt: startLat, ln: startLon, _virtual: true }, ...future];
+        let result = [];
+
+        for (let a = 0; a < anchors.length; a++) {
+            const from = anchors[a];
+            const to = anchors[a + 1];
+
+            if (!from._virtual) result.push(from);
+
+            if (free.length === 0) continue;
+
+            // Greedy nearest neighbor con bonus direzione verso prossima ancorata (peso 30%)
+            let slot = [];
+            let remaining = [...free];
+            let curLat = from.lt, curLon = from.ln;
+
+            const slotsLeft = anchors.length - a;
+            const freeInSlot = a === anchors.length - 1
+                ? remaining.length
+                : Math.round(remaining.length / slotsLeft);
+
+            for (let k = 0; k < freeInSlot && remaining.length > 0; k++) {
+                let bestIdx = 0;
+                let bestScore = Infinity;
+                remaining.forEach((item, idx) => {
+                    const dFrom = parseFloat(calculateDistance(curLat, curLon, item.lt, item.ln)) || 9999;
+                    const dTo = to ? (parseFloat(calculateDistance(item.lt, item.ln, to.lt, to.ln)) || 9999) : 0;
+                    const score = dFrom + dTo * 0.3;
+                    if (score < bestScore) { bestScore = score; bestIdx = idx; }
+                });
+                const chosen = remaining.splice(bestIdx, 1)[0];
+                slot.push(chosen);
+                curLat = chosen.lt;
+                curLon = chosen.ln;
+            }
+            result = result.concat(slot);
+            free = free.filter(f => !slot.includes(f));
+        }
+
+        // Tappe passate in fondo, nell'ordine originale
+        result = [...result, ...past];
+
+        // Aggiorna il database mantenendo gli altri giorni intatti
+        const otherDays = arr.filter(i => (i.day || 1) != day);
+        result.forEach(item => item.day = parseInt(day));
+        database[city] = [...otherDays, ...result].sort((a, b) => (a.day || 1) - (b.day || 1));
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+        refreshList();
+        showItineraryMarkers();
+
+        const gpsNote = userCoords ? "dalla tua posizione GPS" : "dalla prima tappa futura";
+        const pastNote = past.length > 0 ? `, ${past.length} tappa/e già passate messe in fondo` : '';
+        showToast(`✅ Giorno ${day} ottimizzato (ore ${nowTime}): libere ordinate ${gpsNote}${pastNote}.`);
+    }
+
+    function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
+    function openDirections(lat, lon) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, "_blank"); }
+
+    function scrollToCard(idx) {
+        let card = document.querySelector(`.card[data-idx="${idx}"]`);
+        if (card) {
+            if (!document.getElementById('view-itinerario').classList.contains('active')) {
+                switchTab('itinerario');
+                setTimeout(() => performScroll(card), 200);
+            } else {
+                performScroll(card);
+            }
+        }
+    }
+
+    function performScroll(card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('highlight-card');
+        setTimeout(() => card.classList.remove('highlight-card'), 2000);
+    }
+
+    function panToMarker(idx, lat, lon) {
+        if(!map) return;
+        
+        let mapContainer = document.getElementById('map-container');
+        if (mapContainer.getBoundingClientRect().top < 0 || mapContainer.getBoundingClientRect().bottom > window.innerHeight) {
+            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        map.flyTo([lat, lon], 16, { animate: true, duration: 1.5 });
+        
+        setTimeout(() => {
+            let markerIconInner = document.querySelector(`.marker-idx-${idx} .marker-inner`);
+            if (markerIconInner) {
+                let parentPin = markerIconInner.closest('.custom-pin');
+                if(parentPin) parentPin.style.zIndex = 1000;
+                
+                markerIconInner.classList.add('highlight-marker-inner');
+                setTimeout(() => {
+                    markerIconInner.classList.remove('highlight-marker-inner');
+                    if(parentPin) parentPin.style.zIndex = "";
+                }, 2000);
+            }
+        }, 300);
+    }
+
+    async function searchCity() { const v = document.getElementById('cityInput').value; if(!v || !map) return; currentActiveCity = v; try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(v)}&limit=1`); const data = await res.json(); if(data[0]) map.flyTo([data[0].lat, data[0].lon], 14); } catch(e) { showToast("⚠️ Errore ricerca.", "error"); } }
+    
+    // NUOVO ASSISTENTE CONVERSAZIONALE (Niente più pin sulla mappa)
+    async function askAI() { 
+        const q = document.getElementById('aiQuery').value; 
+        if(!q) return; 
+        
+        showLoader("L'IA sta elaborando..."); 
+        
+        try { 
+            const prompt = `L'utente ti fa una domanda o chiede un consiglio turistico (es. tradizioni, piatti tipici, storia, ecc): "${q}".
+Rispondi in italiano in modo discorsivo, amichevole, utile e dettagliato. Sei una guida turistica esperta.
+Restituisci ESATTAMENTE E SOLO un file JSON valido con questa struttura esatta:
+{"title": "Un titolo breve e accattivante della tua risposta", "text": "Il testo completo della tua risposta. Usa pure paragrafi e bullet points se necessario."}`;
+            
+            const data = await callAI(prompt); 
+            if(!data || !data.text) throw new Error("Dati vuoti dall'IA");
+
+            document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖";
+            document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare la risposta.";
+            document.getElementById('modalHours').innerText = "Assistente Virtuale Turistico";
+            document.getElementById('descModal').style.display = 'block';
+
+        } catch(e) { 
+            showToast("⚠️ Errore IA durante la conversazione.", "error"); 
+        } 
+        hideLoader(); 
+    }
+
+    async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const data = await callAI(`Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}]. JSON: {"places": [{"title": "Nome", "lat": numero, "lon": numero, "desc": "Descrizione", "rating": 4.8, "type": "food|hotel|monument|nature|other"}]}`); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
+    async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}]. Rispondi JSON: {"places": [{"title": "Nome", "lat": numero, "lon": numero, "desc": "Descrizione", "rating": 4.5}]}`); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
+    async function loadWiki(lat, lon, t = 'monument') { try { const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); const d = await res.json(); if(d.query?.geosearch) { for(let p of d.query.geosearch) { const sRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); const s = await sRes.json(); currentSuggestions.push({ title: p.title, lat: p.lat, lon: p.lon, desc: s.extract || "Monumento", type: t }); } } } catch(e) { console.error(e); } }
+    
+    function renderSuggestions() { 
+        const l = document.getElementById('sug-list'); l.innerHTML = ""; 
+        if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; }
+        currentSuggestions.forEach((s, idx) => { 
+            if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); }
+            const distVal = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon) : null;
+            const distBadge = distVal !== null
+                ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">
+                       📍 <span class="live-dist-${idx}">${distVal} km da te</span>
+                   </div>`
+                : '';
+            l.innerHTML += `<div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>
+                ${distBadge}
+                <div class="rating">${s.stars || "★★★★☆"}</div>
+                <p class="desc-preview">${escapeHtml(s.desc)}</p>
+                <div class="btn-row">
+                    <button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button>
+                    <button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button>
+                    <button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>
+                </div>
+            </div>`; 
+        }); 
+    }
+
+    function updateSuggestionsDistance() {
+        if (!userCoords || currentSuggestions.length === 0) return;
+        currentSuggestions.forEach((s, idx) => {
+            const el = document.querySelector(`.live-dist-${idx}`);
+            if (el) {
+                const d = calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon);
+                el.innerText = `${d} km da te`;
+            }
+        });
+    }
+
+    function updateItineraryDistance() {
+        if (!userCoords || !currentActiveTrip || !database[currentActiveTrip]) return;
+        database[currentActiveTrip].forEach((item, idx) => {
+            const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`);
+            const d = calculateDistance(userCoords.lat, userCoords.lon, item.lt, item.ln);
+            badges.forEach(badge => { badge.innerHTML = `📍${d} km`; });
+        });
+    }
+    
+    async function openFullDesc(idx) { 
+        const s = currentSuggestions[idx]; 
+        document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; 
+        showLoader("Recupero Info...");
+        try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.title}". Trova/stima orari. JSON: {"info": "...", "hours": "..."}`); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } 
+        catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader();
+    }
+
+    async function openSavedDesc(city, idx) {
+        const s = database[city][idx];
+        if (!s) return;
+        document.getElementById('modalTitle').innerText = s.n; 
+        document.getElementById('modalBody').innerText = "Ricerca info in corso..."; 
+        document.getElementById('modalHours').innerText = "🕒 ..."; 
+        document.getElementById('descModal').style.display = 'block'; 
+        showLoader("Recupero Info...");
+        try { 
+            const data = await callAI(`Descrivi brevemente questo luogo: "${s.n}". Trova/stima orari. JSON: {"info": "...", "hours": "..."}`); 
+            document.getElementById('modalBody').innerText = data.info; 
+            document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; 
+        } catch(e) { 
+            document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; 
+            document.getElementById('modalHours').innerText = ""; 
+        } 
+        hideLoader();
+    }
+
+    function openAddModal(placeObj) {
+        pendingPlaceToAdd = placeObj;
+        document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n;
+        
+        const select = document.getElementById('addModalSelect');
+        const trips = Object.keys(database);
+        
+        let optionsHtml = trips.map(t => `<option value="${t}">${t}</option>`).join('');
+        optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`;
+        select.innerHTML = optionsHtml;
+        
+        if (currentActiveTrip && trips.includes(currentActiveTrip)) {
+            select.value = currentActiveTrip;
+        } else if (trips.length === 0) {
+            select.value = "_new_";
+        }
+        
+        handleAddModalChange();
+        document.getElementById('addPlaceModal').style.display = 'flex';
+    }
+
+    function handleAddModalChange() {
+        const val = document.getElementById('addModalSelect').value;
+        const inputField = document.getElementById('addModalNewInput');
+        if (val === '_new_') {
+            inputField.style.display = 'block';
+            inputField.value = '';
+            inputField.focus();
+        } else {
+            inputField.style.display = 'none';
+        }
+    }
+
+    function closeAddModal() {
+        document.getElementById('addPlaceModal').style.display = 'none';
+        pendingPlaceToAdd = null;
+    }
+
+    function openTripManager() {
+        if (!currentActiveTrip) return;
+        document.getElementById('tripManagerName').innerText = '📁 ' + currentActiveTrip;
+        document.getElementById('tripRenameInput').value = currentActiveTrip;
+        document.getElementById('tripManagerModal').style.display = 'flex';
+    }
+
+    function closeTripManager() {
+        document.getElementById('tripManagerModal').style.display = 'none';
+    }
+
+    function confirmRenameTrip() {
+        const newName = document.getElementById('tripRenameInput').value.trim();
+        if (!newName) { showToast("⚠️ Inserisci un nome valido.", "error"); return; }
+        if (newName === currentActiveTrip) { closeTripManager(); return; }
+        if (database[newName]) { showToast("⚠️ Esiste già un itinerario con questo nome.", "error"); return; }
+        database[newName] = database[currentActiveTrip];
+        delete database[currentActiveTrip];
+        if (tripMeta[currentActiveTrip]) {
+            tripMeta[newName] = tripMeta[currentActiveTrip];
+            delete tripMeta[currentActiveTrip];
+        }
+        currentActiveTrip = newName;
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+        closeTripManager();
+        refreshList();
+        showToast(`✅ Rinominato in "${newName}"`);
+    }
+
+    function confirmDuplicateTrip() {
+        if (!currentActiveTrip) return;
+        let newName = currentActiveTrip + ' (copia)';
+        let counter = 2;
+        while (database[newName]) { newName = currentActiveTrip + ` (copia ${counter++})`; }
+        database[newName] = JSON.parse(JSON.stringify(database[currentActiveTrip]));
+        if (tripMeta[currentActiveTrip]) tripMeta[newName] = JSON.parse(JSON.stringify(tripMeta[currentActiveTrip]));
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+        currentActiveTrip = newName;
+        closeTripManager();
+        refreshList();
+        showToast(`📋 Duplicato come "${newName}"`);
+    }
+
+    function confirmDeleteTrip() {
+        if (!currentActiveTrip) return;
+        if (!confirm(`Eliminare l'itinerario "${currentActiveTrip}" e tutte le sue tappe? L'operazione non è reversibile.`)) return;
+        delete database[currentActiveTrip];
+        delete tripMeta[currentActiveTrip];
+        currentActiveTrip = '';
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+        closeTripManager();
+        refreshList();
+        showToast('🗑️ Itinerario eliminato.');
+    }
+
+    function confirmAddPlace() {
+        if (!pendingPlaceToAdd) return;
+        
+        let targetTrip = document.getElementById('addModalSelect').value;
+        if (targetTrip === '_new_') {
+            targetTrip = document.getElementById('addModalNewInput').value.trim();
+            if (!targetTrip) { showToast("⚠️ Inserisci un nome per il nuovo itinerario", "error"); return; }
+        }
+        
+        if (!database[targetTrip]) database[targetTrip] = [];
+        
+        let targetDay = 1;
+        if (database[targetTrip].length > 0) {
+            targetDay = Math.max(...database[targetTrip].map(i => i.day || 1));
+        }
+        pendingPlaceToAdd.day = targetDay;
+
+        database[targetTrip].push(pendingPlaceToAdd);
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+        currentActiveTrip = targetTrip;
+        
+        refreshList();
+        closeAddModal();
+        showToast("✅ Tappa salvata in: " + targetTrip);
+    }
+    
+    function savePlace(idx) { 
+        const s = currentSuggestions[idx]; 
+        openAddModal({ n: s.title, lt: s.lat, ln: s.lon, note: "", time: "", link: "", photo: "", cost: "", type: s.type || 'other' });
+    }
+
+    async function searchAndSaveManual() { 
+        const q = document.getElementById('mSearch').value; if(!q) return; 
+        const customName = document.getElementById('mName').value.trim(); 
+        showLoader("Ricerca indirizzo...");
+        
+        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=1`;
+        if (map) {
+            const bounds = map.getBounds();
+            url += `&viewbox=${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}&bounded=0`;
+        }
+
+        try {
+            let res = await fetch(url); 
+            let data = await res.json(); 
+            
+            let lat = null, lon = null;
+            let placeName = customName || q; 
+            let foundExactHouseNumber = false;
+            let foundRealName = false;
+
+            if(data[0]) { 
+                lat = parseFloat(data[0].lat);
+                lon = parseFloat(data[0].lon);
+                
+                if (data[0].name && !/^\d+[a-zA-Z]?$/.test(data[0].name)) {
+                    let isJustAddress = false;
+                    if (data[0].address) {
+                        if (data[0].name === data[0].address.road) isJustAddress = true;
+                        if (data[0].name === data[0].address.city || data[0].name === data[0].address.town) isJustAddress = true;
+                    }
+                    if (!isJustAddress) {
+                        placeName = data[0].name; 
+                        foundRealName = true;
+                    }
+                }
+                
+                if (!foundRealName) {
+                    if (!customName) { 
+                        if (data[0].address && data[0].address.road) {
+                            placeName = data[0].address.road + (data[0].address.house_number ? " " + data[0].address.house_number : "");
+                        } else if (data[0].display_name) {
+                            placeName = data[0].display_name.split(',')[0];
+                        }
+                    } else { 
+                        placeName = customName;
+                    }
+                }
+
+                if (data[0].address && data[0].address.house_number) foundExactHouseNumber = true;
+            }
+
+            if (!foundExactHouseNumber) {
+                try {
+                    let photUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=1`;
+                    if(map) { const c = map.getCenter(); photUrl += `&lat=${c.lat}&lon=${c.lng}`; } 
+                    
+                    let photRes = await fetch(photUrl);
+                    let photData = await photRes.json();
+                    
+                    if (photData.features && photData.features.length > 0) {
+                        let f = photData.features[0];
+                        lat = parseFloat(f.geometry.coordinates[1]);
+                        lon = parseFloat(f.geometry.coordinates[0]);
+                        let p = f.properties;
+                        
+                        let localFoundRealName = false;
+                        if (p.name) {
+                            let isJustAddressPhot = false;
+                            if (p.name === p.street || p.name === p.city || p.name === p.town) isJustAddressPhot = true;
+                            
+                            if (!isJustAddressPhot) {
+                                placeName = p.name;
+                                localFoundRealName = true;
+                                foundRealName = true;
+                            }
+                        }
+                        
+                        if (!localFoundRealName && !foundRealName) {
+                            if (!customName) { 
+                                if (p.street) {
+                                    placeName = p.street + (p.housenumber ? " " + p.housenumber : "");
+                                }
+                            } else { 
+                                placeName = customName;
+                            }
+                        }
+                        
+                        if(p.housenumber) foundExactHouseNumber = true;
+                    }
+                } catch(err) {
+                    console.log("Errore motore secondario:", err);
+                }
+            }
+
+            if (lat !== null && lon !== null) { 
+                openAddModal({ n: placeName, lt: lat, ln: lon, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); 
+                toggleManual(); 
+                
+                document.getElementById('mSearch').value = '';
+                document.getElementById('mName').value = '';
+                
+                if (!foundExactHouseNumber && q.match(/\d+/)) {
+                    setTimeout(() => showToast("⚠️ Civico esatto assente nel database. Ti ho posizionato nella via.", "error"), 800);
+                }
+            } else {
+                showToast("⚠️ Indirizzo non trovato. Usa il tasto SALVA POSIZIONE MAPPA inquadrandolo a mano.", "error");
+            }
+        } catch(e) {
+            showToast("⚠️ Errore di connessione.", "error");
+        }
+        
+        hideLoader();
+    }
+    
+    function saveManual() { 
+        if(!map) return;
+        const c = map.getCenter(); 
+        openAddModal({ n: document.getElementById('mName').value || "Punto Custom", lt: c.lat, ln: c.lng, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); 
+        toggleManual(); 
+    }
+
+    function changeActiveTrip() { currentActiveTrip = document.getElementById('tripSelector').value; refreshList(); showItineraryMarkers(); }
+
+    function compressAndSavePhoto(event, city, idx) {
+        const file = event.target.files[0]; if (!file) return;
+        showLoader("Compressione foto...");
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX = 400; // ridotto da 600 a 400px
+                let w = img.width, h = img.height;
+                if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+                else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+                // Compressione adattiva: parte da qualità 0.7, scende fino a 0.3 se necessario
+                let quality = 0.7;
+                let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                while (dataUrl.length > 500000 && quality > 0.3) {
+                    quality -= 0.1;
+                    dataUrl = canvas.toDataURL('image/jpeg', quality);
+                }
+
+                if (dataUrl.length > 600000) {
+                    hideLoader();
+                    showToast("⚠️ Foto troppo grande anche dopo compressione. Usa un'immagine più piccola.", "error");
+                    return;
+                }
+
+                const sizeKb = Math.round(dataUrl.length * 0.75 / 1024);
+                database[city][idx].photo = dataUrl;
+                safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+                refreshList(); hideLoader();
+                showToast(`📸 Salvata! (${sizeKb} KB, qualità ${Math.round(quality*100)}%)`);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+    function removePhoto(city, idx) { delete database[city][idx].photo; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showToast("🗑️ Rimossa."); }
+
+    function findIndoorAlternatives() {
+        document.getElementById('aiQuery').value = `Cosa fare al coperto a ${currentActiveTrip} (musei, mostre, attività indoor)?`;
+        switchTab('scopri');
+        askAI();
+    }
+
+    async function updateWeatherWidget() {
+        const wBox = document.getElementById('weatherWidget');
+        if(!currentActiveTrip || !database[currentActiveTrip] || database[currentActiveTrip].length === 0) { wBox.style.display = 'none'; return; }
+        
+        if (currentActiveTrip === lastWeatherTrip && wBox.innerHTML !== "") { 
+            wBox.style.display = 'flex'; 
+            return; 
+        }
+        
+        const firstPlace = database[currentActiveTrip][0]; if(!firstPlace || !firstPlace.lt) return;
+        
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${firstPlace.lt}&longitude=${firstPlace.ln}&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`);
+            const data = await res.json();
+            currentWeatherForecast = data; lastWeatherTrip = currentActiveTrip;
+
+            const today = data.daily;
+            const sunrise = today.sunrise[0].split('T')[1]; const sunset = today.sunset[0].split('T')[1];
+            const maxT = today.temperature_2m_max[0]; const minT = today.temperature_2m_min[0];
+            const code = today.weathercode[0];
+
+            let emoji = '☀️';
+            if([1,2,3].includes(code)) emoji = '⛅'; else if([45,48].includes(code)) emoji = '🌫️'; else if([51,53,55,61,63,65,80,81,82].includes(code)) emoji = '🌧️'; else if([71,73,75,85,86].includes(code)) emoji = '❄️'; else if([95,96,99].includes(code)) emoji = '⛈️';
+
+            let rainAlertHtml = '';
+            if([51,53,55,61,63,65,80,81,82,95,96,99].includes(code)) {
+                rainAlertHtml = `<div style="margin-top: 8px; background: rgba(74, 158, 187, 0.2); border-radius: 6px; padding: 10px; font-size: 12px; text-align: center; width: 100%; box-sizing: border-box; border: 1px solid rgba(74, 158, 187, 0.5);">
+                    🌧️ <b>Prevista pioggia!</b> Vuoi un'alternativa?
+                    <button onclick="findIndoorAlternatives()" style="background: var(--accent-blue); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; width: 100%;">🔍 Cerca attività al coperto</button>
+                </div>`;
+            }
+
+            wBox.innerHTML = `
+                <div class="weather-row">
+                    <div class="weather-col"><span class="weather-label">Oggi</span><span class="weather-val">${emoji} ${minT}° / ${maxT}°</span></div>
+                    <div class="weather-col"><span class="weather-label">Alba</span><span class="weather-val" style="color:var(--accent-gold)">🌅 ${sunrise}</span></div>
+                    <div class="weather-col"><span class="weather-label">Tramonto</span><span class="weather-val" style="color:#e74c3c">🌇 ${sunset}</span></div>
+                </div>
+                ${rainAlertHtml}
+            `;
+            wBox.style.display = 'flex';
+        } catch(e) { wBox.style.display = 'none'; }
+    }
+
+    async function analyzeWeatherAI() {
+        if(!currentActiveTrip || !currentWeatherForecast) { showToast("Meteo non ancora disponibile. Aggiungi tappe.", "error"); return; }
+        showLoader("Analisi Meteo e Itinerario...");
+        try {
+            let places = database[currentActiveTrip].map(p => ({ n: p.n, day: p.day||1, type: p.type||"other" }));
+            let forecast = currentWeatherForecast.daily.weathercode.map((c, i) => ({ day: i+1, code: c })); 
+            const prompt = `Itinerario: ${JSON.stringify(places)}. Previsioni semplificate (Giorno 1 è oggi): ${JSON.stringify(forecast)}. Agisci da meteorologo/tour operator esperto. Dai un consiglio breve e amichevole in italiano. Formato JSON: {"advice": "..."}`;
+            const data = await callAI(prompt);
+            document.getElementById('modalTitle').innerText = "Consigli Meteo dell'IA 🌤️";
+            document.getElementById('modalBody').innerText = data.advice;
+            document.getElementById('modalHours').innerText = "Valutazione intelligente dei tuoi giorni...";
+            document.getElementById('descModal').style.display = 'block';
+        } catch(e) { }
+        hideLoader();
+    }
+    
+    function updateTravelMeta(field, value) {
+        if(!currentActiveTrip) return;
+        if(!tripMeta[currentActiveTrip]) tripMeta[currentActiveTrip] = {};
+        tripMeta[currentActiveTrip][field] = parseFloat(value) || 0;
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+        refreshList();
+    }
+
+    function refreshList() {
+        try {
+            const b = document.getElementById('myList'); const actionsBox = document.getElementById('itinerary-actions');
+            const selector = document.getElementById('tripSelector'); const statsBox = document.getElementById('tripStats');
+            const aiActions = document.getElementById('ai-actions-box'); const navBtn = document.getElementById('btn-start-nav'); b.innerHTML = "";
+            const routingToggleBox = document.getElementById('routing-toggle-box'); const survivalWidget = document.getElementById('survivalWidget');
+            
+            if(document.getElementById('userApiKeyInput')) document.getElementById('userApiKeyInput').value = userPersonalApiKey;
+
+            let availableCities = Object.keys(database).filter(c => database[c] && database[c].length > 0);
+            if (availableCities.length === 0) {
+                selector.style.display = statsBox.style.display = actionsBox.style.display = aiActions.style.display = navBtn.style.display = 'none';
+                routingToggleBox.style.display = survivalWidget.style.display = 'none';
+                document.getElementById('weatherWidget').style.display = 'none';
+                document.getElementById('tripManageBtn').style.display = 'none';
+                b.innerHTML = `<div class="empty-state">Nessuna tappa salvata. Clicca su "🪄 AI Wizard" o "Esplora" per iniziare.</div>`; return;
+            }
+            if (!currentActiveTrip || !availableCities.includes(currentActiveTrip)) currentActiveTrip = availableCities[0];
+            selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${c}" ${c === currentActiveTrip ? 'selected' : ''}>${c.toUpperCase()}</option>`).join("");
+            document.getElementById('tripManageBtn').style.display = 'block';
+            
+            updateWeatherWidget(); 
+
+            if (tripMeta[currentActiveTrip] && tripMeta[currentActiveTrip].survival) {
+                let s = tripMeta[currentActiveTrip].survival;
+                survivalWidget.innerHTML = `<div style="background: rgba(232, 184, 75, 0.08); border: 1px dashed var(--accent-gold); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px;">
+                    <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">🎒 Kit di Sopravvivenza Locale</div>
+                    <div style="margin-bottom: 4px;">💸 <b>Valuta:</b> <span style="color:#ccc">${s.currency || '--'}</span></div>
+                    <div style="margin-bottom: 4px;">🤝 <b>Mance:</b> <span style="color:#ccc">${s.tips || '--'}</span></div>
+                    <div style="margin-bottom: 4px;">🔌 <b>Prese:</b> <span style="color:#ccc">${s.plugs || '--'}</span></div>
+                    <div>🆘 <b>Info Utili:</b> <span style="color:#ccc">${s.emergency || '--'}</span></div>
+                </div>`;
+                survivalWidget.style.display = 'block';
+            } else {
+                survivalWidget.style.display = 'none';
+            }
+            
+            let currentTripItems = database[currentActiveTrip] || []; let days = {}; let totalCost = 0; let paidCost = 0;
+            
+            currentTripItems.forEach((item, idx) => { 
+                const d = item.day || 1; if(!days[d]) days[d] = []; days[d].push({...item, idx}); 
+                if(item.cost && !isNaN(item.cost)) {
+                    totalCost += parseFloat(item.cost);
+                    if (item.paid) paidCost += parseFloat(item.cost);
+                }
+            });
+
+            let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
+            let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
+            totalCost += tCostNum + hCostNum;
+            const remainingCost = totalCost - paidCost;
+            
+            statsBox.style.display = 'block'; 
+            statsBox.innerHTML = `📍 <b>${currentTripItems.length}</b> tappe <span style="margin:0 5px; opacity:0.3">|</span> 📅 <b>${Object.keys(days).length}</b> giorni
+            <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 13px; color: var(--accent-blue);">✈️ Spese di Viaggio:</span>
+                <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${tCostNum||''}" onchange="updateTravelMeta('travelCost', this.value)">
+            </div>
+            <div style="margin-top: 5px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 13px; color: var(--accent-green);">🏨 Spese Hotel:</span>
+                <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${hCostNum||''}" onchange="updateTravelMeta('hotelCost', this.value)">
+            </div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">
+                💰 Totale stimato: <b style="color:var(--accent-green); font-size:16px;">${totalCost.toFixed(2)} €</b>
+            </div>
+            <div style="margin-top:5px; display:flex; gap:10px; font-size:13px;">
+                <span>✅ Pagato: <b style="color:#2ecc71;">${paidCost.toFixed(2)} €</b></span>
+                <span>⏳ Da pagare: <b style="color:#e8b84b;">${remainingCost.toFixed(2)} €</b></span>
+            </div>`;
+
+            actionsBox.style.display = aiActions.style.display = navBtn.style.display = routingToggleBox.style.display = 'flex';
+            
+            Object.keys(days).sort((a,b) => a-b).forEach(d => {
+                // Calcola ore stimate: differenza tra prima e ultima tappa con orario
+                const timedInDay = days[d].filter(p => p.time).sort((a,b) => a.time.localeCompare(b.time));
+                let dayHoursSummary = '';
+                if (timedInDay.length >= 2) {
+                    const t1 = new Date(`1970-01-01T${timedInDay[0].time}:00`);
+                    const t2 = new Date(`1970-01-01T${timedInDay[timedInDay.length-1].time}:00`);
+                    const diffH = ((t2 - t1) / 3600000).toFixed(1);
+                    dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe · ~${diffH}h</span>`;
+                } else {
+                    dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe</span>`;
+                }
+
+                b.innerHTML += `<div class="day-label">
+                    <span>GIORNO ${d}${dayHoursSummary}</span>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-left:auto;">
+                        <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder('${currentActiveTrip.replace(/'/g, "\\'")}', ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA GIORNATA</button>
+                        <span style="font-size:8px; color:#8a7a62;">GPS + ora corrente</span>
+                    </div>
+                </div><div id="day-cont-${d}" class="day-container"></div>`;
+                
+                const container = document.getElementById(`day-cont-${d}`);
+                
+                let dayWarnings = [];
+                if(days[d].length > 5) dayWarnings.push(`Giornata fitta (${days[d].length} tappe).`);
+                
+                let timedPlaces = days[d].filter(p => p.time).sort((a,b) => a.time.localeCompare(b.time));
+                for(let i=0; i<timedPlaces.length-1; i++) {
+                    if(!timedPlaces[i].time || !timedPlaces[i+1].time) continue;
+                    let t1 = new Date(`1970-01-01T${timedPlaces[i].time}:00`);
+                    let t2 = new Date(`1970-01-01T${timedPlaces[i+1].time}:00`);
+                    let diffMins = (t2 - t1) / 60000;
+                    let dist = calculateDistance(timedPlaces[i].lt, timedPlaces[i].ln, timedPlaces[i+1].lt, timedPlaces[i+1].ln);
+                    if (diffMins > 0 && diffMins < (dist * 4)) { 
+                        dayWarnings.push(`Tempi stretti tra "${timedPlaces[i].n}" e "${timedPlaces[i+1].n}".`);
+                    }
+                }
+                
+                if(dayWarnings.length > 0) {
+                     container.innerHTML += `<div style="background: rgba(231, 76, 60, 0.15); border-left: 3px solid #e74c3c; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 12px; color: #ff8c8c; line-height: 1.4;">⚠️ <b>Avviso Fattibilità:</b> ${dayWarnings.join(" ")}</div>`;
+                }
+
+                days[d].forEach((i, vIdx) => {
+                    const sCity = currentActiveTrip.replace(/'/g, "\\'");
+                    
+                    let photoHtml = i.photo ? `<div class="photo-preview-container active"><img src="${i.photo}" class="photo-preview" onclick="window.open('${i.photo}', '_blank')"><button class="remove-photo-btn" onclick="removePhoto('${sCity}', ${i.idx})">×</button></div>` : '';
+                    let timeBadge = i.time ? `<span class="badge-time">🕒 ${i.time}</span>` : '';
+                    let costBadge = i.cost ? `<span class="badge-cost" style="${i.paid ? 'opacity:0.5; text-decoration:line-through;' : ''}">💰 ${i.cost} €</span>` : '';
+                    let paidBadge = i.paid ? `<span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; margin-left:4px;">✅ PAGATO</span>` : '';
+                    let notePreview = (i.note && i.note.trim()) ? `<div style="font-size:12px; color:#a59781; margin:6px 0 0 0; padding:6px 8px; background:rgba(255,255,255,0.04); border-left:2px solid var(--border); border-radius:4px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📝 ${escapeHtml(i.note.trim())}</div>` : '';
+                    const gpsDist = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, i.lt, i.ln) : null;
+                    const gpsDistBadge = gpsDist !== null ? `<span class="itinerary-dist-badge" data-idx="${i.idx}" style="display:inline-flex; align-items:center; gap:3px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:6px; padding:2px 7px; font-size:10px; color:var(--accent-blue); font-weight:700; margin-left:6px;">📍${gpsDist} km</span>` : '';
+
+                    container.innerHTML += `<div class="card" data-idx="${i.idx}" style="${i.paid ? 'opacity:0.75;' : ''}">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center; cursor: pointer; flex: 1;" onclick="panToMarker(${i.idx}, ${i.lt}, ${i.ln})" title="Mostra sulla mappa">
+                                <span class="drag-handle" title="Trascina per spostare" onclick="event.stopPropagation()">☰</span>
+                                <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${costBadge}${paidBadge}${gpsDistBadge}</b>
+                            </div>
+                            <div style="display:flex; gap:5px; position:relative; z-index: 5;">
+                                <button onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;">▲</button>
+                                <button onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;">▼</button>
+                                <button onclick="removeItem('${sCity}', ${i.idx})" style="color:red; background:none; border:none; font-size:20px;">×</button>
+                            </div>
+                        </div>
+                        ${notePreview}
+                        <div class="day-ctrl" style="margin-top:8px">
+                            <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)-1})">-</button>
+                            <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)+1})">+</button>
+                        </div>
+                        
+                        <div class="btn-row" style="margin-top: 10px; margin-bottom: 10px;">
+                            <button class="btn-action" onclick="openSavedDesc('${sCity}', ${i.idx})">DETTAGLI</button>
+                            <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
+                        </div>
+                        
+                        <div class="wallet-box">
+                            <div class="wallet-row">
+                                <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario">
+                                <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost('${sCity}', ${i.idx}, this.value)" title="Costo stimato in Euro">
+                                <button class="photo-btn" onclick="document.getElementById('cam-${i.idx}').click()" title="Allega Foto">📷</button>
+                                <input type="file" id="cam-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
+                            </div>
+                            <div class="wallet-row" style="align-items:center; gap:10px;">
+                                <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink('${sCity}', ${i.idx}, this.value)" style="flex:1;">
+                                <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : '#8a7a62'}; user-select:none;" title="Segna come pagato">
+                                    <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid('${sCity}', ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;">
+                                    Pagato
+                                </label>
+                            </div>
+                        </div>
+                        
+                        ${i.link ? `<a href="${escapeHtml(i.link)}" target="_blank" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
+                        ${photoHtml}
+                        <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote('${sCity}', ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
+                    </div>`;
+                });
+            });
+
+            if (typeof Sortable !== 'undefined') {
+                document.querySelectorAll('.day-container').forEach(container => {
+                    new Sortable(container, {
+                        handle: '.drag-handle',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        onEnd: function () {
+                            let newOrder = [];
+                            let cTrip = document.getElementById('tripSelector').value;
+                            
+                            document.querySelectorAll('.day-container').forEach(cont => {
+                                let dayNum = parseInt(cont.id.split('-')[2]);
+                                cont.querySelectorAll('.card').forEach(card => {
+                                    let idx = parseInt(card.getAttribute('data-idx'));
+                                    let item = database[cTrip][idx];
+                                    if(item) {
+                                        item.day = dayNum; 
+                                        newOrder.push(item);
+                                    }
+                                });
+                            });
+                            
+                            database[cTrip].forEach(item => {
+                                if(!newOrder.includes(item)) newOrder.push(item);
+                            });
+
+                            database[cTrip] = newOrder;
+                            safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
+                            refreshList();
+                        }
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Errore Refresh: ", error);
+        }
+    }
+
+    async function showItineraryMarkers() { 
+        if(!map) return;
+        // Annulla richieste OSRM precedenti ancora in corso
+        if (osrmAbortController) osrmAbortController.abort();
+        osrmAbortController = new AbortController();
+        const signal = osrmAbortController.signal;
+
+        activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; 
+        routeLines.forEach(line => map.removeLayer(line)); routeLines = []; 
+        if (liveUserLine) { map.removeLayer(liveUserLine); liveUserLine = null; }
+        
+        if (!currentActiveTrip || !database[currentActiveTrip] || document.body.classList.contains('nav-active')) return;
+        
+        let daysMap = {}; 
+        database[currentActiveTrip].forEach((i, index) => { 
+            let d = i.day || 1; 
+            if (!daysMap[d]) daysMap[d] = []; 
+            daysMap[d].push({...i, originalIdx: index}); 
+        });
+        
+        for (let day of Object.keys(daysMap).sort((a,b) => a-b)) {
+            if (signal.aborted) return;
+            let pts = daysMap[day]; let latlngs = [];
+            pts.forEach((p, seq) => { 
+                let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, seq + 1, false, p.originalIdx) })
+                    .addTo(map)
+                    .bindPopup(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`); 
+                
+                marker.on('click', function() {
+                    scrollToCard(p.originalIdx);
+                });
+
+                activeMarkers.push(marker); 
+                latlngs.push([p.lt, p.ln]); 
+            });
+            
+            if (latlngs.length > 1) { 
+                for(let i=0; i < latlngs.length - 1; i++) {
+                    if (signal.aborted) return;
+                    let routeCoords = await fetchRoute(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1], signal);
+                    if(routeCoords) {
+                        routeLines.push(L.polyline(routeCoords, { color: '#4a9ebb', weight: 4, opacity: 0.9 }).addTo(map));
+                    } else {
+                        routeLines.push(L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.9, dashArray: '5, 5' }).addTo(map));
+                    }
+                }
+            }
+            if(day == Object.keys(daysMap).sort()[0] && latlngs.length > 0) { map.flyTo(latlngs[0], 14); }
+        }
+    }
+
+    async function organizeDaysAI() { if (!currentActiveTrip) return; let all = database[currentActiveTrip].map((p, idx) => ({...p, idx})); showLoader("Organizzo giorni..."); try { const data = await callAI(`Dividi in tappe: ${JSON.stringify(all.map(p => p.n))}. JSON: {"assignments": [{"name": "Nome", "day": 1}]}`); data.assignments.forEach(a => { const t = all.find(p => p.n === a.name); if(t) database[currentActiveTrip][t.idx].day = a.day; }); safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); } catch(e) {} hideLoader(); }
+    async function optimizeItinerary() { if (!currentActiveTrip) return; showLoader("Ottimizzazione..."); try { let allPlaces = database[currentActiveTrip].map((p, idx) => ({ name: p.n, time: p.time || '' })); const data = await callAI(`Ordina rispettando orari: ${JSON.stringify(allPlaces)}. JSON: {"optimizedOrder": ["Nome 1", "Nome 2"]}`); let newArr = []; let oldArr = [...database[currentActiveTrip]]; data.optimizedOrder.forEach(aiName => { let idx = oldArr.findIndex(p => p.n === aiName); if (idx !== -1) { newArr.push(oldArr[idx]); oldArr.splice(idx, 1); } }); database[currentActiveTrip] = [...newArr, ...oldArr]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); } catch(e) {} hideLoader(); }
+
+    function changeDay(city, idx, newDay) { if(newDay < 1) return; database[city][idx].day = newDay; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
+    function removeItem(c, i) { database[c].splice(i, 1); if(!database[c].length) delete database[c]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
+    function moveItem(city, index, direction) { let arr = database[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); } }
+    
+    function updateTime(c, i, v) { database[c][i].time = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
+    function updateLink(c, i, v) { database[c][i].link = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
+    function updateNote(c, i, v) { database[c][i].note = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); }
+    function updateCost(c, i, v) { database[c][i].cost = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
+    function updatePaid(c, i, v) { database[c][i].paid = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
+    
+    function toggleManual() { const x = document.getElementById('manBox'); x.style.display = x.style.display==='none'?'block':'none'; }
+    
+    function shareItinerary() { 
+        if (!currentActiveTrip) return; let t = `📍 PIANO: ${currentActiveTrip.toUpperCase()}\n`; let days = {}; let tot = 0;
+        database[currentActiveTrip].forEach(i => { const d = i.day || 1; if(!days[d]) days[d] = []; days[d].push(i); if(i.cost) tot += parseFloat(i.cost); });
+        
+        let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
+        let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
+        tot += tCostNum + hCostNum;
+        
+        Object.keys(days).sort((a,b)=>a-b).forEach(d => t += `\n📅 GIORNO ${d}:\n` + days[d].map(i => `- ${i.n} ${i.time ? '('+i.time+')' : ''} ${i.cost ? '[💰 '+i.cost+'€]' : ''}`).join('\n') + "\n");
+        
+        if(tCostNum > 0) t += `\n✈️ Spese di Viaggio: ${tCostNum.toFixed(2)}€`;
+        if(hCostNum > 0) t += `\n🏨 Spese Hotel: ${hCostNum.toFixed(2)}€`;
+        if(tot > 0) t += `\n💰 Budget Totale: ${tot.toFixed(2)}€`;
+        
+        window.open("https://wa.me/?text=" + encodeURIComponent(t)); 
+    }
+    
+    async function downloadPDF() { 
+        if (!currentActiveTrip || typeof window.jspdf === 'undefined') { showToast("Attendere caricamento modulo PDF...", "error"); return; }
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF(); 
+        let y = 20; 
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22); 
+        doc.setTextColor(0, 0, 0);
+        doc.text(`PIANO: ${currentActiveTrip.toUpperCase()}`, 20, y); 
+        y += 15; 
+        
+        let days = {}; let tot = 0; 
+        database[currentActiveTrip].forEach(i => { 
+            const d = i.day || 1; 
+            if(!days[d]) days[d] = []; 
+            days[d].push(i); 
+            if(i.cost) tot += parseFloat(i.cost); 
+        }); 
+        
+        let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
+        let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
+        tot += tCostNum + hCostNum;
+        
+        Object.keys(days).sort((a,b) => a-b).forEach(d => { 
+            if(y > 270) { doc.addPage(); y = 20; } 
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16); 
+            doc.setTextColor(232, 184, 75);
+            doc.text(`GIORNO ${d}`, 20, y); 
+            y += 10; 
+            
+            days[d].forEach(item => { 
+                if(y > 270) { doc.addPage(); y = 20; } 
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12); 
+                doc.setTextColor(0, 0, 0); 
+                
+                let timeStr = item.time ? ` (${item.time})` : '';
+                let costStr = item.cost ? ` [Euro ${item.cost}]` : '';
+                
+                doc.text(`• ${item.n}${timeStr}${costStr}`, 25, y); 
+                y += 7; 
+
+                if(item.note && item.note.trim() !== "") {
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    const splitNotes = doc.splitTextToSize(`Nota: ${item.note}`, 160); 
+                    doc.text(splitNotes, 30, y);
+                    y += (splitNotes.length * 5) + 3; 
+                } else {
+                    y += 3; 
+                }
+                
+                if(item.photo) { 
+                    try { 
+                        if(y > 240) { doc.addPage(); y = 20; }
+                        doc.addImage(item.photo, 'JPEG', 30, y, 40, 25); 
+                        y += 30; 
+                    } catch(e) { console.error("Errore immagine PDF"); } 
+                } 
+            }); 
+            y += 5; 
+        }); 
+        
+        if(tot > 0) { 
+            if(y > 250) { doc.addPage(); y = 20; } 
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12); 
+            doc.setTextColor(74, 158, 187);
+            if (tCostNum > 0) {
+                doc.text(`SPESE DI VIAGGIO: ${tCostNum.toFixed(2)} Euro`, 20, y); 
+                y += 8; 
+            }
+            if (hCostNum > 0) {
+                doc.text(`SPESE HOTEL: ${hCostNum.toFixed(2)} Euro`, 20, y); 
+                y += 8; 
+            }
+            
+            doc.setFontSize(14); 
+            doc.setTextColor(46, 204, 113); 
+            doc.text(`BUDGET TOTALE STIMATO: ${tot.toFixed(2)} Euro`, 20, y+10); 
+        }
+        
+        doc.save(`Itinerario_${currentActiveTrip}.pdf`); 
+    }
+    
+    function backupData() { 
+        const today = new Date().toISOString().slice(0, 10);
+        const exportData = { database: database, tripMeta: tripMeta };
+        const dataStr = JSON.stringify(exportData); 
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr); 
+        let linkElement = document.createElement('a'); 
+        linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_Viaggi_${today}.json`); 
+        linkElement.click(); 
+    }
+    
+    function handleRestore(event) { 
+        const file = event.target.files[0]; if (!file) return; 
+        const reader = new FileReader(); 
+        reader.onload = function(e) { 
+            try {
+                let imported = JSON.parse(e.target.result); 
+                if (imported.database) { database = imported.database; tripMeta = imported.tripMeta || {}; } 
+                else { database = imported; tripMeta = {}; }
+                safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
+                location.reload(); 
+            } catch(err) { showToast("Errore nel ripristino del file", "error"); }
+        }; 
+        reader.readAsText(file); 
+    }
+
+    function startNavigation() {
+        if (!currentActiveTrip || !database[currentActiveTrip] || database[currentActiveTrip].length === 0) { showToast("Nessuna tappa salvata da navigare.", "error"); return; }
+        if (!map) { showToast("Attendi il caricamento della mappa.", "error"); return; }
+        navPlaces = [...database[currentActiveTrip]].sort((a, b) => {
+            if ((a.day||1) !== (b.day||1)) return (a.day||1) - (b.day||1);
+            return (a.time||"99:99").localeCompare(b.time||"99:99");
+        }); navIndex = 0;
+        document.body.classList.add('nav-active'); document.getElementById('nav-dashboard').classList.add('active');
+        setTimeout(() => map.invalidateSize(), 400); 
+        
+        lastRouteUserCoords = null; 
+        lastRouteDest = null;
+        
+        if(navigator.geolocation) { gpsWatchId = navigator.geolocation.watchPosition(updateLiveGPS, (e)=>{}, {enableHighAccuracy: true}); }
+        renderNavStep();
+    }
+
+    function stopNavigation() { 
+        document.body.classList.remove('nav-active'); 
+        document.getElementById('nav-dashboard').classList.remove('active'); 
+        if(gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId); 
+        setTimeout(() => { if(map){ map.invalidateSize(); showItineraryMarkers(); } }, 400); 
+        showToast("Navigazione terminata."); 
+        
+        lastRouteUserCoords = null; 
+        lastRouteDest = null;
+    }
+
+    function nextNavStep() { 
+        navIndex++; 
+        renderNavStep(); 
+    }
+
+    async function renderNavStep() {
+        if(!map) return;
+        reachedDestinationAlerted = false; 
+        
+        if (navIndex >= navPlaces.length) { showToast("Hai completato tutte le tappe!"); stopNavigation(); return; }
+        for(let i=1; i<=3; i++) { document.getElementById(`nav-stop-${i}`).style.display = 'none'; }
+        let coordsToMap = [];
+        for(let i = 0; i < 3; i++) {
+            let p = navPlaces[navIndex + i];
+            if (p) {
+                let div = document.getElementById(`nav-stop-${i+1}`); div.style.display = 'block'; document.getElementById(`name-stop-${i+1}`).innerText = `${navIndex + i + 1}. ${p.n}`;
+                if(i === 0) {
+                    document.getElementById('nav-dash-step').innerText = `TAPPA ${navIndex + 1} DI ${navPlaces.length} (GIORNO ${p.day||1})`;
+                    let noteHtml = ""; if(p.time) noteHtml += `🕒 Appuntamento: ${p.time}<br>`; if(p.cost) noteHtml += `💰 Costo previsto: ${p.cost}€<br>`; if(p.note) noteHtml += `📝 Note: ${p.note}`;
+                    document.getElementById('note-stop-1').innerHTML = noteHtml; document.getElementById('nav-dist-1').innerText = "Calcolo...";
+                } coordsToMap.push(p);
+            }
+        }
+        activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; 
+        routeLines.forEach(line => map.removeLayer(line)); routeLines = []; 
+        let latlngs = [];
+        
+        coordsToMap.forEach((p, idx) => { 
+            let isCurrent = (idx === 0); 
+            let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, navIndex + 1 + idx, isCurrent) }).addTo(map); 
+            activeMarkers.push(marker); 
+            latlngs.push([p.lt, p.ln]); 
+        });
+
+        if (latlngs.length > 1) { 
+            for(let i=0; i < latlngs.length - 1; i++) {
+                let routeCoords = await fetchRoute(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1]);
+                if(routeCoords) {
+                    routeLines.push(L.polyline(routeCoords, { color: '#4a9ebb', weight: 4, opacity: 0.8, dashArray: '5, 10' }).addTo(map));
+                } else {
+                    routeLines.push(L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.8, dashArray: '5, 10' }).addTo(map));
+                }
+            }
+        }
+
+        map.flyTo([coordsToMap[0].lt, coordsToMap[0].ln], 15); 
+        if(userCoords) updateLiveGPS({coords: {latitude: userCoords.lat, longitude: userCoords.lon}});
+    }
+
+    function updateLiveGPS(pos) {
+        if(!map) return;
+        userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        if (myPosMarker) map.removeLayer(myPosMarker); myPosMarker = L.circleMarker([userCoords.lat, userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
+        updateSuggestionsDistance();
+        updateItineraryDistance();
+        
+        const p = navPlaces[navIndex];
+        if(p) {
+            const dist = calculateDistance(userCoords.lat, userCoords.lon, p.lt, p.ln); 
+            document.getElementById('nav-dist-1').innerText = `${dist} km`;
+            
+            if (dist <= 0.05 && !reachedDestinationAlerted) {
+                reachedDestinationAlerted = true;
+                showToast("🎯 SEI ARRIVATO A: " + p.n.toUpperCase() + "!");
+                if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 500]); 
+            }
+
+            let shouldFetchRoute = false;
+            if (!lastRouteUserCoords || !lastRouteDest || lastRouteDest.lt !== p.lt || lastRouteDest.ln !== p.ln) {
+                shouldFetchRoute = true;
+            } else {
+                let distFromLast = calculateDistance(userCoords.lat, userCoords.lon, lastRouteUserCoords.lat, lastRouteUserCoords.lon);
+                if (distFromLast > 0.05) { shouldFetchRoute = true; } 
+            }
+
+            if (shouldFetchRoute) {
+                lastRouteUserCoords = { lat: userCoords.lat, lon: userCoords.lon };
+                lastRouteDest = { lt: p.lt, ln: p.ln };
+                
+                fetchRoute(userCoords.lat, userCoords.lon, p.lt, p.ln).then(routeCoords => {
+                    if (liveUserLine) map.removeLayer(liveUserLine); 
+                    if (routeCoords) {
+                        liveUserLine = L.polyline(routeCoords, { color: '#e74c3c', weight: 5, opacity: 0.9 }).addTo(map);
+                    } else {
+                        liveUserLine = L.polyline([[userCoords.lat, userCoords.lon], [p.lt, p.ln]], { color: '#e74c3c', weight: 4, opacity: 0.7, dashArray: '10, 10' }).addTo(map);
+                    }
+                });
+            }
+        }
+    }
+
+    // SISTEMA SALVAVITA: Aspetta che tutto l'HTML sia caricato prima di lanciare la Mappa e le List.
+    document.addEventListener("DOMContentLoaded", () => {
+        try {
+            if (typeof L !== 'undefined') {
+                map = L.map('map', {zoomControl: false}).setView([44.647, 10.925], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+            } else {
+                console.error("Leaflet.js non caricato!");
+            }
+            refreshList();
+        } catch(e) {
+            console.error("Errore fatale all'avvio: ", e);
+        }
+    });
+
+</script>
+</body>
+</html>
+
+
+```
