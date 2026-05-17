@@ -44,6 +44,9 @@
         #map { height: 100%; width: 100%; background: #ffffff; }
         .map-control-btn { position: absolute; bottom: 15px; right: 15px; z-index: 1000; background: var(--card-bg); border: 2px solid var(--accent-gold); color: var(--accent-gold); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; }
         
+        .map-close-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(0,0,0,0.7); border: 2px solid #e74c3c; color: #ff5c5c; width: 40px; height: 40px; border-radius: 50%; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; backdrop-filter: blur(4px); }
+        body.map-fullscreen .map-close-btn { display: flex; }
+
         /* MAPPA A SCHERMO INTERO */
         body.map-fullscreen #map-container { position: fixed; top: 65px; left: 0; width: 100vw; height: calc(100vh - 65px); z-index: 9000; }
         body.map-fullscreen main { display: none !important; }
@@ -93,7 +96,7 @@
         .note-area::placeholder { color: #a59781; opacity: 0.8; font-style: italic; }
 
         .badge-time { background: var(--accent-blue); color: #fff; padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 6px; vertical-align: middle; }
-        .badge-cost { background: rgba(46, 204, 113, 0.2); color: var(--accent-green); padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 6px; vertical-align: middle; border: 1px solid var(--accent-green); }
+        .badge-cost { background: rgba(46, 204, 113, 0.2); color: var(--accent-green); padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 6px; vertical-align: middle; border: 1px solid var(--accent-green); transition: 0.3s;}
         .ticket-btn { background: #27ae60; color: #fff; font-weight: 700; border: none; padding: 12px; border-radius: 8px; font-size: 11px; cursor: pointer; text-decoration: none; display: block; text-align: center; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
 
         .photo-preview-container { position: relative; margin-top: 12px; width: 100%; height: 160px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
@@ -105,7 +108,7 @@
         
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000; padding: 30px; overflow-y: auto; }
         
-        .day-label { color: var(--accent-gold); font-size: 11px; font-weight: 700; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
+        .day-label { color: var(--accent-gold); font-size: 11px; font-weight: 700; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-end; text-transform: uppercase; }
         .day-ctrl { display: flex; align-items: center; gap: 6px; }
         .day-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: var(--text-main); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.2s; }
         .day-btn:active { background: rgba(255,255,255,0.3); }
@@ -160,6 +163,36 @@
         .stop-note { font-size: 13px; color: #ccc; margin-top: 6px; line-height: 1.4; }
         .nav-dash-dist { background: rgba(231, 76, 60, 0.2); color: #e74c3c; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 5px; display: inline-block;}
         .nav-controls { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
+
+        /* STILI DROPDOWN OTTIMIZZATI - BOTTOM SHEET */
+        .dropdown-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 3999; backdrop-filter: blur(3px); animation: fadeInOverlay 0.3s; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        
+        .dropdown-menu { display: none; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 4000; background: var(--card-bg); border-top-left-radius: 24px; border-top-right-radius: 24px; border-top: 2px solid var(--accent-gold); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); padding: 25px 20px 40px; box-sizing: border-box; animation: slideUpMenu 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        body.light-theme .dropdown-menu { box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
+        @keyframes slideUpMenu { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .dropdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--accent-gold); font-family: 'Playfair Display'; font-size: 22px; font-weight: bold; }
+        .dropdown-close { background: rgba(255,255,255,0.1); border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; transition: 0.2s; }
+        .dropdown-close:active { background: rgba(255,255,255,0.3); }
+        
+        .dropdown-item { display: block; width: 100%; text-align: left; padding: 18px; margin-bottom: 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: var(--text-main); font-family: 'Jost', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .dropdown-item:last-child { margin-bottom: 0; }
+        .dropdown-item:active { background: rgba(232, 184, 75, 0.2); border-color: var(--accent-gold); transform: scale(0.98); }
+        body.light-theme .dropdown-item { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+        body.light-theme .dropdown-item:active { background: rgba(232, 184, 75, 0.2); }
+        
+        .dropdown-title { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        .dropdown-desc { font-size: 12px; color: #8a7a62; margin-top: 6px; padding-left: 35px; line-height: 1.4; font-weight: 500; }
+        
+        /* TIMELINE E CONFLITTI */
+        .timeline-wrapper { position: relative; width: 100%; height: 35px; margin: 10px 0 25px 0; }
+        .timeline-track { position: absolute; top: 10px; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .timeline-marker { position: absolute; top: 2px; width: 18px; height: 18px; background: var(--card-bg); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 9px; font-weight: bold; color: var(--accent-gold); transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2; cursor: pointer; }
+        .timeline-marker.conflict { border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        .timeline-time-label { position: absolute; top: 24px; font-size: 9px; color: #8a7a62; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
+        .card.conflict-card { border: 1px solid #e74c3c !important; box-shadow: 0 0 10px rgba(231, 76, 60, 0.2); }
+        .conflict-badge { display: inline-block; background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 6px; border: 1px solid rgba(231, 76, 60, 0.4); vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -178,8 +211,8 @@
             <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: #8a7a62; font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-            <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema">🌓</button>
-            <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero">🗺️</button>
+            <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
+            <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
     </div>
     <div class="nav-tabs">
@@ -190,8 +223,9 @@
 </header>
 
 <div id="map-container">
+    <button class="map-close-btn" onclick="toggleMapFullscreen()" aria-label="Chiudi Mappa Schermo Intero">✖</button>
     <div id="map"></div>
-    <button class="map-control-btn" onclick="forceGPS()">🎯</button>
+    <button class="map-control-btn" onclick="forceGPS()" aria-label="Centra sulla mia posizione">🎯</button>
 </div>
 
 <div id="nav-dashboard" class="nav-dashboard">
@@ -308,8 +342,8 @@
         
         <div style="display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
             <button class="btn-action" onclick="setFilter('monument')">🏛️ Monumenti</button>
-            <button class="btn-action" onclick="setFilter('food')">🍴 Ristoranti</button>
-            <button class="btn-action" onclick="setFilter('hotel')">🏨 Hotel</button>
+            <button class="btn-action" onclick="toggleRestoMenu()">🍴 Ristoranti ▾</button>
+            <button class="btn-action" onclick="toggleHotelMenu()">🏨 Hotel ▾</button>
             <button class="btn-action" onclick="setFilter('nature')">🌲 Natura</button>
         </div>
 
@@ -324,7 +358,7 @@
                 <h2 style="font-family: 'Playfair Display'; margin: 0; font-size: 22px;">Itinerario</h2>
                 <div style="display:flex; gap:6px; align-items:center;">
                     <select id="tripSelector" class="trip-selector" onchange="changeActiveTrip()" style="display:none;"></select>
-                    <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:#8a7a62; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario">⚙️</button>
+                    <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:#8a7a62; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario" aria-label="Gestisci itinerario">⚙️</button>
                 </div>
             </div>
             
@@ -385,6 +419,42 @@
 
 <input type="file" id="restoreFile" style="display:none" accept=".json" onchange="handleRestore(event)">
 
+<div id="dropdown-overlay" class="dropdown-overlay" onclick="closeAllMenus()"></div>
+
+<div id="resto-dropdown" class="dropdown-menu">
+    <div class="dropdown-header">
+        <span>🍴 Cerca Ristoranti</span>
+        <button class="dropdown-close" onclick="closeAllMenus()" aria-label="Chiudi menu ristoranti">×</button>
+    </div>
+    <button class="dropdown-item" onclick="closeAllMenus(); setFilter('food');">
+        <div class="dropdown-title">📍 Cerca nei dintorni</div>
+        <div class="dropdown-desc">Trova locali via mappa e aggiungili direttamente all'itinerario.</div>
+    </button>
+    <button class="dropdown-item" onclick="closeAllMenus(); openTripAdvisorRestaurants();">
+        <div class="dropdown-title">🌐 Esplora su TripAdvisor</div>
+        <div class="dropdown-desc">Scopri recensioni, classifiche e prenota tavoli nella zona.</div>
+    </button>
+</div>
+
+<div id="hotel-dropdown" class="dropdown-menu">
+    <div class="dropdown-header">
+        <span>🏨 Cerca Alloggi</span>
+        <button class="dropdown-close" onclick="closeAllMenus()" aria-label="Chiudi menu alloggi">×</button>
+    </div>
+    <button class="dropdown-item" onclick="closeAllMenus(); setFilter('hotel');">
+        <div class="dropdown-title">📍 Cerca sulla mappa</div>
+        <div class="dropdown-desc">Trova hotel nelle vicinanze e aggiungili come tappa.</div>
+    </button>
+    <button class="dropdown-item" onclick="closeAllMenus(); openAirbnbHotels();">
+        <div class="dropdown-title">🏠 Apri Airbnb</div>
+        <div class="dropdown-desc">Cerca appartamenti, B&B e case vacanza per questa destinazione.</div>
+    </button>
+    <button class="dropdown-item" onclick="closeAllMenus(); openBookingHotels();">
+        <div class="dropdown-title">🏨 Apri Booking.com</div>
+        <div class="dropdown-desc">Cerca e prenota direttamente stanze d'albergo.</div>
+    </button>
+</div>
+
 <div id="descModal" class="modal">
     <div style="max-width: 600px; margin: auto;">
         <h2 id="modalTitle" style="color: var(--accent-gold); font-family: 'Playfair Display'"></h2>
@@ -441,6 +511,15 @@
     const apiKey = ""; 
     let userPersonalApiKey = "";
 
+    const AppState = {
+        db: {},
+        meta: {},
+        activeTrip: "",
+        userCoords: null,
+        wizard: { days: '2', who: 'Coppia', interests: ['Gastronomia'], budget: 'Medio', date: '' },
+        aiModel: ""
+    };
+
     function safeLocalStorageSave(key, value) {
         try {
             localStorage.setItem(key, value);
@@ -453,33 +532,25 @@
         }
     }
 
-    let dynamicallySelectedModel = "";
-    let database = {};
-    let tripMeta = {};
+    function saveAllData() {
+        safeLocalStorageSave('travel_db_v18', JSON.stringify(AppState.db));
+        safeLocalStorageSave('travel_meta_v1', JSON.stringify(AppState.meta));
+    }
+
     let map = null;
     let routingProfile = 'driving'; 
+    let lastApiCallTime = 0; 
+    let routeCache = {};     
+    let itineraryMarkersDict = {}; 
+    let itineraryLinesDict = {};   
 
-    try { 
-        userPersonalApiKey = localStorage.getItem('travel_api_key_v1') || "";
-    } catch(e) { console.error("Memoria API protetta"); }
+    try { userPersonalApiKey = localStorage.getItem('travel_api_key_v1') || ""; } catch(e) {}
+    try { AppState.db = JSON.parse(localStorage.getItem('travel_db_v18')) || {}; } catch(e) { AppState.db = {}; saveAllData(); }
+    try { AppState.meta = JSON.parse(localStorage.getItem('travel_meta_v1')) || {}; } catch(e) { AppState.meta = {}; saveAllData(); }
 
-    try { 
-        database = JSON.parse(localStorage.getItem('travel_db_v18')) || {}; 
-    } catch(e) { 
-        console.error("Database resettato per corruzione dati precedenti.");
-        database = {}; 
-        safeLocalStorageSave('travel_db_v18', JSON.stringify({}));
-    }
-
-    try { 
-        tripMeta = JSON.parse(localStorage.getItem('travel_meta_v1')) || {}; 
-    } catch(e) { 
-        tripMeta = {}; 
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify({}));
-    }
-
-    let currentActiveCity = "", currentActiveTrip = "", currentSuggestions = [], activeMarkers = [], routeLines = []; 
-    let userCoords = null, myPosMarker = null, navPlaces = [], navIndex = 0, gpsWatchId = null, liveUserLine = null; 
+    let currentActiveCity = "", currentSuggestions = [];
+    let activeMarkers = [], routeLines = []; 
+    let myPosMarker = null, navPlaces = [], navIndex = 0, gpsWatchId = null, liveUserLine = null; 
     let currentWeatherForecast = null, lastWeatherTrip = "";
     
     let reachedDestinationAlerted = false;
@@ -487,17 +558,27 @@
     let lastRouteDest = null;
     let pendingPlaceToAdd = null;
     let osrmAbortController = null;
+    let liveRouteTimeout = null;
 
-    let wizardData = { days: '2', who: 'Coppia', interests: ['Gastronomia'], budget: 'Medio', date: '' };
+    function getEffectiveMins(t) {
+        if(!t) return Infinity;
+        let [h, m] = t.split(':').map(Number);
+        if (isNaN(h) || isNaN(m)) return Infinity;
+        if (h >= 0 && h <= 5) h += 24;
+        return h * 60 + m;
+    }
+
+    async function throttledFetch(url, options = {}) {
+        const now = Date.now();
+        const elapsed = now - lastApiCallTime;
+        if (elapsed < 1100) { await new Promise(r => setTimeout(r, 1100 - elapsed)); }
+        lastApiCallTime = Date.now();
+        return fetch(url, options);
+    }
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     function toggleMapFullscreen() {
@@ -508,15 +589,15 @@
     function toggleWiz(category, element, value) {
         document.querySelectorAll(`#wiz${category.charAt(0).toUpperCase() + category.slice(1)} .pill`).forEach(p => p.classList.remove('selected'));
         element.classList.add('selected');
-        wizardData[category] = value;
+        AppState.wizard[category] = value;
     }
 
     function toggleWizMulti(element, value) {
         element.classList.toggle('selected');
         if (element.classList.contains('selected')) {
-            if (!wizardData.interests.includes(value)) wizardData.interests.push(value);
+            if (!AppState.wizard.interests.includes(value)) AppState.wizard.interests.push(value);
         } else {
-            wizardData.interests = wizardData.interests.filter(i => i !== value);
+            AppState.wizard.interests = AppState.wizard.interests.filter(i => i !== value);
         }
     }
 
@@ -524,82 +605,52 @@
         routingProfile = mode;
         const btnDrive = document.getElementById('route-mode-driving');
         const btnFoot = document.getElementById('route-mode-foot');
-        
         btnDrive.style.background = mode === 'driving' ? 'var(--accent-gold)' : 'transparent';
         btnDrive.style.color = mode === 'driving' ? '#000' : 'var(--accent-gold)';
-        
         btnFoot.style.background = mode === 'foot' ? 'var(--accent-gold)' : 'transparent';
         btnFoot.style.color = mode === 'foot' ? '#000' : 'var(--accent-gold)';
-        
         showItineraryMarkers();
         if (document.body.classList.contains('nav-active')) renderNavStep();
         showToast("Modalità percorso: " + (mode === 'driving' ? "Auto" : "A piedi"));
     }
 
+    const AI_WIZARD_SCHEMA = {
+        type: "OBJECT",
+        properties: {
+            survival: { type: "OBJECT", properties: { currency: {type: "STRING"}, tips: {type: "STRING"}, plugs: {type: "STRING"}, emergency: {type: "STRING"} } },
+            places: { type: "ARRAY", items: { type: "OBJECT", properties: { n: {type: "STRING"}, lt: {type: "NUMBER"}, ln: {type: "NUMBER"}, day: {type: "NUMBER"}, time: {type: "STRING"}, cost: {type: "NUMBER"}, type: {type: "STRING"}, note: {type: "STRING"} } } }
+        }
+    };
+
     async function generateWizardItinerary() {
         const dest = document.getElementById('wizDest').value.trim();
         if (!dest) { showToast("⚠️ Inserisci una destinazione!", "error"); return; }
-        if (wizardData.interests.length === 0) { showToast("⚠️ Seleziona almeno un interesse!", "error"); return; }
-        wizardData.date = document.getElementById('wizDate').value || '';
-        const dateInfo = wizardData.date ? `- Data di partenza: ${wizardData.date} (segnala festività locali, alta stagione, eventi speciali in quella data)` : '';
+        if (AppState.wizard.interests.length === 0) { showToast("⚠️ Seleziona almeno un interesse!", "error"); return; }
+        AppState.wizard.date = document.getElementById('wizDate').value || '';
+        const dateInfo = AppState.wizard.date ? `- Data di partenza: ${AppState.wizard.date} (segnala festività locali, alta stagione, eventi speciali in quella data)` : '';
 
         showLoader("L'Intelligenza Artificiale sta creando il tuo viaggio su misura...");
 
         const prompt = `Agisci da Travel Planner esperto. Genera un itinerario dettagliato per la destinazione: "${dest}".
 Parametri:
-- Durata: ${wizardData.days} giorni
-- Viaggiatori: ${wizardData.who}
-- Interessi: ${wizardData.interests.join(', ')}
-- Budget: ${wizardData.budget}
+- Durata: ${AppState.wizard.days} giorni
+- Viaggiatori: ${AppState.wizard.who}
+- Interessi: ${AppState.wizard.interests.join(', ')}
+- Budget: ${AppState.wizard.budget}
 ${dateInfo}
-Restituisci ESATTAMENTE E SOLO un file JSON valido con questa struttura esatta:
-{
-  "survival": {
-    "currency": "Moneta locale e se accettano carta",
-    "tips": "Regole o abitudini sulle mance in questo luogo",
-    "plugs": "Tipo di prese elettriche",
-    "emergency": "Numeri di emergenza o info sanitarie base"
-  },
-  "places": [
-    {
-      "n": "Nome del luogo o ristorante",
-      "lt": latitudine_numerica,
-      "ln": longitudine_numerica,
-      "day": giorno_numerico_da_1_a_${wizardData.days},
-      "time": "HH:MM",
-      "cost": numero_intero_costo_in_euro,
-      "type": "monument|food|hotel|nature|other",
-      "note": "Breve nota sul perché andarci"
-    }
-  ]
-}
 Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln siano reali.`;
 
         try {
-            const data = await callAI(prompt);
+            const data = await callAI(prompt, AI_WIZARD_SCHEMA);
             if (!data || !data.places || data.places.length === 0) throw new Error("Dati vuoti");
 
             let tripName = dest.charAt(0).toUpperCase() + dest.slice(1);
-
-            const isValidCoord = (lt, ln) => {
-                if (isNaN(lt) || isNaN(ln)) return false;
-                if (lt === 0 && ln === 0) return false; // Atlantico
-                if (lt < -90 || lt > 90) return false;
-                if (ln < -180 || ln > 180) return false;
-                return true;
-            };
+            const isValidCoord = (lt, ln) => { return !(isNaN(lt) || isNaN(ln) || (lt === 0 && ln === 0) || lt < -90 || lt > 90 || ln < -180 || ln > 180); };
 
             const allPlaces = data.places.map(p => ({
-                n: p.n || "Tappa",
-                lt: parseFloat(p.lt),
-                ln: parseFloat(p.ln),
-                day: parseInt(p.day) || 1,
-                time: p.time || "",
-                cost: p.cost || "",
-                type: p.type || "other",
-                note: p.note || "",
-                link: "",
-                photo: ""
+                n: p.n || "Tappa", lt: parseFloat(p.lt), ln: parseFloat(p.ln),
+                day: parseInt(p.day) || 1, time: p.time || "", cost: p.cost || "",
+                type: p.type || "other", note: p.note || "", link: "", photo: ""
             }));
 
             const formattedPlaces = allPlaces.filter(p => isValidCoord(p.lt, p.ln));
@@ -607,45 +658,32 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             if (formattedPlaces.length === 0) throw new Error("Nessuna coordinata valida restituita dall'AI");
             if (skipped > 0) showToast(`⚠️ ${skipped} tappa/e scartata/e: coordinate non valide.`, "error");
 
-            database[tripName] = formattedPlaces;
-            
+            AppState.db[tripName] = formattedPlaces;
             if (data.survival) {
-                if(!tripMeta[tripName]) tripMeta[tripName] = {};
-                tripMeta[tripName].survival = data.survival;
+                if(!AppState.meta[tripName]) AppState.meta[tripName] = {};
+                AppState.meta[tripName].survival = data.survival;
             }
 
-            safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-            safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-            currentActiveTrip = tripName;
+            saveAllData();
+            AppState.activeTrip = tripName;
             
-            if(formattedPlaces[0] && formattedPlaces[0].lt && map) {
-                map.flyTo([formattedPlaces[0].lt, formattedPlaces[0].ln], 13);
-            }
-
-            hideLoader();
-            showToast("✨ Itinerario creato con successo!");
-            switchTab('itinerario');
+            if(formattedPlaces[0] && formattedPlaces[0].lt && map) { map.flyTo([formattedPlaces[0].lt, formattedPlaces[0].ln], 13); }
+            hideLoader(); showToast("✨ Itinerario creato con successo!"); switchTab('itinerario');
 
         } catch (e) {
-            hideLoader();
-            showToast("⚠️ Errore durante la generazione. Riprova tra poco.", "error");
-            console.error(e);
+            hideLoader(); showToast("⚠️ Errore durante la generazione. Riprova tra poco.", "error"); console.error(e);
         }
     }
 
     function saveUserApiKey() {
         const val = document.getElementById('userApiKeyInput').value.trim();
         if(val) {
-            if(val.includes("http") || val.includes("family=") || val.includes(" ")) {
-                showToast("⚠️ Formato non valido. Assicurati di copiare SOLO la chiave (es. AIzaSy...)", "error");
-                document.getElementById('userApiKeyInput').value = ""; 
-                return;
-            }
+            if(val.includes("http") || val.includes("family=") || val.includes(" ")) { showToast("⚠️ Formato non valido. Assicurati di copiare SOLO la chiave (es. AIzaSy...)", "error"); document.getElementById('userApiKeyInput').value = ""; return; }
             localStorage.setItem('travel_api_key_v1', val);
-            userPersonalApiKey = val; dynamicallySelectedModel = ""; showToast("🔑 Chiave API Personale salvata!");
+            userPersonalApiKey = val; AppState.aiModel = ""; showToast("🔑 Chiave API Personale salvata!");
         } else {
             localStorage.removeItem('travel_api_key_v1');
-            userPersonalApiKey = ""; dynamicallySelectedModel = ""; showToast("Chiave rimossa. Ritorno al sistema base.");
+            userPersonalApiKey = ""; AppState.aiModel = ""; showToast("Chiave rimossa. Ritorno al sistema base.");
         }
     }
 
@@ -659,50 +697,43 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             else if (type === 'nature') { emoji = '🌲'; color = '#27ae60'; } 
         }
         let badgeHtml = sequenceNumber !== null ? `<div style="position: absolute; top: -8px; right: -8px; background: #12110d; color: #fff; font-size: 11px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #e8b84b; display: flex; align-items: center; justify-content: center; z-index: 10;">${sequenceNumber}</div>` : '';
-        
         let customClass = `custom-pin ${idx !== null ? 'marker-idx-' + idx : ''}`;
-        
-        return L.divIcon({ 
-            className: customClass, 
-            html: `<div class="marker-inner" style="position: relative; background-color: ${color}; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.5); transition: 0.4s; ${isNavActive ? 'transform: scale(1.3); border: 3px solid #fff;' : ''}">${emoji}${badgeHtml}</div>`, 
-            iconSize: [32, 32], 
-            iconAnchor: [16, 16], 
-            popupAnchor: [0, -16] 
-        });
+        return L.divIcon({ className: customClass, html: `<div class="marker-inner" style="position: relative; background-color: ${color}; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.5); transition: 0.4s; ${isNavActive ? 'transform: scale(1.3); border: 3px solid #fff;' : ''}">${emoji}${badgeHtml}</div>`, iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -16] });
     }
 
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container'); const toast = document.createElement('div');
-        toast.className = `toast ${type}`; toast.innerHTML = message; container.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 4000);
+        toast.className = `toast ${type}`; toast.innerHTML = message; container.appendChild(toast); setTimeout(() => { toast.remove(); }, 4000);
     }
 
     function showLoader(text) { document.getElementById('loader-text').innerText = text; document.getElementById('loader').style.display = 'flex'; }
     function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
-    async function callAI(prompt) {
+    async function callAI(prompt, schema = null) {
         const activeKey = userPersonalApiKey || apiKey;
         if (!activeKey) { hideLoader(); showToast("⚠️ API Key mancante! Inseriscila nelle impostazioni in basso.", "error"); throw new Error("API Key mancante"); }
         let modelToUse = 'gemini-2.5-flash-preview-09-2025';
         if (userPersonalApiKey) {
-            if (!dynamicallySelectedModel) {
+            if (!AppState.aiModel) {
                 try {
                     const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${activeKey}`);
-                    if (!listRes.ok) throw new Error("Fetch models failed");
                     const listData = await listRes.json();
                     const availableModels = listData.models.map(m => m.name.replace('models/', ''));
                     const preferredModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
-                    for (let pref of preferredModels) { if (availableModels.includes(pref)) { dynamicallySelectedModel = pref; break; } }
-                    if (!dynamicallySelectedModel) { dynamicallySelectedModel = availableModels.find(m => m.includes('flash')) || 'gemini-1.5-flash'; }
-                } catch (e) { dynamicallySelectedModel = 'gemini-1.5-flash'; }
+                    for (let pref of preferredModels) { if (availableModels.includes(pref)) { AppState.aiModel = pref; break; } }
+                    if (!AppState.aiModel) { AppState.aiModel = availableModels.find(m => m.includes('flash')) || 'gemini-1.5-flash'; }
+                } catch (e) { AppState.aiModel = 'gemini-1.5-flash'; }
             }
-            modelToUse = dynamicallySelectedModel;
+            modelToUse = AppState.aiModel;
         }
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+        let payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
+        if (schema) { payload.generationConfig.responseSchema = schema; }
+
         let lastErrorMsg = "⚠️ Errore di connessione."; let delay = 1000; 
         for (let i = 0; i < 3; i++) { 
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({})); const googleMsg = errorData?.error?.message || "Errore sconosciuto";
                     if (response.status === 400) { lastErrorMsg = `⚠️ Errore Google (400): ${googleMsg.substring(0, 70)}...`; throw new Error("FATAL"); }
@@ -711,10 +742,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     if (response.status >= 500) { lastErrorMsg = "⚠️ Server Google offline. Riprovo..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
                     lastErrorMsg = `⚠️ Errore HTTP ${response.status}: ${googleMsg.substring(0,50)}`; throw new Error("FATAL");
                 }
-                const result = await response.json(); let textResult = result.candidates[0].content.parts[0].text;
-                const jsonMatch = textResult.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) { lastErrorMsg = "⚠️ L'IA ha risposto, ma il formato del testo è errato."; throw new Error("PARSE_ERROR"); }
-                return JSON.parse(jsonMatch[0]);
+                const result = await response.json(); const textResult = result.candidates[0].content.parts[0].text;
+                try { return JSON.parse(textResult); } catch(e) {
+                    const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) return JSON.parse(jsonMatch[0]);
+                    throw new Error("PARSE_ERROR");
+                }
             } catch (e) { 
                 if (e.message === "FATAL") { showToast(lastErrorMsg, "error"); throw e; }
                 if (e.message === "PARSE_ERROR" || e.name === "SyntaxError") { showToast("⚠️ Il server Google sta restituendo testo illeggibile.", "error"); throw e; }
@@ -730,20 +763,26 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         document.getElementById('view-' + t).classList.add('active');
         const btn = event ? event.currentTarget : document.getElementById('tab-btn-' + t);
         if (btn) btn.classList.add('active');
-        setTimeout(() => { if(map) map.invalidateSize(); if(t === 'itinerario') { refreshList(); showItineraryMarkers(); } }, 100);
+        setTimeout(() => { 
+            if(map) map.invalidateSize(); 
+            if(t === 'itinerario') { refreshList(); showItineraryMarkers(); } 
+            else if (t === 'scopri') {
+                Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {};
+                Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {};
+            }
+        }, 100);
     }
 
     function forceGPS() {
         if (!navigator.geolocation || !map) return; showLoader("Localizzazione...");
         navigator.geolocation.getCurrentPosition(p => {
-            userCoords = { lat: p.coords.latitude, lon: p.coords.longitude };
+            AppState.userCoords = { lat: p.coords.latitude, lon: p.coords.longitude };
             if (myPosMarker) map.removeLayer(myPosMarker);
-            myPosMarker = L.circleMarker([userCoords.lat, userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
-            map.flyTo([userCoords.lat, userCoords.lon], 15); document.getElementById('sort-dist-btn').style.display = 'block';
+            myPosMarker = L.circleMarker([AppState.userCoords.lat, AppState.userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
+            map.flyTo([AppState.userCoords.lat, AppState.userCoords.lon], 15); document.getElementById('sort-dist-btn').style.display = 'block';
             hideLoader(); showToast("📍 Posizione trovata!");
-            updateSuggestionsDistance();
-            updateItineraryDistance();
-            if(document.body.classList.contains('nav-active')) updateLiveGPS({coords: {latitude: userCoords.lat, longitude: userCoords.lon}});
+            updateSuggestionsDistance(); updateItineraryDistance();
+            if(document.body.classList.contains('nav-active')) updateLiveGPS({coords: {latitude: AppState.userCoords.lat, longitude: AppState.userCoords.lon}});
         }, () => { hideLoader(); showToast("⚠️ Errore GPS.", "error"); });
     }
 
@@ -754,1134 +793,771 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     }
 
     async function fetchRoute(lat1, lon1, lat2, lon2, signal) {
+        const cacheKey = `${routingProfile}_${lat1.toFixed(4)},${lon1.toFixed(4)}_${lat2.toFixed(4)},${lon2.toFixed(4)}`;
+        if (routeCache[cacheKey]) return routeCache[cacheKey];
         try {
             const res = await fetch(`https://router.project-osrm.org/route/v1/${routingProfile}/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`, { signal });
             const data = await res.json();
             if (data.routes && data.routes[0]) {
-                return data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                const coords = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                routeCache[cacheKey] = coords; return coords;
             }
-        } catch (e) {
-            if (e.name === 'AbortError') return null;
-            console.warn("Errore OSRM routing, uso fallback rettilineo:", e);
-        }
+        } catch (e) { if (e.name === 'AbortError') return null; console.warn("Errore OSRM routing, uso fallback rettilineo:", e); }
         return null; 
     }
 
-    function sortByDistance() { if(!userCoords) return; currentSuggestions.forEach(s => s.dist = parseFloat(calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon))); currentSuggestions.sort((a,b) => a.dist - b.dist); renderSuggestions(); }
-    
-    // OTTIMIZZA GIORNATA: ordina rispettando orari fissi + nearest neighbor per le tappe libere + ora corrente
-    function optimizeDayOrder(city, day) {
-        let arr = database[city];
-        if (!arr) return;
+    function closeAllMenus() {
+        document.getElementById('dropdown-overlay').style.display = 'none';
+        document.getElementById('resto-dropdown').style.display = 'none';
+        document.getElementById('hotel-dropdown').style.display = 'none';
+    }
 
+    function toggleRestoMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('resto-dropdown').style.display = 'block'; }
+    function toggleHotelMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('hotel-dropdown').style.display = 'block'; }
+
+    async function getCityFromMap() {
+        if (!map) return null; const center = map.getCenter();
+        try {
+            const res = await throttledFetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${center.lat}&lon=${center.lng}&zoom=10&accept-language=it`, { headers: { 'Accept-Language': 'it' } });
+            const data = await res.json(); const addr = data.address || {}; return addr.city || addr.town || addr.village || addr.municipality || addr.county || data.display_name.split(',')[0];
+        } catch(e) { return null; }
+    }
+
+    async function openAirbnbHotels() { showLoader("Ricerca città per Airbnb..."); const city = await getCityFromMap(); hideLoader(); if (city) { window.open(`https://www.airbnb.it/s/${encodeURIComponent(city)}/homes`, '_blank'); showToast(`🏠 Airbnb aperto per ${city}`); } else { window.open('https://www.airbnb.it', '_blank'); showToast("🏠 Airbnb aperto. Cerca manualmente la tua zona.", "error"); } }
+    async function openBookingHotels() { if (!map) { showToast("Attendi il caricamento della mappa.", "error"); return; } showLoader("Apertura Booking.com..."); const center = map.getCenter(); const city = await getCityFromMap(); hideLoader(); const dest = encodeURIComponent(city || 'hotel'); window.open(`https://www.booking.com/searchresults.it.html?ss=${dest}&latitude=${center.lat.toFixed(5)}&longitude=${center.lng.toFixed(5)}&radius=5`, '_blank'); showToast(`🏨 Booking.com aperto per ${city || 'la zona selezionata'}`); }
+    async function openTripAdvisorRestaurants() { if (!map) { showToast("Attendi il caricamento della mappa.", "error"); return; } showLoader("Ricerca città per TripAdvisor..."); const city = await getCityFromMap(); hideLoader(); if (city) { window.open(`https://www.tripadvisor.it/Search?q=ristoranti+${encodeURIComponent(city)}&ssrc=r`, '_blank'); showToast(`🌐 TripAdvisor aperto per ristoranti a ${city}`); } else { window.open('https://www.tripadvisor.it/Restaurants', '_blank'); showToast("🌐 TripAdvisor aperto. Cerca manualmente la tua zona.", "error"); } }
+
+    function sortByDistance() { if(!AppState.userCoords) return; currentSuggestions.forEach(s => s.dist = parseFloat(calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon))); currentSuggestions.sort((a,b) => a.dist - b.dist); renderSuggestions(); }
+
+    function optimizeDayOrder(city, day) {
+        let arr = AppState.db[city]; if (!arr) return;
         let dayItems = arr.filter(i => (i.day || 1) == day);
         if (dayItems.length <= 1) { showToast("ℹ️ Servono almeno 2 tappe per ottimizzare.", "error"); return; }
 
-        // Ora corrente come stringa "HH:MM" per confronto con gli orari delle tappe
-        const now = new Date();
-        const nowTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-        // Punto di partenza: GPS se disponibile, altrimenti prima tappa futura ancorata, altrimenti prima tappa
+        const now = new Date(); const nowTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         let startLat, startLon;
-        if (userCoords) {
-            startLat = userCoords.lat;
-            startLon = userCoords.lon;
-        } else {
-            const firstFutureAnchored = dayItems.find(i => i.time && i.time >= nowTime);
-            const fallback = firstFutureAnchored || dayItems[0];
-            startLat = fallback.lt;
-            startLon = fallback.ln;
-        }
+        if (AppState.userCoords) { startLat = AppState.userCoords.lat; startLon = AppState.userCoords.lon; } 
+        else { const firstFuture = dayItems.find(i => i.time && i.time >= nowTime) || dayItems[0]; startLat = firstFuture.lt; startLon = firstFuture.ln; }
 
-        // Separa in tre gruppi:
-        // - passate: ancorate con orario già trascorso → vanno in fondo invariate
-        // - future: ancorate con orario ancora da venire → posizione fissa nella sequenza
-        // - libere: senza orario → ottimizzate con nearest neighbor tra le future
-        const past = dayItems.filter(i => i.time && i.time < nowTime).sort((a, b) => a.time.localeCompare(b.time));
-        const future = dayItems.filter(i => i.time && i.time >= nowTime).sort((a, b) => a.time.localeCompare(b.time));
+        const past = dayItems.filter(i => i.time && i.time < nowTime).sort((a, b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
+        const future = dayItems.filter(i => i.time && i.time >= nowTime).sort((a, b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
         let free = dayItems.filter(i => !i.time);
 
-        // Costruisce la sequenza: start virtuale → future ancorate con libere negli slot → passate in coda
-        const anchors = [{ lt: startLat, ln: startLon, _virtual: true }, ...future];
-        let result = [];
-
+        const anchors = [{ lt: startLat, ln: startLon, _virtual: true }, ...future]; let result = [];
         for (let a = 0; a < anchors.length; a++) {
-            const from = anchors[a];
-            const to = anchors[a + 1];
-
+            const from = anchors[a]; const to = anchors[a + 1];
             if (!from._virtual) result.push(from);
-
             if (free.length === 0) continue;
-
-            // Greedy nearest neighbor con bonus direzione verso prossima ancorata (peso 30%)
-            let slot = [];
-            let remaining = [...free];
-            let curLat = from.lt, curLon = from.ln;
-
+            let slot = []; let remaining = [...free]; let curLat = from.lt, curLon = from.ln;
             const slotsLeft = anchors.length - a;
-            const freeInSlot = a === anchors.length - 1
-                ? remaining.length
-                : Math.round(remaining.length / slotsLeft);
+            const freeInSlot = a === anchors.length - 1 ? remaining.length : Math.round(remaining.length / slotsLeft);
 
             for (let k = 0; k < freeInSlot && remaining.length > 0; k++) {
-                let bestIdx = 0;
-                let bestScore = Infinity;
+                let bestIdx = 0; let bestScore = Infinity;
                 remaining.forEach((item, idx) => {
                     const dFrom = parseFloat(calculateDistance(curLat, curLon, item.lt, item.ln)) || 9999;
                     const dTo = to ? (parseFloat(calculateDistance(item.lt, item.ln, to.lt, to.ln)) || 9999) : 0;
                     const score = dFrom + dTo * 0.3;
                     if (score < bestScore) { bestScore = score; bestIdx = idx; }
                 });
-                const chosen = remaining.splice(bestIdx, 1)[0];
-                slot.push(chosen);
-                curLat = chosen.lt;
-                curLon = chosen.ln;
+                const chosen = remaining.splice(bestIdx, 1)[0]; slot.push(chosen); curLat = chosen.lt; curLon = chosen.ln;
             }
-            result = result.concat(slot);
-            free = free.filter(f => !slot.includes(f));
+            result = result.concat(slot); free = free.filter(f => !slot.includes(f));
         }
 
-        // Tappe passate in fondo, nell'ordine originale
         result = [...result, ...past];
-
-        // Aggiorna il database mantenendo gli altri giorni intatti
         const otherDays = arr.filter(i => (i.day || 1) != day);
         result.forEach(item => item.day = parseInt(day));
-        database[city] = [...otherDays, ...result].sort((a, b) => (a.day || 1) - (b.day || 1));
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-        refreshList();
-        showItineraryMarkers();
-
-        const gpsNote = userCoords ? "dalla tua posizione GPS" : "dalla prima tappa futura";
+        AppState.db[city] = [...otherDays, ...result].sort((a, b) => (a.day || 1) - (b.day || 1));
+        saveAllData(); refreshList(); showItineraryMarkers();
+        const gpsNote = AppState.userCoords ? "dalla tua posizione GPS" : "dalla prima tappa futura";
         const pastNote = past.length > 0 ? `, ${past.length} tappa/e già passate messe in fondo` : '';
         showToast(`✅ Giorno ${day} ottimizzato (ore ${nowTime}): libere ordinate ${gpsNote}${pastNote}.`);
     }
 
-    function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
-    function openDirections(lat, lon) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, "_blank"); }
-
-    function scrollToCard(idx) {
-        let card = document.querySelector(`.card[data-idx="${idx}"]`);
-        if (card) {
-            if (!document.getElementById('view-itinerario').classList.contains('active')) {
-                switchTab('itinerario');
-                setTimeout(() => performScroll(card), 200);
-            } else {
-                performScroll(card);
-            }
+    // NUOVA FUNZIONE MIGLIORATA: Apri Singolo Giorno su Google Maps
+    function openDayInGoogleMaps(city, day) {
+        let arr = AppState.db[city];
+        if (!arr) return;
+        
+        let dayItems = arr.filter(i => (i.day || 1) == day).sort((a,b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
+        
+        if (dayItems.length === 0) {
+            showToast("⚠️ Nessuna tappa in questo giorno.", "error"); return;
         }
+        if (dayItems.length === 1) {
+            openDirections(dayItems[0].lt, dayItems[0].ln); return;
+        }
+
+        // 1. Omettiamo 'origin' in modo che Google Maps usi la "Posizione Attuale" (GPS) dell'utente per calcolare la rotta in tempo reale e sbloccare il tasto "Avvia"
+        // 2. Usiamo 'dir_action=navigate' per forzare l'apertura immediata in modalità Navigazione (Turn-by-turn).
+        
+        let destination = `${dayItems[dayItems.length - 1].lt},${dayItems[dayItems.length - 1].ln}`;
+        let waypoints = "";
+
+        // Prendiamo come waypoints TUTTE le tappe intermedie (dalla prima in lista fino alla penultima)
+        let middleItems = dayItems.slice(0, dayItems.length - 1);
+        if (middleItems.length > 0) {
+            if (middleItems.length > 9) { // Maps di solito supporta max 9 waypoints intermedi
+                middleItems = middleItems.slice(0, 9);
+                showToast("⚠️ Limite di Maps raggiunto. Caricate solo le prime 10 tappe.", "error");
+            }
+            waypoints = "&waypoints=" + middleItems.map(p => `${p.lt},${p.ln}`).join('%7C');
+        }
+        
+        let mode = routingProfile === 'foot' ? 'walking' : 'driving';
+        let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}${waypoints}&travelmode=${mode}&dir_action=navigate`;
+        window.open(url, '_blank');
     }
 
-    function performScroll(card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('highlight-card');
-        setTimeout(() => card.classList.remove('highlight-card'), 2000);
-    }
+    function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
+    
+    // AGGIORNATO ANCHE QUI PER COERENZA
+    function openDirections(lat, lon) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate`, "_blank"); }
+
+    function scrollToCard(idx) { let card = document.querySelector(`.card[data-idx="${idx}"]`); if (card) { if (!document.getElementById('view-itinerario').classList.contains('active')) { switchTab('itinerario'); setTimeout(() => performScroll(card), 200); } else { performScroll(card); } } }
+    function performScroll(card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('highlight-card'); setTimeout(() => card.classList.remove('highlight-card'), 2000); }
 
     function panToMarker(idx, lat, lon) {
-        if(!map) return;
-        
-        let mapContainer = document.getElementById('map-container');
-        if (mapContainer.getBoundingClientRect().top < 0 || mapContainer.getBoundingClientRect().bottom > window.innerHeight) {
-            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
+        if(!map) return; let mapContainer = document.getElementById('map-container');
+        if (mapContainer.getBoundingClientRect().top < 0 || mapContainer.getBoundingClientRect().bottom > window.innerHeight) { mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
         map.flyTo([lat, lon], 16, { animate: true, duration: 1.5 });
-        
         setTimeout(() => {
             let markerIconInner = document.querySelector(`.marker-idx-${idx} .marker-inner`);
             if (markerIconInner) {
-                let parentPin = markerIconInner.closest('.custom-pin');
-                if(parentPin) parentPin.style.zIndex = 1000;
-                
+                let parentPin = markerIconInner.closest('.custom-pin'); if(parentPin) parentPin.style.zIndex = 1000;
                 markerIconInner.classList.add('highlight-marker-inner');
-                setTimeout(() => {
-                    markerIconInner.classList.remove('highlight-marker-inner');
-                    if(parentPin) parentPin.style.zIndex = "";
-                }, 2000);
+                setTimeout(() => { markerIconInner.classList.remove('highlight-marker-inner'); if(parentPin) parentPin.style.zIndex = ""; }, 2000);
             }
         }, 300);
     }
 
-    async function searchCity() { const v = document.getElementById('cityInput').value; if(!v || !map) return; currentActiveCity = v; try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(v)}&limit=1`); const data = await res.json(); if(data[0]) map.flyTo([data[0].lat, data[0].lon], 14); } catch(e) { showToast("⚠️ Errore ricerca.", "error"); } }
+    async function searchCity() { const v = document.getElementById('cityInput').value; if(!v || !map) return; currentActiveCity = v; try { const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(v)}&limit=1`); const data = await res.json(); if(data[0]) map.flyTo([data[0].lat, data[0].lon], 14); } catch(e) { showToast("⚠️ Errore ricerca.", "error"); } }
+    async function askAI() { const q = document.getElementById('aiQuery').value; if(!q) return; showLoader("L'IA sta elaborando..."); try { const prompt = `L'utente ti fa una domanda turistica: "${q}". Rispondi in italiano.`; const schema = { type: "OBJECT", properties: { title: {type: "STRING"}, text: {type: "STRING"} } }; const data = await callAI(prompt, schema); if(!data || !data.text) throw new Error("Dati vuoti"); document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖"; document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare."; document.getElementById('modalHours').innerText = "Assistente Turistico"; document.getElementById('descModal').style.display = 'block'; } catch(e) { showToast("⚠️ Errore IA.", "error"); } hideLoader(); }
+    async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const prompt = `Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}].`; const schema = { type: "OBJECT", properties: { places: { type: "ARRAY", items: { type: "OBJECT", properties: { title: {type:"STRING"}, lat: {type:"NUMBER"}, lon: {type:"NUMBER"}, desc: {type:"STRING"}, rating: {type:"NUMBER"}, type: {type:"STRING"} } } } } }; const data = await callAI(prompt, schema); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
     
-    // NUOVO ASSISTENTE CONVERSAZIONALE (Niente più pin sulla mappa)
-    async function askAI() { 
-        const q = document.getElementById('aiQuery').value; 
-        if(!q) return; 
-        
-        showLoader("L'IA sta elaborando..."); 
-        
-        try { 
-            const prompt = `L'utente ti fa una domanda o chiede un consiglio turistico (es. tradizioni, piatti tipici, storia, ecc): "${q}".
-Rispondi in italiano in modo discorsivo, amichevole, utile e dettagliato. Sei una guida turistica esperta.
-Restituisci ESATTAMENTE E SOLO un file JSON valido con questa struttura esatta:
-{"title": "Un titolo breve e accattivante della tua risposta", "text": "Il testo completo della tua risposta. Usa pure paragrafi e bullet points se necessario."}`;
-            
-            const data = await callAI(prompt); 
-            if(!data || !data.text) throw new Error("Dati vuoti dall'IA");
-
-            document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖";
-            document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare la risposta.";
-            document.getElementById('modalHours').innerText = "Assistente Virtuale Turistico";
-            document.getElementById('descModal').style.display = 'block';
-
-        } catch(e) { 
-            showToast("⚠️ Errore IA durante la conversazione.", "error"); 
-        } 
-        hideLoader(); 
-    }
-
-    async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const data = await callAI(`Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}]. JSON: {"places": [{"title": "Nome", "lat": numero, "lon": numero, "desc": "Descrizione", "rating": 4.8, "type": "food|hotel|monument|nature|other"}]}`); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
-    async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}]. Rispondi JSON: {"places": [{"title": "Nome", "lat": numero, "lon": numero, "desc": "Descrizione", "rating": 4.5}]}`); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
+    async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}].`, {type:"OBJECT", properties:{places:{type:"ARRAY", items:{type:"OBJECT", properties:{title:{type:"STRING"}, lat:{type:"NUMBER"}, lon:{type:"NUMBER"}, desc:{type:"STRING"}, rating:{type:"NUMBER"}}}}}}); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
     async function loadWiki(lat, lon, t = 'monument') { try { const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); const d = await res.json(); if(d.query?.geosearch) { for(let p of d.query.geosearch) { const sRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); const s = await sRes.json(); currentSuggestions.push({ title: p.title, lat: p.lat, lon: p.lon, desc: s.extract || "Monumento", type: t }); } } } catch(e) { console.error(e); } }
     
-    function renderSuggestions() { 
-        const l = document.getElementById('sug-list'); l.innerHTML = ""; 
-        if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; }
-        currentSuggestions.forEach((s, idx) => { 
-            if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); }
-            const distVal = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon) : null;
-            const distBadge = distVal !== null
-                ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">
-                       📍 <span class="live-dist-${idx}">${distVal} km da te</span>
-                   </div>`
-                : '';
-            l.innerHTML += `<div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>
-                ${distBadge}
-                <div class="rating">${s.stars || "★★★★☆"}</div>
-                <p class="desc-preview">${escapeHtml(s.desc)}</p>
-                <div class="btn-row">
-                    <button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button>
-                    <button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button>
-                    <button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>
-                </div>
-            </div>`; 
-        }); 
-    }
+    function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
 
-    function updateSuggestionsDistance() {
-        if (!userCoords || currentSuggestions.length === 0) return;
-        currentSuggestions.forEach((s, idx) => {
-            const el = document.querySelector(`.live-dist-${idx}`);
-            if (el) {
-                const d = calculateDistance(userCoords.lat, userCoords.lon, s.lat, s.lon);
-                el.innerText = `${d} km da te`;
-            }
-        });
-    }
-
-    function updateItineraryDistance() {
-        if (!userCoords || !currentActiveTrip || !database[currentActiveTrip]) return;
-        database[currentActiveTrip].forEach((item, idx) => {
-            const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`);
-            const d = calculateDistance(userCoords.lat, userCoords.lon, item.lt, item.ln);
-            badges.forEach(badge => { badge.innerHTML = `📍${d} km`; });
-        });
-    }
+    function updateSuggestionsDistance() { if (!AppState.userCoords || currentSuggestions.length === 0) return; currentSuggestions.forEach((s, idx) => { const el = document.querySelector(`.live-dist-${idx}`); if (el) { const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon); el.innerText = `${d} km da te`; } }); }
+    function updateItineraryDistance() { if (!AppState.userCoords || !AppState.activeTrip || !AppState.db[AppState.activeTrip]) return; AppState.db[AppState.activeTrip].forEach((item, idx) => { const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`); const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, item.lt, item.ln); badges.forEach(badge => { badge.innerHTML = `📍${d} km`; }); }); }
     
-    async function openFullDesc(idx) { 
-        const s = currentSuggestions[idx]; 
-        document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; 
-        showLoader("Recupero Info...");
-        try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.title}". Trova/stima orari. JSON: {"info": "...", "hours": "..."}`); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } 
-        catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader();
-    }
+    async function openFullDesc(idx) { const s = currentSuggestions[idx]; document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.title}". Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
+    async function openSavedDesc(city, idx) { const s = AppState.db[city][idx]; if (!s) return; document.getElementById('modalTitle').innerText = s.n; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.n}". Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
 
-    async function openSavedDesc(city, idx) {
-        const s = database[city][idx];
-        if (!s) return;
-        document.getElementById('modalTitle').innerText = s.n; 
-        document.getElementById('modalBody').innerText = "Ricerca info in corso..."; 
-        document.getElementById('modalHours').innerText = "🕒 ..."; 
-        document.getElementById('descModal').style.display = 'block'; 
-        showLoader("Recupero Info...");
-        try { 
-            const data = await callAI(`Descrivi brevemente questo luogo: "${s.n}". Trova/stima orari. JSON: {"info": "...", "hours": "..."}`); 
-            document.getElementById('modalBody').innerText = data.info; 
-            document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; 
-        } catch(e) { 
-            document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; 
-            document.getElementById('modalHours').innerText = ""; 
-        } 
-        hideLoader();
-    }
+    function openAddModal(placeObj) { pendingPlaceToAdd = placeObj; document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n; const select = document.getElementById('addModalSelect'); const trips = Object.keys(AppState.db); let optionsHtml = trips.map(t => `<option value="${t}">${t}</option>`).join(''); optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`; select.innerHTML = optionsHtml; if (AppState.activeTrip && trips.includes(AppState.activeTrip)) { select.value = AppState.activeTrip; } else if (trips.length === 0) { select.value = "_new_"; } handleAddModalChange(); document.getElementById('addPlaceModal').style.display = 'flex'; }
+    function handleAddModalChange() { const val = document.getElementById('addModalSelect').value; const inputField = document.getElementById('addModalNewInput'); if (val === '_new_') { inputField.style.display = 'block'; inputField.value = ''; inputField.focus(); } else { inputField.style.display = 'none'; } }
+    function closeAddModal() { document.getElementById('addPlaceModal').style.display = 'none'; pendingPlaceToAdd = null; }
 
-    function openAddModal(placeObj) {
-        pendingPlaceToAdd = placeObj;
-        document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n;
-        
-        const select = document.getElementById('addModalSelect');
-        const trips = Object.keys(database);
-        
-        let optionsHtml = trips.map(t => `<option value="${t}">${t}</option>`).join('');
-        optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`;
-        select.innerHTML = optionsHtml;
-        
-        if (currentActiveTrip && trips.includes(currentActiveTrip)) {
-            select.value = currentActiveTrip;
-        } else if (trips.length === 0) {
-            select.value = "_new_";
-        }
-        
-        handleAddModalChange();
-        document.getElementById('addPlaceModal').style.display = 'flex';
-    }
+    function openTripManager() { if (!AppState.activeTrip) return; document.getElementById('tripManagerName').innerText = '📁 ' + AppState.activeTrip; document.getElementById('tripRenameInput').value = AppState.activeTrip; document.getElementById('tripManagerModal').style.display = 'flex'; }
+    function closeTripManager() { document.getElementById('tripManagerModal').style.display = 'none'; }
+    function confirmRenameTrip() { const newName = document.getElementById('tripRenameInput').value.trim(); if (!newName) { showToast("⚠️ Inserisci un nome valido.", "error"); return; } if (newName === AppState.activeTrip) { closeTripManager(); return; } if (AppState.db[newName]) { showToast("⚠️ Esiste già un itinerario con questo nome.", "error"); return; } AppState.db[newName] = AppState.db[AppState.activeTrip]; delete AppState.db[AppState.activeTrip]; if (AppState.meta[AppState.activeTrip]) { AppState.meta[newName] = AppState.meta[AppState.activeTrip]; delete AppState.meta[AppState.activeTrip]; } AppState.activeTrip = newName; saveAllData(); closeTripManager(); refreshList(); showToast(`✅ Rinominato in "${newName}"`); }
+    function confirmDuplicateTrip() { if (!AppState.activeTrip) return; let newName = AppState.activeTrip + ' (copia)'; let counter = 2; while (AppState.db[newName]) { newName = AppState.activeTrip + ` (copia ${counter++})`; } AppState.db[newName] = JSON.parse(JSON.stringify(AppState.db[AppState.activeTrip])); if (AppState.meta[AppState.activeTrip]) AppState.meta[newName] = JSON.parse(JSON.stringify(AppState.meta[AppState.activeTrip])); saveAllData(); AppState.activeTrip = newName; closeTripManager(); refreshList(); showToast(`📋 Duplicato come "${newName}"`); }
+    function confirmDeleteTrip() { if (!AppState.activeTrip) return; if (!confirm(`Eliminare l'itinerario "${AppState.activeTrip}" e tutte le sue tappe? L'operazione non è reversibile.`)) return; delete AppState.db[AppState.activeTrip]; delete AppState.meta[AppState.activeTrip]; AppState.activeTrip = ''; saveAllData(); closeTripManager(); refreshList(); showToast('🗑️ Itinerario eliminato.'); }
 
-    function handleAddModalChange() {
-        const val = document.getElementById('addModalSelect').value;
-        const inputField = document.getElementById('addModalNewInput');
-        if (val === '_new_') {
-            inputField.style.display = 'block';
-            inputField.value = '';
-            inputField.focus();
-        } else {
-            inputField.style.display = 'none';
-        }
-    }
-
-    function closeAddModal() {
-        document.getElementById('addPlaceModal').style.display = 'none';
-        pendingPlaceToAdd = null;
-    }
-
-    function openTripManager() {
-        if (!currentActiveTrip) return;
-        document.getElementById('tripManagerName').innerText = '📁 ' + currentActiveTrip;
-        document.getElementById('tripRenameInput').value = currentActiveTrip;
-        document.getElementById('tripManagerModal').style.display = 'flex';
-    }
-
-    function closeTripManager() {
-        document.getElementById('tripManagerModal').style.display = 'none';
-    }
-
-    function confirmRenameTrip() {
-        const newName = document.getElementById('tripRenameInput').value.trim();
-        if (!newName) { showToast("⚠️ Inserisci un nome valido.", "error"); return; }
-        if (newName === currentActiveTrip) { closeTripManager(); return; }
-        if (database[newName]) { showToast("⚠️ Esiste già un itinerario con questo nome.", "error"); return; }
-        database[newName] = database[currentActiveTrip];
-        delete database[currentActiveTrip];
-        if (tripMeta[currentActiveTrip]) {
-            tripMeta[newName] = tripMeta[currentActiveTrip];
-            delete tripMeta[currentActiveTrip];
-        }
-        currentActiveTrip = newName;
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-        closeTripManager();
-        refreshList();
-        showToast(`✅ Rinominato in "${newName}"`);
-    }
-
-    function confirmDuplicateTrip() {
-        if (!currentActiveTrip) return;
-        let newName = currentActiveTrip + ' (copia)';
-        let counter = 2;
-        while (database[newName]) { newName = currentActiveTrip + ` (copia ${counter++})`; }
-        database[newName] = JSON.parse(JSON.stringify(database[currentActiveTrip]));
-        if (tripMeta[currentActiveTrip]) tripMeta[newName] = JSON.parse(JSON.stringify(tripMeta[currentActiveTrip]));
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-        currentActiveTrip = newName;
-        closeTripManager();
-        refreshList();
-        showToast(`📋 Duplicato come "${newName}"`);
-    }
-
-    function confirmDeleteTrip() {
-        if (!currentActiveTrip) return;
-        if (!confirm(`Eliminare l'itinerario "${currentActiveTrip}" e tutte le sue tappe? L'operazione non è reversibile.`)) return;
-        delete database[currentActiveTrip];
-        delete tripMeta[currentActiveTrip];
-        currentActiveTrip = '';
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-        closeTripManager();
-        refreshList();
-        showToast('🗑️ Itinerario eliminato.');
-    }
-
-    function confirmAddPlace() {
-        if (!pendingPlaceToAdd) return;
-        
-        let targetTrip = document.getElementById('addModalSelect').value;
-        if (targetTrip === '_new_') {
-            targetTrip = document.getElementById('addModalNewInput').value.trim();
-            if (!targetTrip) { showToast("⚠️ Inserisci un nome per il nuovo itinerario", "error"); return; }
-        }
-        
-        if (!database[targetTrip]) database[targetTrip] = [];
-        
-        let targetDay = 1;
-        if (database[targetTrip].length > 0) {
-            targetDay = Math.max(...database[targetTrip].map(i => i.day || 1));
-        }
-        pendingPlaceToAdd.day = targetDay;
-
-        database[targetTrip].push(pendingPlaceToAdd);
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-        currentActiveTrip = targetTrip;
-        
-        refreshList();
-        closeAddModal();
-        showToast("✅ Tappa salvata in: " + targetTrip);
-    }
-    
-    function savePlace(idx) { 
-        const s = currentSuggestions[idx]; 
-        openAddModal({ n: s.title, lt: s.lat, ln: s.lon, note: "", time: "", link: "", photo: "", cost: "", type: s.type || 'other' });
-    }
+    function confirmAddPlace() { if (!pendingPlaceToAdd) return; let targetTrip = document.getElementById('addModalSelect').value; if (targetTrip === '_new_') { targetTrip = document.getElementById('addModalNewInput').value.trim(); if (!targetTrip) { showToast("⚠️ Inserisci un nome per il nuovo itinerario", "error"); return; } } if (!AppState.db[targetTrip]) AppState.db[targetTrip] = []; let targetDay = 1; if (AppState.db[targetTrip].length > 0) { targetDay = Math.max(...AppState.db[targetTrip].map(i => i.day || 1)); } pendingPlaceToAdd.day = targetDay; AppState.db[targetTrip].push(pendingPlaceToAdd); saveAllData(); AppState.activeTrip = targetTrip; refreshList(); closeAddModal(); showToast("✅ Tappa salvata in: " + targetTrip); }
+    function savePlace(idx) { const s = currentSuggestions[idx]; openAddModal({ n: s.title, lt: s.lat, ln: s.lon, note: "", time: "", link: "", photo: "", cost: "", type: s.type || 'other' }); }
 
     async function searchAndSaveManual() { 
-        const q = document.getElementById('mSearch').value; if(!q) return; 
-        const customName = document.getElementById('mName').value.trim(); 
-        showLoader("Ricerca indirizzo...");
-        
+        const q = document.getElementById('mSearch').value; if(!q) return; const customName = document.getElementById('mName').value.trim(); showLoader("Ricerca indirizzo...");
         let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=1`;
-        if (map) {
-            const bounds = map.getBounds();
-            url += `&viewbox=${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}&bounded=0`;
-        }
-
+        if (map) { const bounds = map.getBounds(); url += `&viewbox=${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}&bounded=0`; }
         try {
-            let res = await fetch(url); 
-            let data = await res.json(); 
-            
-            let lat = null, lon = null;
-            let placeName = customName || q; 
-            let foundExactHouseNumber = false;
-            let foundRealName = false;
-
+            let res = await throttledFetch(url); let data = await res.json(); 
+            let lat = null, lon = null; let placeName = customName || q; let foundExactHouseNumber = false; let foundRealName = false;
             if(data[0]) { 
-                lat = parseFloat(data[0].lat);
-                lon = parseFloat(data[0].lon);
-                
+                lat = parseFloat(data[0].lat); lon = parseFloat(data[0].lon);
                 if (data[0].name && !/^\d+[a-zA-Z]?$/.test(data[0].name)) {
                     let isJustAddress = false;
-                    if (data[0].address) {
-                        if (data[0].name === data[0].address.road) isJustAddress = true;
-                        if (data[0].name === data[0].address.city || data[0].name === data[0].address.town) isJustAddress = true;
-                    }
-                    if (!isJustAddress) {
-                        placeName = data[0].name; 
-                        foundRealName = true;
-                    }
+                    if (data[0].address) { if (data[0].name === data[0].address.road || data[0].name === data[0].address.city || data[0].name === data[0].address.town) isJustAddress = true; }
+                    if (!isJustAddress) { placeName = data[0].name; foundRealName = true; }
                 }
-                
-                if (!foundRealName) {
-                    if (!customName) { 
-                        if (data[0].address && data[0].address.road) {
-                            placeName = data[0].address.road + (data[0].address.house_number ? " " + data[0].address.house_number : "");
-                        } else if (data[0].display_name) {
-                            placeName = data[0].display_name.split(',')[0];
-                        }
-                    } else { 
-                        placeName = customName;
-                    }
-                }
-
+                if (!foundRealName) { if (!customName) { if (data[0].address && data[0].address.road) { placeName = data[0].address.road + (data[0].address.house_number ? " " + data[0].address.house_number : ""); } else if (data[0].display_name) { placeName = data[0].display_name.split(',')[0]; } } else { placeName = customName; } }
                 if (data[0].address && data[0].address.house_number) foundExactHouseNumber = true;
             }
-
             if (!foundExactHouseNumber) {
                 try {
                     let photUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=1`;
                     if(map) { const c = map.getCenter(); photUrl += `&lat=${c.lat}&lon=${c.lng}`; } 
-                    
-                    let photRes = await fetch(photUrl);
-                    let photData = await photRes.json();
-                    
+                    let photRes = await throttledFetch(photUrl); let photData = await photRes.json();
                     if (photData.features && photData.features.length > 0) {
-                        let f = photData.features[0];
-                        lat = parseFloat(f.geometry.coordinates[1]);
-                        lon = parseFloat(f.geometry.coordinates[0]);
-                        let p = f.properties;
-                        
-                        let localFoundRealName = false;
-                        if (p.name) {
-                            let isJustAddressPhot = false;
-                            if (p.name === p.street || p.name === p.city || p.name === p.town) isJustAddressPhot = true;
-                            
-                            if (!isJustAddressPhot) {
-                                placeName = p.name;
-                                localFoundRealName = true;
-                                foundRealName = true;
-                            }
-                        }
-                        
-                        if (!localFoundRealName && !foundRealName) {
-                            if (!customName) { 
-                                if (p.street) {
-                                    placeName = p.street + (p.housenumber ? " " + p.housenumber : "");
-                                }
-                            } else { 
-                                placeName = customName;
-                            }
-                        }
-                        
+                        let f = photData.features[0]; lat = parseFloat(f.geometry.coordinates[1]); lon = parseFloat(f.geometry.coordinates[0]); let p = f.properties; let localFoundRealName = false;
+                        if (p.name) { let isJustAddressPhot = false; if (p.name === p.street || p.name === p.city || p.name === p.town) isJustAddressPhot = true; if (!isJustAddressPhot) { placeName = p.name; localFoundRealName = true; foundRealName = true; } }
+                        if (!localFoundRealName && !foundRealName) { if (!customName) { if (p.street) { placeName = p.street + (p.housenumber ? " " + p.housenumber : ""); } } else { placeName = customName; } }
                         if(p.housenumber) foundExactHouseNumber = true;
                     }
-                } catch(err) {
-                    console.log("Errore motore secondario:", err);
-                }
+                } catch(err) {}
             }
-
             if (lat !== null && lon !== null) { 
-                openAddModal({ n: placeName, lt: lat, ln: lon, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); 
-                toggleManual(); 
-                
-                document.getElementById('mSearch').value = '';
-                document.getElementById('mName').value = '';
-                
-                if (!foundExactHouseNumber && q.match(/\d+/)) {
-                    setTimeout(() => showToast("⚠️ Civico esatto assente nel database. Ti ho posizionato nella via.", "error"), 800);
-                }
-            } else {
-                showToast("⚠️ Indirizzo non trovato. Usa il tasto SALVA POSIZIONE MAPPA inquadrandolo a mano.", "error");
-            }
-        } catch(e) {
-            showToast("⚠️ Errore di connessione.", "error");
-        }
-        
+                openAddModal({ n: placeName, lt: lat, ln: lon, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); toggleManual(); document.getElementById('mSearch').value = ''; document.getElementById('mName').value = '';
+                if (!foundExactHouseNumber && q.match(/\d+/)) { setTimeout(() => showToast("⚠️ Civico esatto assente nel database. Ti ho posizionato nella via.", "error"), 800); }
+            } else { showToast("⚠️ Indirizzo non trovato. Usa il tasto SALVA POSIZIONE MAPPA inquadrandolo a mano.", "error"); }
+        } catch(e) { showToast("⚠️ Errore di connessione.", "error"); }
         hideLoader();
     }
     
-    function saveManual() { 
-        if(!map) return;
-        const c = map.getCenter(); 
-        openAddModal({ n: document.getElementById('mName').value || "Punto Custom", lt: c.lat, ln: c.lng, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); 
-        toggleManual(); 
-    }
+    function saveManual() { if(!map) return; const c = map.getCenter(); openAddModal({ n: document.getElementById('mName').value || "Punto Custom", lt: c.lat, ln: c.lng, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); toggleManual(); }
 
-    function changeActiveTrip() { currentActiveTrip = document.getElementById('tripSelector').value; refreshList(); showItineraryMarkers(); }
+    function changeActiveTrip() { AppState.activeTrip = document.getElementById('tripSelector').value; refreshList(); showItineraryMarkers(); }
 
     function compressAndSavePhoto(event, city, idx) {
-        const file = event.target.files[0]; if (!file) return;
-        showLoader("Compressione foto...");
-        const reader = new FileReader();
+        const file = event.target.files[0]; if (!file) return; showLoader("Compressione foto..."); const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const MAX = 400; // ridotto da 600 a 400px
-                let w = img.width, h = img.height;
-                if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-                else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-                // Compressione adattiva: parte da qualità 0.7, scende fino a 0.3 se necessario
-                let quality = 0.7;
-                let dataUrl = canvas.toDataURL('image/jpeg', quality);
-                while (dataUrl.length > 500000 && quality > 0.3) {
-                    quality -= 0.1;
-                    dataUrl = canvas.toDataURL('image/jpeg', quality);
-                }
-
-                if (dataUrl.length > 600000) {
-                    hideLoader();
-                    showToast("⚠️ Foto troppo grande anche dopo compressione. Usa un'immagine più piccola.", "error");
-                    return;
-                }
-
-                const sizeKb = Math.round(dataUrl.length * 0.75 / 1024);
-                database[city][idx].photo = dataUrl;
-                safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-                refreshList(); hideLoader();
-                showToast(`📸 Salvata! (${sizeKb} KB, qualità ${Math.round(quality*100)}%)`);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+                const canvas = document.createElement('canvas'); const MAX = 400; let w = img.width, h = img.height;
+                if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } } else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+                canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                let quality = 0.7; let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                while (dataUrl.length > 500000 && quality > 0.3) { quality -= 0.1; dataUrl = canvas.toDataURL('image/jpeg', quality); }
+                if (dataUrl.length > 600000) { hideLoader(); showToast("⚠️ Foto troppo grande anche dopo compressione. Usa un'immagine più piccola.", "error"); return; }
+                const sizeKb = Math.round(dataUrl.length * 0.75 / 1024); AppState.db[city][idx].photo = dataUrl; saveAllData(); refreshList(); hideLoader(); showToast(`📸 Salvata! (${sizeKb} KB, qualità ${Math.round(quality*100)}%)`);
+            }; img.src = e.target.result;
+        }; reader.readAsDataURL(file);
     }
-    function removePhoto(city, idx) { delete database[city][idx].photo; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showToast("🗑️ Rimossa."); }
+    
+    function removePhoto(city, idx) { delete AppState.db[city][idx].photo; saveAllData(); refreshList(); showToast("🗑️ Rimossa."); }
 
-    function findIndoorAlternatives() {
-        document.getElementById('aiQuery').value = `Cosa fare al coperto a ${currentActiveTrip} (musei, mostre, attività indoor)?`;
+    function findIndoorAlternatives() { document.getElementById('aiQuery').value = `Cosa fare al coperto a ${AppState.activeTrip} (musei, mostre, attività indoor)?`; switchTab('scopri'); askAI(); }
+
+    function findAlternative(city, idx) {
+        document.getElementById('aiQuery').value = `Consigliami un'alternativa simile a ${AppState.db[city][idx].n} a ${city}`;
         switchTab('scopri');
         askAI();
     }
 
     async function updateWeatherWidget() {
         const wBox = document.getElementById('weatherWidget');
-        if(!currentActiveTrip || !database[currentActiveTrip] || database[currentActiveTrip].length === 0) { wBox.style.display = 'none'; return; }
-        
-        if (currentActiveTrip === lastWeatherTrip && wBox.innerHTML !== "") { 
-            wBox.style.display = 'flex'; 
-            return; 
-        }
-        
-        const firstPlace = database[currentActiveTrip][0]; if(!firstPlace || !firstPlace.lt) return;
-        
+        if(!AppState.activeTrip || !AppState.db[AppState.activeTrip] || AppState.db[AppState.activeTrip].length === 0) { wBox.style.display = 'none'; return; }
+        if (AppState.activeTrip === lastWeatherTrip && wBox.innerHTML !== "") { wBox.style.display = 'flex'; return; }
+        const firstPlace = AppState.db[AppState.activeTrip][0]; if(!firstPlace || !firstPlace.lt) return;
         try {
             const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${firstPlace.lt}&longitude=${firstPlace.ln}&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`);
-            const data = await res.json();
-            currentWeatherForecast = data; lastWeatherTrip = currentActiveTrip;
-
-            const today = data.daily;
-            const sunrise = today.sunrise[0].split('T')[1]; const sunset = today.sunset[0].split('T')[1];
-            const maxT = today.temperature_2m_max[0]; const minT = today.temperature_2m_min[0];
-            const code = today.weathercode[0];
-
-            let emoji = '☀️';
-            if([1,2,3].includes(code)) emoji = '⛅'; else if([45,48].includes(code)) emoji = '🌫️'; else if([51,53,55,61,63,65,80,81,82].includes(code)) emoji = '🌧️'; else if([71,73,75,85,86].includes(code)) emoji = '❄️'; else if([95,96,99].includes(code)) emoji = '⛈️';
-
-            let rainAlertHtml = '';
-            if([51,53,55,61,63,65,80,81,82,95,96,99].includes(code)) {
-                rainAlertHtml = `<div style="margin-top: 8px; background: rgba(74, 158, 187, 0.2); border-radius: 6px; padding: 10px; font-size: 12px; text-align: center; width: 100%; box-sizing: border-box; border: 1px solid rgba(74, 158, 187, 0.5);">
-                    🌧️ <b>Prevista pioggia!</b> Vuoi un'alternativa?
-                    <button onclick="findIndoorAlternatives()" style="background: var(--accent-blue); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; width: 100%;">🔍 Cerca attività al coperto</button>
-                </div>`;
-            }
-
-            wBox.innerHTML = `
-                <div class="weather-row">
-                    <div class="weather-col"><span class="weather-label">Oggi</span><span class="weather-val">${emoji} ${minT}° / ${maxT}°</span></div>
-                    <div class="weather-col"><span class="weather-label">Alba</span><span class="weather-val" style="color:var(--accent-gold)">🌅 ${sunrise}</span></div>
-                    <div class="weather-col"><span class="weather-label">Tramonto</span><span class="weather-val" style="color:#e74c3c">🌇 ${sunset}</span></div>
-                </div>
-                ${rainAlertHtml}
-            `;
-            wBox.style.display = 'flex';
+            const data = await res.json(); currentWeatherForecast = data; lastWeatherTrip = AppState.activeTrip;
+            const today = data.daily; const sunrise = today.sunrise[0].split('T')[1]; const sunset = today.sunset[0].split('T')[1];
+            const maxT = today.temperature_2m_max[0]; const minT = today.temperature_2m_min[0]; const code = today.weathercode[0];
+            let emoji = '☀️'; if([1,2,3].includes(code)) emoji = '⛅'; else if([45,48].includes(code)) emoji = '🌫️'; else if([51,53,55,61,63,65,80,81,82].includes(code)) emoji = '🌧️'; else if([71,73,75,85,86].includes(code)) emoji = '❄️'; else if([95,96,99].includes(code)) emoji = '⛈️';
+            let rainAlertHtml = ''; if([51,53,55,61,63,65,80,81,82,95,96,99].includes(code)) { rainAlertHtml = `<div style="margin-top: 8px; background: rgba(74, 158, 187, 0.2); border-radius: 6px; padding: 10px; font-size: 12px; text-align: center; width: 100%; box-sizing: border-box; border: 1px solid rgba(74, 158, 187, 0.5);">🌧️ <b>Prevista pioggia!</b> Vuoi un'alternativa? <button onclick="findIndoorAlternatives()" style="background: var(--accent-blue); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; width: 100%;">🔍 Cerca attività al coperto</button></div>`; }
+            wBox.innerHTML = `<div class="weather-row"><div class="weather-col"><span class="weather-label">Oggi</span><span class="weather-val">${emoji} ${minT}° / ${maxT}°</span></div><div class="weather-col"><span class="weather-label">Alba</span><span class="weather-val" style="color:var(--accent-gold)">🌅 ${sunrise}</span></div><div class="weather-col"><span class="weather-label">Tramonto</span><span class="weather-val" style="color:#e74c3c">🌇 ${sunset}</span></div></div>${rainAlertHtml}`; wBox.style.display = 'flex';
         } catch(e) { wBox.style.display = 'none'; }
     }
 
     async function analyzeWeatherAI() {
-        if(!currentActiveTrip || !currentWeatherForecast) { showToast("Meteo non ancora disponibile. Aggiungi tappe.", "error"); return; }
+        if(!AppState.activeTrip || !currentWeatherForecast) { showToast("Meteo non ancora disponibile. Aggiungi tappe.", "error"); return; }
         showLoader("Analisi Meteo e Itinerario...");
         try {
-            let places = database[currentActiveTrip].map(p => ({ n: p.n, day: p.day||1, type: p.type||"other" }));
+            let places = AppState.db[AppState.activeTrip].map(p => ({ n: p.n, day: p.day||1, type: p.type||"other" }));
             let forecast = currentWeatherForecast.daily.weathercode.map((c, i) => ({ day: i+1, code: c })); 
-            const prompt = `Itinerario: ${JSON.stringify(places)}. Previsioni semplificate (Giorno 1 è oggi): ${JSON.stringify(forecast)}. Agisci da meteorologo/tour operator esperto. Dai un consiglio breve e amichevole in italiano. Formato JSON: {"advice": "..."}`;
-            const data = await callAI(prompt);
-            document.getElementById('modalTitle').innerText = "Consigli Meteo dell'IA 🌤️";
-            document.getElementById('modalBody').innerText = data.advice;
-            document.getElementById('modalHours').innerText = "Valutazione intelligente dei tuoi giorni...";
-            document.getElementById('descModal').style.display = 'block';
-        } catch(e) { }
-        hideLoader();
+            const prompt = `Itinerario: ${JSON.stringify(places)}. Previsioni: ${JSON.stringify(forecast)}. Dai un consiglio breve meteo in italiano.`;
+            const data = await callAI(prompt, {type:"OBJECT", properties:{advice:{type:"STRING"}}});
+            document.getElementById('modalTitle').innerText = "Consigli Meteo dell'IA 🌤️"; document.getElementById('modalBody').innerText = data.advice; document.getElementById('modalHours').innerText = "Valutazione intelligente dei tuoi giorni..."; document.getElementById('descModal').style.display = 'block';
+        } catch(e) { } hideLoader();
     }
     
-    function updateTravelMeta(field, value) {
-        if(!currentActiveTrip) return;
-        if(!tripMeta[currentActiveTrip]) tripMeta[currentActiveTrip] = {};
-        tripMeta[currentActiveTrip][field] = parseFloat(value) || 0;
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-        refreshList();
+    function updateTravelMeta(field, value) { if(!AppState.activeTrip) return; if(!AppState.meta[AppState.activeTrip]) AppState.meta[AppState.activeTrip] = {}; AppState.meta[AppState.activeTrip][field] = parseFloat(value) || 0; saveAllData(); refreshStatsUI(); }
+
+    function refreshStatsUI() {
+        const statsBox = document.getElementById('tripStats');
+        const survivalWidget = document.getElementById('survivalWidget');
+        if (!AppState.activeTrip || !AppState.db[AppState.activeTrip]) return;
+
+        if (AppState.meta[AppState.activeTrip] && AppState.meta[AppState.activeTrip].survival) {
+            let s = AppState.meta[AppState.activeTrip].survival;
+            survivalWidget.innerHTML = `<div style="background: rgba(232, 184, 75, 0.08); border: 1px dashed var(--accent-gold); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px;"><div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">🎒 Kit di Sopravvivenza Locale</div><div style="margin-bottom: 4px;">💸 <b>Valuta:</b> <span style="color:#ccc">${s.currency || '--'}</span></div><div style="margin-bottom: 4px;">🤝 <b>Mance:</b> <span style="color:#ccc">${s.tips || '--'}</span></div><div style="margin-bottom: 4px;">🔌 <b>Prese:</b> <span style="color:#ccc">${s.plugs || '--'}</span></div><div>🆘 <b>Info Utili:</b> <span style="color:#ccc">${s.emergency || '--'}</span></div></div>`;
+            survivalWidget.style.display = 'block';
+        } else { survivalWidget.style.display = 'none'; }
+        
+        let currentTripItems = AppState.db[AppState.activeTrip] || []; let daysCount = new Set(); let totalCost = 0; let paidCost = 0;
+        let expenses = { travel: parseFloat(AppState.meta[AppState.activeTrip]?.travelCost) || 0, hotel: parseFloat(AppState.meta[AppState.activeTrip]?.hotelCost) || 0, food: 0, activities: 0, other: 0 };
+        totalCost += expenses.travel + expenses.hotel;
+
+        currentTripItems.forEach((item) => { 
+            daysCount.add(item.day || 1);
+            if(item.cost && !isNaN(item.cost)) {
+                let c = parseFloat(item.cost); totalCost += c; if (item.paid) paidCost += c;
+                if (item.type === 'food') expenses.food += c; else if (item.type === 'hotel') expenses.hotel += c; else if (item.type === 'monument' || item.type === 'nature') expenses.activities += c; else expenses.other += c;
+            }
+        });
+        const remainingCost = totalCost - paidCost;
+
+        statsBox.style.display = 'block'; 
+        statsBox.innerHTML = `📍 <b>${currentTripItems.length}</b> tappe <span style="margin:0 5px; opacity:0.3">|</span> 📅 <b>${daysCount.size}</b> giorni
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="position: relative; width: 75px; height: 75px; flex-shrink: 0;"><canvas id="budgetChart" width="75" height="75"></canvas></div>
+            <div style="flex: 1; font-size: 11px; line-height: 1.6; font-weight: 600;">
+                <div style="display:flex; justify-content:space-between; color: var(--accent-blue)"><span>✈️ Viaggio:</span> <span>${expenses.travel.toFixed(2)}€</span></div>
+                <div style="display:flex; justify-content:space-between; color: var(--accent-green)"><span>🏨 Hotel:</span> <span>${expenses.hotel.toFixed(2)}€</span></div>
+                <div style="display:flex; justify-content:space-between; color: #e74c3c"><span>🍝 Ristoranti:</span> <span>${expenses.food.toFixed(2)}€</span></div>
+                <div style="display:flex; justify-content:space-between; color: var(--accent-gold)"><span>🎫 Biglietti/Attività:</span> <span>${expenses.activities.toFixed(2)}€</span></div>
+                <div style="display:flex; justify-content:space-between; color: #95a5a6"><span>🏷️ Altro:</span> <span>${expenses.other.toFixed(2)}€</span></div>
+            </div>
+        </div>
+        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--accent-blue);">✈️ Spese di Viaggio:</span>
+            <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${expenses.travel||''}" onchange="updateTravelMeta('travelCost', this.value)">
+        </div>
+        <div style="margin-top: 5px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--accent-green);">🏨 Spese Hotel:</span>
+            <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${expenses.hotel||''}" onchange="updateTravelMeta('hotelCost', this.value)">
+        </div>
+        <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">
+            💰 Totale stimato: <b style="color:var(--accent-green); font-size:16px;">${totalCost.toFixed(2)} €</b>
+        </div>
+        <div style="margin-top:5px; display:flex; gap:10px; font-size:13px;">
+            <span>✅ Pagato: <b style="color:#2ecc71;">${paidCost.toFixed(2)} €</b></span>
+            <span>⏳ Da pagare: <b style="color:#e8b84b;">${remainingCost.toFixed(2)} €</b></span>
+        </div>`;
+        drawBudgetChart(expenses);
+    }
+
+    function createPlaceCard(i, vIdx, sCity, d, conflictingIndices, userCoords) {
+        let photoHtml = i.photo ? `<div class="photo-preview-container active"><img src="${i.photo}" class="photo-preview" onclick="window.open('${i.photo}', '_blank')"><button class="remove-photo-btn" onclick="removePhoto('${sCity}', ${i.idx})" aria-label="Rimuovi foto">×</button></div>` : '';
+        let timeBadge = i.time ? `<span class="badge-time">🕒 ${i.time}</span>` : '';
+        let costBadge = i.cost ? `<span class="badge-cost badge-cost-live" style="${i.paid ? 'opacity:0.5; text-decoration:line-through;' : ''}">💰 ${i.cost} €</span>` : '';
+        let paidBadge = `<span class="badge-paid-live" style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; margin-left:4px; display:${i.paid ? 'inline-block' : 'none'};">✅ PAGATO</span>`;
+        let notePreview = (i.note && i.note.trim()) ? `<div style="font-size:12px; color:#a59781; margin:6px 0 0 0; padding:6px 8px; background:rgba(255,255,255,0.04); border-left:2px solid var(--border); border-radius:4px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📝 ${escapeHtml(i.note.trim())}</div>` : '';
+        const gpsDist = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, i.lt, i.ln) : null;
+        const gpsDistBadge = gpsDist !== null ? `<span class="itinerary-dist-badge" data-idx="${i.idx}" style="display:inline-flex; align-items:center; gap:3px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:6px; padding:2px 7px; font-size:10px; color:var(--accent-blue); font-weight:700; margin-left:6px;">📍${gpsDist} km</span>` : '';
+
+        let isConflict = conflictingIndices.has(i.idx);
+        let conflictClass = isConflict ? ' conflict-card' : '';
+        let conflictBadge = isConflict ? `<span class="conflict-badge" title="Orario ravvicinato o in sovrapposizione">⚠️ CONFLITTO</span>` : '';
+
+        return `<div class="card${conflictClass}" data-idx="${i.idx}" style="${i.paid ? 'opacity:0.75;' : ''}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; cursor: pointer; flex: 1;" onclick="panToMarker(${i.idx}, ${i.lt}, ${i.ln})" title="Mostra sulla mappa">
+                    <span class="drag-handle" title="Trascina per spostare" aria-label="Trascina per spostare" onclick="event.stopPropagation()">☰</span>
+                    <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${conflictBadge} ${costBadge}${paidBadge}${gpsDistBadge}</b>
+                </div>
+                <div style="display:flex; gap:5px; position:relative; z-index: 5;">
+                    <button onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;" aria-label="Sposta in alto">▲</button>
+                    <button onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;" aria-label="Sposta in basso">▼</button>
+                    <button onclick="removeItem('${sCity}', ${i.idx})" style="color:red; background:none; border:none; font-size:20px;" aria-label="Rimuovi tappa">×</button>
+                </div>
+            </div>
+            ${notePreview}
+            <div class="day-ctrl" style="margin-top:8px">
+                <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)-1})" aria-label="Sposta al giorno precedente">-</button>
+                <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)+1})" aria-label="Sposta al giorno successivo">+</button>
+            </div>
+            <div class="btn-row" style="margin-top: 10px; margin-bottom: 10px;">
+                <button class="btn-action" onclick="openSavedDesc('${sCity}', ${i.idx})">DETTAGLI</button>
+                <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
+                <button class="btn-action" style="border-color: #8a7a62; color: #8a7a62;" onclick="findAlternative('${sCity}', ${i.idx})">🔄 ALTERNATIVA</button>
+            </div>
+            <div class="wallet-box">
+                <div class="wallet-row">
+                    <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario" aria-label="Orario tappa">
+                    <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost('${sCity}', ${i.idx}, this.value)" title="Costo stimato in Euro" aria-label="Costo stimato in Euro">
+                    <button class="photo-btn" onclick="document.getElementById('cam-${i.idx}').click()" title="Allega Foto" aria-label="Allega Foto">📷</button>
+                    <input type="file" id="cam-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
+                </div>
+                <div class="wallet-row" style="align-items:center; gap:10px;">
+                    <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink('${sCity}', ${i.idx}, this.value)" style="flex:1;">
+                    <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : '#8a7a62'}; user-select:none;" title="Segna come pagato">
+                        <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid('${sCity}', ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;"> Pagato
+                    </label>
+                </div>
+            </div>
+            ${i.link ? `<a href="${escapeHtml(i.link)}" target="_blank" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
+            ${photoHtml}
+            <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote('${sCity}', ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
+        </div>`;
     }
 
     function refreshList() {
         try {
             const b = document.getElementById('myList'); const actionsBox = document.getElementById('itinerary-actions');
-            const selector = document.getElementById('tripSelector'); const statsBox = document.getElementById('tripStats');
-            const aiActions = document.getElementById('ai-actions-box'); const navBtn = document.getElementById('btn-start-nav'); b.innerHTML = "";
-            const routingToggleBox = document.getElementById('routing-toggle-box'); const survivalWidget = document.getElementById('survivalWidget');
+            const selector = document.getElementById('tripSelector'); const aiActions = document.getElementById('ai-actions-box'); 
+            const navBtn = document.getElementById('btn-start-nav'); const routingToggleBox = document.getElementById('routing-toggle-box'); 
+            b.innerHTML = "";
             
             if(document.getElementById('userApiKeyInput')) document.getElementById('userApiKeyInput').value = userPersonalApiKey;
 
-            let availableCities = Object.keys(database).filter(c => database[c] && database[c].length > 0);
+            let availableCities = Object.keys(AppState.db).filter(c => AppState.db[c] && AppState.db[c].length > 0);
             if (availableCities.length === 0) {
-                selector.style.display = statsBox.style.display = actionsBox.style.display = aiActions.style.display = navBtn.style.display = 'none';
-                routingToggleBox.style.display = survivalWidget.style.display = 'none';
-                document.getElementById('weatherWidget').style.display = 'none';
-                document.getElementById('tripManageBtn').style.display = 'none';
+                selector.style.display = actionsBox.style.display = aiActions.style.display = navBtn.style.display = routingToggleBox.style.display = 'none';
+                document.getElementById('tripStats').style.display = document.getElementById('weatherWidget').style.display = document.getElementById('survivalWidget').style.display = document.getElementById('tripManageBtn').style.display = 'none';
                 b.innerHTML = `<div class="empty-state">Nessuna tappa salvata. Clicca su "🪄 AI Wizard" o "Esplora" per iniziare.</div>`; return;
             }
-            if (!currentActiveTrip || !availableCities.includes(currentActiveTrip)) currentActiveTrip = availableCities[0];
-            selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${c}" ${c === currentActiveTrip ? 'selected' : ''}>${c.toUpperCase()}</option>`).join("");
+            if (!AppState.activeTrip || !availableCities.includes(AppState.activeTrip)) AppState.activeTrip = availableCities[0];
+            selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${c}" ${c === AppState.activeTrip ? 'selected' : ''}>${c.toUpperCase()}</option>`).join("");
             document.getElementById('tripManageBtn').style.display = 'block';
             
             updateWeatherWidget(); 
+            refreshStatsUI();
 
-            if (tripMeta[currentActiveTrip] && tripMeta[currentActiveTrip].survival) {
-                let s = tripMeta[currentActiveTrip].survival;
-                survivalWidget.innerHTML = `<div style="background: rgba(232, 184, 75, 0.08); border: 1px dashed var(--accent-gold); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px;">
-                    <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">🎒 Kit di Sopravvivenza Locale</div>
-                    <div style="margin-bottom: 4px;">💸 <b>Valuta:</b> <span style="color:#ccc">${s.currency || '--'}</span></div>
-                    <div style="margin-bottom: 4px;">🤝 <b>Mance:</b> <span style="color:#ccc">${s.tips || '--'}</span></div>
-                    <div style="margin-bottom: 4px;">🔌 <b>Prese:</b> <span style="color:#ccc">${s.plugs || '--'}</span></div>
-                    <div>🆘 <b>Info Utili:</b> <span style="color:#ccc">${s.emergency || '--'}</span></div>
-                </div>`;
-                survivalWidget.style.display = 'block';
-            } else {
-                survivalWidget.style.display = 'none';
-            }
+            let currentTripItems = AppState.db[AppState.activeTrip] || []; let days = {};
+            currentTripItems.forEach((item, idx) => { const d = item.day || 1; if(!days[d]) days[d] = []; days[d].push({...item, idx}); });
             
-            let currentTripItems = database[currentActiveTrip] || []; let days = {}; let totalCost = 0; let paidCost = 0;
-            
-            currentTripItems.forEach((item, idx) => { 
-                const d = item.day || 1; if(!days[d]) days[d] = []; days[d].push({...item, idx}); 
-                if(item.cost && !isNaN(item.cost)) {
-                    totalCost += parseFloat(item.cost);
-                    if (item.paid) paidCost += parseFloat(item.cost);
-                }
-            });
-
-            let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
-            let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
-            totalCost += tCostNum + hCostNum;
-            const remainingCost = totalCost - paidCost;
-            
-            statsBox.style.display = 'block'; 
-            statsBox.innerHTML = `📍 <b>${currentTripItems.length}</b> tappe <span style="margin:0 5px; opacity:0.3">|</span> 📅 <b>${Object.keys(days).length}</b> giorni
-            <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 13px; color: var(--accent-blue);">✈️ Spese di Viaggio:</span>
-                <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${tCostNum||''}" onchange="updateTravelMeta('travelCost', this.value)">
-            </div>
-            <div style="margin-top: 5px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 13px; color: var(--accent-green);">🏨 Spese Hotel:</span>
-                <input type="number" step="0.01" class="wallet-input" style="width: 85px; padding: 6px; flex: none; text-align:center; font-size:13px;" placeholder="€" value="${hCostNum||''}" onchange="updateTravelMeta('hotelCost', this.value)">
-            </div>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">
-                💰 Totale stimato: <b style="color:var(--accent-green); font-size:16px;">${totalCost.toFixed(2)} €</b>
-            </div>
-            <div style="margin-top:5px; display:flex; gap:10px; font-size:13px;">
-                <span>✅ Pagato: <b style="color:#2ecc71;">${paidCost.toFixed(2)} €</b></span>
-                <span>⏳ Da pagare: <b style="color:#e8b84b;">${remainingCost.toFixed(2)} €</b></span>
-            </div>`;
-
             actionsBox.style.display = aiActions.style.display = navBtn.style.display = routingToggleBox.style.display = 'flex';
             
             Object.keys(days).sort((a,b) => a-b).forEach(d => {
-                // Calcola ore stimate: differenza tra prima e ultima tappa con orario
-                const timedInDay = days[d].filter(p => p.time).sort((a,b) => a.time.localeCompare(b.time));
-                let dayHoursSummary = '';
+                const timedInDay = days[d].filter(p => p.time).sort((a,b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
+                let dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe</span>`;
                 if (timedInDay.length >= 2) {
-                    const t1 = new Date(`1970-01-01T${timedInDay[0].time}:00`);
-                    const t2 = new Date(`1970-01-01T${timedInDay[timedInDay.length-1].time}:00`);
-                    const diffH = ((t2 - t1) / 3600000).toFixed(1);
+                    const diffH = ((getEffectiveMins(timedInDay[timedInDay.length-1].time) - getEffectiveMins(timedInDay[0].time)) / 60).toFixed(1);
                     dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe · ~${diffH}h</span>`;
-                } else {
-                    dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe</span>`;
                 }
 
-                b.innerHTML += `<div class="day-label">
-                    <span>GIORNO ${d}${dayHoursSummary}</span>
-                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-left:auto;">
-                        <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder('${currentActiveTrip.replace(/'/g, "\\'")}', ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA GIORNATA</button>
-                        <span style="font-size:8px; color:#8a7a62;">GPS + ora corrente</span>
+                b.innerHTML += `<div class="day-label" style="align-items: flex-end;">
+                    <span style="margin-bottom: 4px;">GIORNO ${d}${dayHoursSummary}</span>
+                    <div style="display:flex; gap:6px;">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="openDayInGoogleMaps('${AppState.activeTrip.replace(/'/g, "\\'")}', ${d})" title="Apri percorso in Google Maps">🗺️ APRI IN MAPS</button>
+                            <span style="font-size:8px; color:#8a7a62;">(Max 10 tappe)</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder('${AppState.activeTrip.replace(/'/g, "\\'")}', ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA</button>
+                            <span style="font-size:8px; color:#8a7a62;">GPS + ora</span>
+                        </div>
                     </div>
                 </div><div id="day-cont-${d}" class="day-container"></div>`;
                 
                 const container = document.getElementById(`day-cont-${d}`);
-                
-                let dayWarnings = [];
+                let dayWarnings = []; let conflictingIndices = new Set();
                 if(days[d].length > 5) dayWarnings.push(`Giornata fitta (${days[d].length} tappe).`);
                 
-                let timedPlaces = days[d].filter(p => p.time).sort((a,b) => a.time.localeCompare(b.time));
+                let timedPlaces = days[d].map((p, index) => ({...p, dayIdx: index})).filter(p => p.time).sort((a,b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
                 for(let i=0; i<timedPlaces.length-1; i++) {
-                    if(!timedPlaces[i].time || !timedPlaces[i+1].time) continue;
-                    let t1 = new Date(`1970-01-01T${timedPlaces[i].time}:00`);
-                    let t2 = new Date(`1970-01-01T${timedPlaces[i+1].time}:00`);
-                    let diffMins = (t2 - t1) / 60000;
+                    let diffMins = getEffectiveMins(timedPlaces[i+1].time) - getEffectiveMins(timedPlaces[i].time);
                     let dist = calculateDistance(timedPlaces[i].lt, timedPlaces[i].ln, timedPlaces[i+1].lt, timedPlaces[i+1].ln);
-                    if (diffMins > 0 && diffMins < (dist * 4)) { 
-                        dayWarnings.push(`Tempi stretti tra "${timedPlaces[i].n}" e "${timedPlaces[i+1].n}".`);
+                    let requiredMins = Math.max(45, dist * 4);
+                    if (diffMins < requiredMins) { 
+                        dayWarnings.push(`Tempi stretti tra "${timedPlaces[i].n}" e "${timedPlaces[i+1].n}".`); conflictingIndices.add(timedPlaces[i].idx); conflictingIndices.add(timedPlaces[i+1].idx);
                     }
                 }
-                
-                if(dayWarnings.length > 0) {
-                     container.innerHTML += `<div style="background: rgba(231, 76, 60, 0.15); border-left: 3px solid #e74c3c; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 12px; color: #ff8c8c; line-height: 1.4;">⚠️ <b>Avviso Fattibilità:</b> ${dayWarnings.join(" ")}</div>`;
+
+                let timelineHtml = '';
+                if (timedPlaces.length > 0) {
+                    let startMins = 8 * 60; let endMins = 24 * 60; 
+                    let firstMins = getEffectiveMins(timedPlaces[0].time);
+                    let lastMins = getEffectiveMins(timedPlaces[timedPlaces.length-1].time);
+                    if (firstMins < startMins) startMins = firstMins - 60; 
+                    if (lastMins > endMins) endMins = lastMins + 60; 
+                    let totalMins = endMins - startMins;
+                    
+                    let markersHtml = timedPlaces.map((tp) => {
+                        let tMins = getEffectiveMins(tp.time);
+                        let percent = Math.max(0, Math.min(100, ((tMins - startMins) / totalMins) * 100));
+                        let isConf = conflictingIndices.has(tp.idx);
+                        return `<div class="timeline-marker ${isConf ? 'conflict' : ''}" style="left: ${percent}%;" title="${escapeHtml(tp.n)}">${tp.dayIdx + 1}</div><div class="timeline-time-label" style="left: ${percent}%; ${isConf ? 'color:#e74c3c;' : ''}">${tp.time}</div>`;
+                    }).join('');
+                    timelineHtml = `<div class="timeline-wrapper"><div class="timeline-track"></div>${markersHtml}</div>`;
                 }
+                
+                if(dayWarnings.length > 0) { container.innerHTML += `<div style="background: rgba(231, 76, 60, 0.15); border-left: 3px solid #e74c3c; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-size: 12px; color: #ff8c8c; line-height: 1.4;">⚠️ <b>Avviso Fattibilità:</b> ${dayWarnings.join(" ")}</div>`; }
+                if (timelineHtml) container.innerHTML += timelineHtml;
 
                 days[d].forEach((i, vIdx) => {
-                    const sCity = currentActiveTrip.replace(/'/g, "\\'");
-                    
-                    let photoHtml = i.photo ? `<div class="photo-preview-container active"><img src="${i.photo}" class="photo-preview" onclick="window.open('${i.photo}', '_blank')"><button class="remove-photo-btn" onclick="removePhoto('${sCity}', ${i.idx})">×</button></div>` : '';
-                    let timeBadge = i.time ? `<span class="badge-time">🕒 ${i.time}</span>` : '';
-                    let costBadge = i.cost ? `<span class="badge-cost" style="${i.paid ? 'opacity:0.5; text-decoration:line-through;' : ''}">💰 ${i.cost} €</span>` : '';
-                    let paidBadge = i.paid ? `<span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; margin-left:4px;">✅ PAGATO</span>` : '';
-                    let notePreview = (i.note && i.note.trim()) ? `<div style="font-size:12px; color:#a59781; margin:6px 0 0 0; padding:6px 8px; background:rgba(255,255,255,0.04); border-left:2px solid var(--border); border-radius:4px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📝 ${escapeHtml(i.note.trim())}</div>` : '';
-                    const gpsDist = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, i.lt, i.ln) : null;
-                    const gpsDistBadge = gpsDist !== null ? `<span class="itinerary-dist-badge" data-idx="${i.idx}" style="display:inline-flex; align-items:center; gap:3px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:6px; padding:2px 7px; font-size:10px; color:var(--accent-blue); font-weight:700; margin-left:6px;">📍${gpsDist} km</span>` : '';
-
-                    container.innerHTML += `<div class="card" data-idx="${i.idx}" style="${i.paid ? 'opacity:0.75;' : ''}">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; cursor: pointer; flex: 1;" onclick="panToMarker(${i.idx}, ${i.lt}, ${i.ln})" title="Mostra sulla mappa">
-                                <span class="drag-handle" title="Trascina per spostare" onclick="event.stopPropagation()">☰</span>
-                                <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${costBadge}${paidBadge}${gpsDistBadge}</b>
-                            </div>
-                            <div style="display:flex; gap:5px; position:relative; z-index: 5;">
-                                <button onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;">▲</button>
-                                <button onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;">▼</button>
-                                <button onclick="removeItem('${sCity}', ${i.idx})" style="color:red; background:none; border:none; font-size:20px;">×</button>
-                            </div>
-                        </div>
-                        ${notePreview}
-                        <div class="day-ctrl" style="margin-top:8px">
-                            <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)-1})">-</button>
-                            <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)+1})">+</button>
-                        </div>
-                        
-                        <div class="btn-row" style="margin-top: 10px; margin-bottom: 10px;">
-                            <button class="btn-action" onclick="openSavedDesc('${sCity}', ${i.idx})">DETTAGLI</button>
-                            <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
-                        </div>
-                        
-                        <div class="wallet-box">
-                            <div class="wallet-row">
-                                <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario">
-                                <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost('${sCity}', ${i.idx}, this.value)" title="Costo stimato in Euro">
-                                <button class="photo-btn" onclick="document.getElementById('cam-${i.idx}').click()" title="Allega Foto">📷</button>
-                                <input type="file" id="cam-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
-                            </div>
-                            <div class="wallet-row" style="align-items:center; gap:10px;">
-                                <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink('${sCity}', ${i.idx}, this.value)" style="flex:1;">
-                                <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : '#8a7a62'}; user-select:none;" title="Segna come pagato">
-                                    <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid('${sCity}', ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;">
-                                    Pagato
-                                </label>
-                            </div>
-                        </div>
-                        
-                        ${i.link ? `<a href="${escapeHtml(i.link)}" target="_blank" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
-                        ${photoHtml}
-                        <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote('${sCity}', ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
-                    </div>`;
+                    container.innerHTML += createPlaceCard(i, vIdx, AppState.activeTrip.replace(/'/g, "\\'"), d, conflictingIndices, AppState.userCoords);
                 });
             });
 
             if (typeof Sortable !== 'undefined') {
                 document.querySelectorAll('.day-container').forEach(container => {
                     new Sortable(container, {
-                        handle: '.drag-handle',
-                        animation: 150,
-                        ghostClass: 'sortable-ghost',
+                        handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
                         onEnd: function () {
-                            let newOrder = [];
-                            let cTrip = document.getElementById('tripSelector').value;
-                            
+                            let newOrder = []; let cTrip = document.getElementById('tripSelector').value;
                             document.querySelectorAll('.day-container').forEach(cont => {
                                 let dayNum = parseInt(cont.id.split('-')[2]);
                                 cont.querySelectorAll('.card').forEach(card => {
-                                    let idx = parseInt(card.getAttribute('data-idx'));
-                                    let item = database[cTrip][idx];
-                                    if(item) {
-                                        item.day = dayNum; 
-                                        newOrder.push(item);
-                                    }
+                                    let item = AppState.db[cTrip][parseInt(card.getAttribute('data-idx'))];
+                                    if(item) { item.day = dayNum; newOrder.push(item); }
                                 });
                             });
-                            
-                            database[cTrip].forEach(item => {
-                                if(!newOrder.includes(item)) newOrder.push(item);
-                            });
-
-                            database[cTrip] = newOrder;
-                            safeLocalStorageSave('travel_db_v18', JSON.stringify(database));
-                            refreshList();
+                            AppState.db[cTrip].forEach(item => { if(!newOrder.includes(item)) newOrder.push(item); });
+                            AppState.db[cTrip] = newOrder; saveAllData(); refreshList();
                         }
                     });
                 });
             }
-        } catch (error) {
-            console.error("Errore Refresh: ", error);
-        }
+        } catch (error) { console.error("Errore Refresh: ", error); }
     }
 
     async function showItineraryMarkers() { 
         if(!map) return;
-        // Annulla richieste OSRM precedenti ancora in corso
         if (osrmAbortController) osrmAbortController.abort();
-        osrmAbortController = new AbortController();
-        const signal = osrmAbortController.signal;
+        osrmAbortController = new AbortController(); const signal = osrmAbortController.signal;
 
         activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; 
         routeLines.forEach(line => map.removeLayer(line)); routeLines = []; 
         if (liveUserLine) { map.removeLayer(liveUserLine); liveUserLine = null; }
         
-        if (!currentActiveTrip || !database[currentActiveTrip] || document.body.classList.contains('nav-active')) return;
+        if (!AppState.activeTrip || !AppState.db[AppState.activeTrip] || document.body.classList.contains('nav-active')) {
+            Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {};
+            Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; return;
+        }
         
-        let daysMap = {}; 
-        database[currentActiveTrip].forEach((i, index) => { 
-            let d = i.day || 1; 
-            if (!daysMap[d]) daysMap[d] = []; 
-            daysMap[d].push({...i, originalIdx: index}); 
-        });
+        let targetMarkerKeys = new Set(); let targetLineKeys = new Set(); let daysMap = {}; 
+        
+        AppState.db[AppState.activeTrip].forEach((i, index) => { let d = i.day || 1; if (!daysMap[d]) daysMap[d] = []; daysMap[d].push({...i, originalIdx: index}); });
         
         for (let day of Object.keys(daysMap).sort((a,b) => a-b)) {
             if (signal.aborted) return;
             let pts = daysMap[day]; let latlngs = [];
-            pts.forEach((p, seq) => { 
-                let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, seq + 1, false, p.originalIdx) })
-                    .addTo(map)
-                    .bindPopup(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`); 
-                
-                marker.on('click', function() {
-                    scrollToCard(p.originalIdx);
-                });
-
-                activeMarkers.push(marker); 
+            
+            for (let seq = 0; seq < pts.length; seq++) {
+                let p = pts[seq]; let mKey = `m_${p.originalIdx}`; targetMarkerKeys.add(mKey);
+                if (!itineraryMarkersDict[mKey]) {
+                    let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, seq + 1, false, p.originalIdx) }).addTo(map).bindPopup(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`); 
+                    marker.on('click', function() { scrollToCard(p.originalIdx); }); itineraryMarkersDict[mKey] = marker;
+                } else {
+                    itineraryMarkersDict[mKey].setLatLng([p.lt, p.ln]); itineraryMarkersDict[mKey].setIcon(getCustomIcon(p.type, seq + 1, false, p.originalIdx)); itineraryMarkersDict[mKey].getPopup().setContent(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`);
+                }
                 latlngs.push([p.lt, p.ln]); 
-            });
+            }
             
             if (latlngs.length > 1) { 
                 for(let i=0; i < latlngs.length - 1; i++) {
                     if (signal.aborted) return;
-                    let routeCoords = await fetchRoute(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1], signal);
-                    if(routeCoords) {
-                        routeLines.push(L.polyline(routeCoords, { color: '#4a9ebb', weight: 4, opacity: 0.9 }).addTo(map));
-                    } else {
-                        routeLines.push(L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.9, dashArray: '5, 5' }).addTo(map));
+                    let p1 = pts[i]; let p2 = pts[i+1]; let lKey = `l_${p1.originalIdx}_${p2.originalIdx}_${routingProfile}`; targetLineKeys.add(lKey);
+                    
+                    if (!itineraryLinesDict[lKey]) {
+                        let line = L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.9, dashArray: '5, 5' }).addTo(map);
+                        itineraryLinesDict[lKey] = line;
+                        
+                        fetchRoute(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1], signal).then(routeCoords => {
+                            if(signal.aborted) return;
+                            if(routeCoords && itineraryLinesDict[lKey]) {
+                                itineraryLinesDict[lKey].setLatLngs(routeCoords);
+                                itineraryLinesDict[lKey].setStyle({dashArray: null});
+                            }
+                        });
                     }
                 }
             }
-            if(day == Object.keys(daysMap).sort()[0] && latlngs.length > 0) { map.flyTo(latlngs[0], 14); }
         }
+        
+        Object.keys(itineraryMarkersDict).forEach(k => { if (!targetMarkerKeys.has(k)) { map.removeLayer(itineraryMarkersDict[k]); delete itineraryMarkersDict[k]; } });
+        Object.keys(itineraryLinesDict).forEach(k => { if (!targetLineKeys.has(k)) { map.removeLayer(itineraryLinesDict[k]); delete itineraryLinesDict[k]; } });
     }
 
-    async function organizeDaysAI() { if (!currentActiveTrip) return; let all = database[currentActiveTrip].map((p, idx) => ({...p, idx})); showLoader("Organizzo giorni..."); try { const data = await callAI(`Dividi in tappe: ${JSON.stringify(all.map(p => p.n))}. JSON: {"assignments": [{"name": "Nome", "day": 1}]}`); data.assignments.forEach(a => { const t = all.find(p => p.n === a.name); if(t) database[currentActiveTrip][t.idx].day = a.day; }); safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); } catch(e) {} hideLoader(); }
-    async function optimizeItinerary() { if (!currentActiveTrip) return; showLoader("Ottimizzazione..."); try { let allPlaces = database[currentActiveTrip].map((p, idx) => ({ name: p.n, time: p.time || '' })); const data = await callAI(`Ordina rispettando orari: ${JSON.stringify(allPlaces)}. JSON: {"optimizedOrder": ["Nome 1", "Nome 2"]}`); let newArr = []; let oldArr = [...database[currentActiveTrip]]; data.optimizedOrder.forEach(aiName => { let idx = oldArr.findIndex(p => p.n === aiName); if (idx !== -1) { newArr.push(oldArr[idx]); oldArr.splice(idx, 1); } }); database[currentActiveTrip] = [...newArr, ...oldArr]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); } catch(e) {} hideLoader(); }
+    async function organizeDaysAI() { if (!AppState.activeTrip) return; let all = AppState.db[AppState.activeTrip].map((p, idx) => ({...p, idx})); showLoader("Organizzo giorni..."); try { const prompt = `Dividi in tappe sensate sui vari giorni: ${JSON.stringify(all.map(p => p.n))}.`; const schema = { type: "OBJECT", properties: { assignments: { type: "ARRAY", items: { type: "OBJECT", properties: { name: {type:"STRING"}, day: {type:"NUMBER"} } } } } }; const data = await callAI(prompt, schema); data.assignments.forEach(a => { const t = all.find(p => p.n === a.name); if(t) AppState.db[AppState.activeTrip][t.idx].day = a.day; }); saveAllData(); refreshList(); } catch(e) {} hideLoader(); }
+    async function optimizeItinerary() { if (!AppState.activeTrip) return; showLoader("Ottimizzazione..."); try { let allPlaces = AppState.db[AppState.activeTrip].map((p) => ({ name: p.n, time: p.time || '' })); const prompt = `Ordina per logica territoriale rispettando orari: ${JSON.stringify(allPlaces)}.`; const schema = { type: "OBJECT", properties: { optimizedOrder: { type: "ARRAY", items: { type: "STRING" } } } }; const data = await callAI(prompt, schema); let newArr = []; let oldArr = [...AppState.db[AppState.activeTrip]]; data.optimizedOrder.forEach(aiName => { let idx = oldArr.findIndex(p => p.n === aiName); if (idx !== -1) { newArr.push(oldArr[idx]); oldArr.splice(idx, 1); } }); AppState.db[AppState.activeTrip] = [...newArr, ...oldArr]; saveAllData(); refreshList(); showItineraryMarkers(); } catch(e) {} hideLoader(); }
 
-    function changeDay(city, idx, newDay) { if(newDay < 1) return; database[city][idx].day = newDay; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
-    function removeItem(c, i) { database[c].splice(i, 1); if(!database[c].length) delete database[c]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
-    function moveItem(city, index, direction) { let arr = database[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); } }
+    function changeDay(city, idx, newDay) { if(newDay < 1) return; AppState.db[city][idx].day = newDay; saveAllData(); refreshList(); showItineraryMarkers(); }
+    function removeItem(c, i) { AppState.db[c].splice(i, 1); if(!AppState.db[c].length) delete AppState.db[c]; saveAllData(); refreshList(); showItineraryMarkers(); }
+    function moveItem(city, index, direction) { let arr = AppState.db[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; saveAllData(); refreshList(); showItineraryMarkers(); } }
     
-    function updateTime(c, i, v) { database[c][i].time = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); showItineraryMarkers(); }
-    function updateLink(c, i, v) { database[c][i].link = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
-    function updateNote(c, i, v) { database[c][i].note = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); }
-    function updateCost(c, i, v) { database[c][i].cost = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
-    function updatePaid(c, i, v) { database[c][i].paid = v; safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); refreshList(); }
+    function updateTime(c, i, v) { AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); } 
+    function updateLink(c, i, v) { AppState.db[c][i].link = v; saveAllData(); } 
+    function updateNote(c, i, v) { AppState.db[c][i].note = v; saveAllData(); }
+    function updateCost(c, i, v) { 
+        AppState.db[c][i].cost = v; saveAllData(); refreshStatsUI(); 
+        let card = document.querySelector(`.card[data-idx="${i}"]`);
+        if(card) { let costBadge = card.querySelector('.badge-cost-live'); if(costBadge) costBadge.innerText = v ? `💰 ${v} €` : ''; }
+    }
+    function updatePaid(c, i, v) { 
+        AppState.db[c][i].paid = v; saveAllData(); refreshStatsUI(); 
+        let card = document.querySelector(`.card[data-idx="${i}"]`);
+        if(card) { 
+            card.style.opacity = v ? '0.75' : '1'; 
+            let paidBadge = card.querySelector('.badge-paid-live'); if (paidBadge) paidBadge.style.display = v ? 'inline-block' : 'none'; 
+            let costBadge = card.querySelector('.badge-cost-live'); if (costBadge) { costBadge.style.opacity = v ? '0.5' : '1'; costBadge.style.textDecoration = v ? 'line-through' : 'none'; }
+        }
+    }
     
     function toggleManual() { const x = document.getElementById('manBox'); x.style.display = x.style.display==='none'?'block':'none'; }
     
     function shareItinerary() { 
-        if (!currentActiveTrip) return; let t = `📍 PIANO: ${currentActiveTrip.toUpperCase()}\n`; let days = {}; let tot = 0;
-        database[currentActiveTrip].forEach(i => { const d = i.day || 1; if(!days[d]) days[d] = []; days[d].push(i); if(i.cost) tot += parseFloat(i.cost); });
-        
-        let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
-        let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
-        tot += tCostNum + hCostNum;
-        
+        if (!AppState.activeTrip) return; let t = `📍 PIANO: ${AppState.activeTrip.toUpperCase()}\n`; let days = {}; let tot = 0;
+        AppState.db[AppState.activeTrip].forEach(i => { const d = i.day || 1; if(!days[d]) days[d] = []; days[d].push(i); if(i.cost) tot += parseFloat(i.cost); });
+        let tCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.travelCost) || 0; let hCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.hotelCost) || 0; tot += tCostNum + hCostNum;
         Object.keys(days).sort((a,b)=>a-b).forEach(d => t += `\n📅 GIORNO ${d}:\n` + days[d].map(i => `- ${i.n} ${i.time ? '('+i.time+')' : ''} ${i.cost ? '[💰 '+i.cost+'€]' : ''}`).join('\n') + "\n");
-        
-        if(tCostNum > 0) t += `\n✈️ Spese di Viaggio: ${tCostNum.toFixed(2)}€`;
-        if(hCostNum > 0) t += `\n🏨 Spese Hotel: ${hCostNum.toFixed(2)}€`;
-        if(tot > 0) t += `\n💰 Budget Totale: ${tot.toFixed(2)}€`;
-        
+        if(tCostNum > 0) t += `\n✈️ Spese di Viaggio: ${tCostNum.toFixed(2)}€`; if(hCostNum > 0) t += `\n🏨 Spese Hotel: ${hCostNum.toFixed(2)}€`; if(tot > 0) t += `\n💰 Budget Totale: ${tot.toFixed(2)}€`;
         window.open("https://wa.me/?text=" + encodeURIComponent(t)); 
     }
     
     async function downloadPDF() { 
-        if (!currentActiveTrip || typeof window.jspdf === 'undefined') { showToast("Attendere caricamento modulo PDF...", "error"); return; }
-        const { jsPDF } = window.jspdf; 
-        const doc = new jsPDF(); 
-        let y = 20; 
-        
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22); 
-        doc.setTextColor(0, 0, 0);
-        doc.text(`PIANO: ${currentActiveTrip.toUpperCase()}`, 20, y); 
-        y += 15; 
-        
+        if (!AppState.activeTrip || typeof window.jspdf === 'undefined') { showToast("Attendere caricamento modulo PDF...", "error"); return; }
+        const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y = 20; 
+        doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(0, 0, 0); doc.text(`PIANO: ${AppState.activeTrip.toUpperCase()}`, 20, y); y += 15; 
         let days = {}; let tot = 0; 
-        database[currentActiveTrip].forEach(i => { 
-            const d = i.day || 1; 
-            if(!days[d]) days[d] = []; 
-            days[d].push(i); 
-            if(i.cost) tot += parseFloat(i.cost); 
-        }); 
-        
-        let tCostNum = parseFloat(tripMeta[currentActiveTrip]?.travelCost) || 0;
-        let hCostNum = parseFloat(tripMeta[currentActiveTrip]?.hotelCost) || 0;
-        tot += tCostNum + hCostNum;
-        
+        AppState.db[AppState.activeTrip].forEach(i => { const d = i.day || 1; if(!days[d]) days[d] = []; days[d].push(i); if(i.cost) tot += parseFloat(i.cost); }); 
+        let tCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.travelCost) || 0; let hCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.hotelCost) || 0; tot += tCostNum + hCostNum;
         Object.keys(days).sort((a,b) => a-b).forEach(d => { 
             if(y > 270) { doc.addPage(); y = 20; } 
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(16); 
-            doc.setTextColor(232, 184, 75);
-            doc.text(`GIORNO ${d}`, 20, y); 
-            y += 10; 
-            
+            doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(232, 184, 75); doc.text(`GIORNO ${d}`, 20, y); y += 10; 
             days[d].forEach(item => { 
                 if(y > 270) { doc.addPage(); y = 20; } 
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12); 
-                doc.setTextColor(0, 0, 0); 
-                
-                let timeStr = item.time ? ` (${item.time})` : '';
-                let costStr = item.cost ? ` [Euro ${item.cost}]` : '';
-                
-                doc.text(`• ${item.n}${timeStr}${costStr}`, 25, y); 
-                y += 7; 
-
-                if(item.note && item.note.trim() !== "") {
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(10);
-                    doc.setTextColor(100, 100, 100);
-                    const splitNotes = doc.splitTextToSize(`Nota: ${item.note}`, 160); 
-                    doc.text(splitNotes, 30, y);
-                    y += (splitNotes.length * 5) + 3; 
-                } else {
-                    y += 3; 
-                }
-                
-                if(item.photo) { 
-                    try { 
-                        if(y > 240) { doc.addPage(); y = 20; }
-                        doc.addImage(item.photo, 'JPEG', 30, y, 40, 25); 
-                        y += 30; 
-                    } catch(e) { console.error("Errore immagine PDF"); } 
-                } 
-            }); 
-            y += 5; 
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 0, 0); 
+                let timeStr = item.time ? ` (${item.time})` : ''; let costStr = item.cost ? ` [Euro ${item.cost}]` : '';
+                doc.text(`• ${item.n}${timeStr}${costStr}`, 25, y); y += 7; 
+                if(item.note && item.note.trim() !== "") { doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100); const splitNotes = doc.splitTextToSize(`Nota: ${item.note}`, 160); doc.text(splitNotes, 30, y); y += (splitNotes.length * 5) + 3; } else { y += 3; }
+                if(item.photo) { try { if(y > 240) { doc.addPage(); y = 20; } doc.addImage(item.photo, 'JPEG', 30, y, 40, 25); y += 30; } catch(e) {} } 
+            }); y += 5; 
         }); 
-        
         if(tot > 0) { 
             if(y > 250) { doc.addPage(); y = 20; } 
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12); 
-            doc.setTextColor(74, 158, 187);
-            if (tCostNum > 0) {
-                doc.text(`SPESE DI VIAGGIO: ${tCostNum.toFixed(2)} Euro`, 20, y); 
-                y += 8; 
-            }
-            if (hCostNum > 0) {
-                doc.text(`SPESE HOTEL: ${hCostNum.toFixed(2)} Euro`, 20, y); 
-                y += 8; 
-            }
-            
-            doc.setFontSize(14); 
-            doc.setTextColor(46, 204, 113); 
-            doc.text(`BUDGET TOTALE STIMATO: ${tot.toFixed(2)} Euro`, 20, y+10); 
+            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(74, 158, 187);
+            if (tCostNum > 0) { doc.text(`SPESE DI VIAGGIO: ${tCostNum.toFixed(2)} Euro`, 20, y); y += 8; }
+            if (hCostNum > 0) { doc.text(`SPESE HOTEL: ${hCostNum.toFixed(2)} Euro`, 20, y); y += 8; }
+            doc.setFontSize(14); doc.setTextColor(46, 204, 113); doc.text(`BUDGET TOTALE STIMATO: ${tot.toFixed(2)} Euro`, 20, y+10); 
         }
-        
-        doc.save(`Itinerario_${currentActiveTrip}.pdf`); 
+        doc.save(`Itinerario_${AppState.activeTrip}.pdf`); 
+    }
+
+    function backupData() {
+        const data = { db: AppState.db, meta: AppState.meta };
+        const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = "Viaggi_Backup.json";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     
-    function backupData() { 
-        const today = new Date().toISOString().slice(0, 10);
-        const exportData = { database: database, tripMeta: tripMeta };
-        const dataStr = JSON.stringify(exportData); 
-        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr); 
-        let linkElement = document.createElement('a'); 
-        linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_Viaggi_${today}.json`); 
-        linkElement.click(); 
-    }
-    
-    function handleRestore(event) { 
-        const file = event.target.files[0]; if (!file) return; 
-        const reader = new FileReader(); 
-        reader.onload = function(e) { 
+    function handleRestore(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
             try {
-                let imported = JSON.parse(e.target.result); 
-                if (imported.database) { database = imported.database; tripMeta = imported.tripMeta || {}; } 
-                else { database = imported; tripMeta = {}; }
-                safeLocalStorageSave('travel_db_v18', JSON.stringify(database)); safeLocalStorageSave('travel_meta_v1', JSON.stringify(tripMeta));
-                location.reload(); 
-            } catch(err) { showToast("Errore nel ripristino del file", "error"); }
-        }; 
-        reader.readAsText(file); 
+                const data = JSON.parse(event.target.result);
+                if(data.db) { AppState.db = data.db; if(data.meta) AppState.meta = data.meta; saveAllData(); refreshList(); showToast("✅ Dati ripristinati!"); }
+            } catch(err) { showToast("⚠️ File non valido.", "error"); }
+        };
+        reader.readAsText(file);
+    }
+
+    function drawBudgetChart(exp) {
+        const canvas = document.getElementById('budgetChart');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const values = [exp.travel, exp.hotel, exp.food, exp.activities, exp.other];
+        const colors = ['#4a9ebb', '#2ecc71', '#e74c3c', '#e8b84b', '#95a5a6'];
+        const total = values.reduce((a,b)=>a+b, 0);
+        ctx.clearRect(0,0,75,75);
+        if(total === 0) {
+            ctx.beginPath(); ctx.arc(37.5,37.5,30,0,2*Math.PI);
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth=10; ctx.stroke();
+            return;
+        }
+        let startAngle = -0.5 * Math.PI;
+        for(let i=0; i<values.length; i++) {
+            if(values[i] <= 0) continue;
+            const sliceAngle = (values[i] / total) * 2 * Math.PI;
+            ctx.beginPath(); ctx.arc(37.5,37.5,30,startAngle, startAngle+sliceAngle);
+            ctx.strokeStyle = colors[i]; ctx.lineWidth = 10; ctx.stroke();
+            startAngle += sliceAngle;
+        }
     }
 
     function startNavigation() {
-        if (!currentActiveTrip || !database[currentActiveTrip] || database[currentActiveTrip].length === 0) { showToast("Nessuna tappa salvata da navigare.", "error"); return; }
-        if (!map) { showToast("Attendi il caricamento della mappa.", "error"); return; }
-        navPlaces = [...database[currentActiveTrip]].sort((a, b) => {
-            if ((a.day||1) !== (b.day||1)) return (a.day||1) - (b.day||1);
-            return (a.time||"99:99").localeCompare(b.time||"99:99");
-        }); navIndex = 0;
-        document.body.classList.add('nav-active'); document.getElementById('nav-dashboard').classList.add('active');
-        setTimeout(() => map.invalidateSize(), 400); 
+        if (!AppState.activeTrip || !AppState.db[AppState.activeTrip] || AppState.db[AppState.activeTrip].length === 0) { showToast("Itinerario vuoto.", "error"); return; }
+        if (!navigator.geolocation) { showToast("GPS non supportato dal browser.", "error"); return; }
         
-        lastRouteUserCoords = null; 
-        lastRouteDest = null;
+        let allPlaces = [...AppState.db[AppState.activeTrip]];
+        allPlaces.sort((a,b) => {
+            if (a.day !== b.day) return (a.day || 1) - (b.day || 1);
+            return getEffectiveMins(a.time) - getEffectiveMins(b.time);
+        });
+
+        navPlaces = allPlaces;
+        navIndex = 0;
+        document.body.classList.add('nav-active');
+        document.getElementById('nav-dashboard').classList.add('active');
+        showItineraryMarkers();
         
-        if(navigator.geolocation) { gpsWatchId = navigator.geolocation.watchPosition(updateLiveGPS, (e)=>{}, {enableHighAccuracy: true}); }
+        if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+        showLoader("Avvio GPS Live...");
+        gpsWatchId = navigator.geolocation.watchPosition(updateLiveGPS, (err) => { hideLoader(); showToast("Errore GPS Live. Assicurati di aver dato i permessi.", "error"); }, { enableHighAccuracy: true, maximumAge: 0 });
+        
         renderNavStep();
     }
 
-    function stopNavigation() { 
-        document.body.classList.remove('nav-active'); 
-        document.getElementById('nav-dashboard').classList.remove('active'); 
-        if(gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId); 
-        setTimeout(() => { if(map){ map.invalidateSize(); showItineraryMarkers(); } }, 400); 
-        showToast("Navigazione terminata."); 
-        
-        lastRouteUserCoords = null; 
-        lastRouteDest = null;
+    function stopNavigation() {
+        document.body.classList.remove('nav-active');
+        document.getElementById('nav-dashboard').classList.remove('active');
+        if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+        if (liveRouteTimeout) { clearTimeout(liveRouteTimeout); liveRouteTimeout = null; }
+        if (liveUserLine) { map.removeLayer(liveUserLine); liveUserLine = null; }
+        navPlaces = [];
+        showItineraryMarkers();
+        if (map) setTimeout(() => map.invalidateSize(), 400);
     }
 
-    function nextNavStep() { 
-        navIndex++; 
-        renderNavStep(); 
-    }
-
-    async function renderNavStep() {
-        if(!map) return;
-        reachedDestinationAlerted = false; 
-        
-        if (navIndex >= navPlaces.length) { showToast("Hai completato tutte le tappe!"); stopNavigation(); return; }
-        for(let i=1; i<=3; i++) { document.getElementById(`nav-stop-${i}`).style.display = 'none'; }
-        let coordsToMap = [];
-        for(let i = 0; i < 3; i++) {
-            let p = navPlaces[navIndex + i];
-            if (p) {
-                let div = document.getElementById(`nav-stop-${i+1}`); div.style.display = 'block'; document.getElementById(`name-stop-${i+1}`).innerText = `${navIndex + i + 1}. ${p.n}`;
-                if(i === 0) {
-                    document.getElementById('nav-dash-step').innerText = `TAPPA ${navIndex + 1} DI ${navPlaces.length} (GIORNO ${p.day||1})`;
-                    let noteHtml = ""; if(p.time) noteHtml += `🕒 Appuntamento: ${p.time}<br>`; if(p.cost) noteHtml += `💰 Costo previsto: ${p.cost}€<br>`; if(p.note) noteHtml += `📝 Note: ${p.note}`;
-                    document.getElementById('note-stop-1').innerHTML = noteHtml; document.getElementById('nav-dist-1').innerText = "Calcolo...";
-                } coordsToMap.push(p);
-            }
+    function nextNavStep() {
+        if (navIndex < navPlaces.length - 1) {
+            navIndex++;
+            reachedDestinationAlerted = false;
+            lastRouteDest = null; 
+            renderNavStep();
+            if (AppState.userCoords) { updateLiveGPS({coords: {latitude: AppState.userCoords.lat, longitude: AppState.userCoords.lon}}); }
+        } else {
+            showToast("🎉 Hai completato tutte le tappe!");
+            stopNavigation();
         }
-        activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; 
-        routeLines.forEach(line => map.removeLayer(line)); routeLines = []; 
-        let latlngs = [];
-        
-        coordsToMap.forEach((p, idx) => { 
-            let isCurrent = (idx === 0); 
-            let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, navIndex + 1 + idx, isCurrent) }).addTo(map); 
-            activeMarkers.push(marker); 
-            latlngs.push([p.lt, p.ln]); 
-        });
-
-        if (latlngs.length > 1) { 
-            for(let i=0; i < latlngs.length - 1; i++) {
-                let routeCoords = await fetchRoute(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1]);
-                if(routeCoords) {
-                    routeLines.push(L.polyline(routeCoords, { color: '#4a9ebb', weight: 4, opacity: 0.8, dashArray: '5, 10' }).addTo(map));
-                } else {
-                    routeLines.push(L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.8, dashArray: '5, 10' }).addTo(map));
-                }
-            }
-        }
-
-        map.flyTo([coordsToMap[0].lt, coordsToMap[0].ln], 15); 
-        if(userCoords) updateLiveGPS({coords: {latitude: userCoords.lat, longitude: userCoords.lon}});
     }
 
-    function updateLiveGPS(pos) {
-        if(!map) return;
-        userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        if (myPosMarker) map.removeLayer(myPosMarker); myPosMarker = L.circleMarker([userCoords.lat, userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
-        updateSuggestionsDistance();
-        updateItineraryDistance();
+    function renderNavStep() {
+        if (navIndex >= navPlaces.length) return;
         
-        const p = navPlaces[navIndex];
-        if(p) {
-            const dist = calculateDistance(userCoords.lat, userCoords.lon, p.lt, p.ln); 
-            document.getElementById('nav-dist-1').innerText = `${dist} km`;
-            
-            if (dist <= 0.05 && !reachedDestinationAlerted) {
-                reachedDestinationAlerted = true;
-                showToast("🎯 SEI ARRIVATO A: " + p.n.toUpperCase() + "!");
-                if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 500]); 
-            }
+        const current = navPlaces[navIndex];
+        document.getElementById('nav-dash-step').innerText = `TAPPA ${navIndex + 1} DI ${navPlaces.length} - GIORNO ${current.day || 1}`;
+        document.getElementById('name-stop-1').innerText = current.n;
+        document.getElementById('note-stop-1').innerText = current.note ? escapeHtml(current.note) : '';
+        document.getElementById('nav-dist-1').innerText = "Calcolo distanza...";
 
-            let shouldFetchRoute = false;
-            if (!lastRouteUserCoords || !lastRouteDest || lastRouteDest.lt !== p.lt || lastRouteDest.ln !== p.ln) {
-                shouldFetchRoute = true;
+        const next1 = navPlaces[navIndex + 1];
+        if (next1) { document.getElementById('name-stop-2').innerText = `${navIndex + 2}. ${next1.n}`; document.getElementById('nav-stop-2').style.display = 'block'; } else { document.getElementById('nav-stop-2').style.display = 'none'; }
+        
+        const next2 = navPlaces[navIndex + 2];
+        if (next2) { document.getElementById('name-stop-3').innerText = `${navIndex + 3}. ${next2.n}`; document.getElementById('nav-stop-3').style.display = 'block'; } else { document.getElementById('nav-stop-3').style.display = 'none'; }
+
+        if(map) {
+            activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = [];
+            let m = L.marker([current.lt, current.ln], { icon: getCustomIcon(current.type, navIndex + 1, true) }).addTo(map).bindPopup(`<b>Destinazione</b><br>${current.n}`);
+            activeMarkers.push(m);
+            if (AppState.userCoords) {
+                let bounds = L.latLngBounds([[AppState.userCoords.lat, AppState.userCoords.lon], [current.lt, current.ln]]);
+                map.fitBounds(bounds, { padding: [40, 40] });
             } else {
-                let distFromLast = calculateDistance(userCoords.lat, userCoords.lon, lastRouteUserCoords.lat, lastRouteUserCoords.lon);
-                if (distFromLast > 0.05) { shouldFetchRoute = true; } 
+                map.flyTo([current.lt, current.ln], 16);
+            }
+        }
+    }
+
+    function updateLiveGPS(position) {
+        hideLoader();
+        const userCoords = { lat: position.coords.latitude, lon: position.coords.longitude };
+        AppState.userCoords = userCoords;
+
+        if (myPosMarker) {
+            myPosMarker.setLatLng([userCoords.lat, userCoords.lon]);
+        } else if (map) {
+            myPosMarker = L.circleMarker([userCoords.lat, userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1, zIndexOffset: 1000 }).addTo(map);
+        }
+
+        if (navPlaces.length > 0 && navIndex < navPlaces.length) {
+            const p = navPlaces[navIndex];
+            const distKm = parseFloat(calculateDistance(userCoords.lat, userCoords.lon, p.lt, p.ln));
+            const distText = distKm < 1 ? Math.round(distKm * 1000) + " m" : distKm.toFixed(1) + " km";
+            
+            let distBadge = document.getElementById('nav-dist-1');
+            distBadge.innerText = `A ${distText} da te`;
+            
+            if (distKm <= 0.05 && !reachedDestinationAlerted) {
+                distBadge.innerText = "📍 SEI ARRIVATO!";
+                distBadge.style.background = "rgba(46, 204, 113, 0.2)"; distBadge.style.color = "#2ecc71";
+                showToast(`Sei arrivato a: ${p.n}! 🎉`);
+                reachedDestinationAlerted = true;
+                if (liveUserLine) map.removeLayer(liveUserLine);
+                return;
+            } else if (distKm > 0.05) {
+                distBadge.style.background = "rgba(231, 76, 60, 0.2)"; distBadge.style.color = "#e74c3c";
+                reachedDestinationAlerted = false;
+            }
+
+            let shouldFetchRoute = true;
+            if (lastRouteUserCoords && lastRouteDest) {
+                const movedSinceLastFetch = parseFloat(calculateDistance(userCoords.lat, userCoords.lon, lastRouteUserCoords.lat, lastRouteUserCoords.lon));
+                if (movedSinceLastFetch < 0.05 && lastRouteDest.lt === p.lt && lastRouteDest.ln === p.ln && liveUserLine) {
+                    shouldFetchRoute = false; 
+                }
             }
 
             if (shouldFetchRoute) {
@@ -1900,24 +1576,24 @@ Restituisci ESATTAMENTE E SOLO un file JSON valido con questa struttura esatta:
         }
     }
 
-    // SISTEMA SALVAVITA: Aspetta che tutto l'HTML sia caricato prima di lanciare la Mappa e le List.
     document.addEventListener("DOMContentLoaded", () => {
         try {
             if (typeof L !== 'undefined') {
                 map = L.map('map', {zoomControl: false}).setView([44.647, 10.925], 13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
             } else {
-                console.error("Leaflet.js non caricato!");
+                console.error("Leaflet non caricato correttamente.");
             }
-            refreshList();
-        } catch(e) {
-            console.error("Errore fatale all'avvio: ", e);
+            refreshList(); 
+            switchTab('wizard');
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('wizDate').value = today;
+            
+        } catch (e) {
+            console.error("Errore inizializzazione:", e);
         }
     });
-
 </script>
 </body>
 </html>
-
-
-```
