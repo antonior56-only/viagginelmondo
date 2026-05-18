@@ -47,7 +47,6 @@
         .map-close-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(0,0,0,0.7); border: 2px solid #e74c3c; color: #ff5c5c; width: 40px; height: 40px; border-radius: 50%; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; backdrop-filter: blur(4px); }
         body.map-fullscreen .map-close-btn { display: flex; }
 
-        /* MAPPA A SCHERMO INTERO */
         body.map-fullscreen #map-container { position: fixed; top: 65px; left: 0; width: 100vw; height: calc(100vh - 65px); z-index: 9000; }
         body.map-fullscreen main { display: none !important; }
         body.map-fullscreen .nav-dashboard { display: none !important; }
@@ -59,7 +58,6 @@
         
         .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 8px 16px rgba(0,0,0,0.6); transition: 0.3s; }
         
-        /* MANIGLIA DRAG & DROP E HIGHLIGHT */
         .highlight-card { border-color: var(--accent-gold) !important; box-shadow: 0 0 20px rgba(232, 184, 75, 0.5) !important; background-color: rgba(232, 184, 75, 0.1) !important; }
         .highlight-marker-inner { border-color: var(--accent-gold) !important; box-shadow: 0 0 25px var(--accent-gold) !important; transform: scale(1.5) !important; }
         
@@ -85,13 +83,10 @@
         
         .wallet-input[type="time"] { flex: 0 0 95px; text-align: center; color: var(--accent-blue); font-weight: 600; background: rgba(74, 158, 187, 0.1); border-color: rgba(74, 158, 187, 0.5); }
         .wallet-input[type="number"] { flex: 0 0 95px; text-align: center; color: var(--accent-green); font-weight: 600; background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.5); }
-        .wallet-input[type="number"]::placeholder { color: rgba(46, 204, 113, 0.7); }
         
         .photo-btn { flex: 0 0 45px; background: rgba(74, 158, 187, 0.15); border: 1px solid rgba(74, 158, 187, 0.6); color: var(--accent-blue); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
-        .photo-btn:hover, .photo-btn:active { background: rgba(74, 158, 187, 0.3); transform: scale(0.95); }
-
+        
         .note-box { background: #13120e; border: 1px solid rgba(232, 184, 75, 0.4); border-radius: 8px; padding: 10px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: 0.3s; }
-        .note-box:focus-within { border-color: var(--accent-gold); box-shadow: 0 0 8px rgba(232, 184, 75, 0.6); }
         .note-area { width: 100%; background: transparent; border: none; color: #ffffff; font-family: 'Jost', sans-serif; font-size: 14px; resize: vertical; min-height: 45px; outline: none; line-height: 1.5; letter-spacing: 0.3px; }
         .note-area::placeholder { color: #a59781; opacity: 0.8; font-style: italic; }
 
@@ -106,6 +101,13 @@
 
         .search-input { width: 100%; padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px; color: white; margin-bottom: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
         
+        .autocomplete-container { position: absolute; top: 100%; left: 0; width: 100%; background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 8px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.8); display: none; max-height: 200px; overflow-y: auto; }
+        .autocomplete-item { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 14px; color: var(--text-main); }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item:active { background: rgba(232, 184, 75, 0.2); }
+        body.light-theme .autocomplete-container { border-color: #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body.light-theme .autocomplete-item { border-bottom-color: rgba(0,0,0,0.1); }
+
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000; padding: 30px; overflow-y: auto; }
         
         .day-label { color: var(--accent-gold); font-size: 11px; font-weight: 700; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-end; text-transform: uppercase; }
@@ -116,8 +118,7 @@
         .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid var(--accent-gold); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .distance-tag { font-size: 11px; color: var(--accent-blue); font-weight: 600; margin-left: auto; }
-
+        
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; width: 90%; max-width: 400px; }
         .toast { background: #2c2a24; color: #fff; border-left: 4px solid var(--accent-gold); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); font-size: 14px; font-weight: 500; animation: slideDown 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards; }
         .toast.error { border-left-color: #e74c3c; }
@@ -136,7 +137,6 @@
         .weather-label { font-size: 10px; color: #8a7a62; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .weather-val { font-size: 16px; font-weight: bold; }
         
-        /* STILI WIZARD E PROPOSTE */
         .wizard-section { margin-bottom: 25px; }
         .wizard-label { color: #8a7a62; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
         .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -151,7 +151,6 @@
         
         .nav-dashboard { position: fixed; bottom: 0; left: 0; width: 100%; height: 45vh; background: var(--bg-dark); z-index: 2000; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 -10px 30px rgba(0,0,0,0.8); overflow-y: auto;}
         .nav-dashboard.active { transform: translateY(0); }
-        
         .nav-stop { margin-bottom: 12px; border-left: 3px solid transparent; padding-left: 15px; position: relative; }
         .nav-stop::before { content: ''; position: absolute; left: -6px; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: #555; }
         .active-stop { border-left-color: var(--accent-gold); }
@@ -159,40 +158,34 @@
         .active-stop .stop-name { font-size: 22px; color: var(--accent-gold); font-family: 'Playfair Display'; font-weight: bold; line-height: 1.2; display: block;}
         .upcoming-stop { border-left-color: #444; opacity: 0.7; }
         .upcoming-stop .stop-name { font-size: 16px; color: var(--text-main); display: block; }
-        
         .stop-note { font-size: 13px; color: #ccc; margin-top: 6px; line-height: 1.4; }
         .nav-dash-dist { background: rgba(231, 76, 60, 0.2); color: #e74c3c; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 5px; display: inline-block;}
         .nav-controls { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
 
-        /* STILI DROPDOWN OTTIMIZZATI - BOTTOM SHEET */
         .dropdown-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 3999; backdrop-filter: blur(3px); animation: fadeInOverlay 0.3s; }
         @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
-        
         .dropdown-menu { display: none; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 4000; background: var(--card-bg); border-top-left-radius: 24px; border-top-right-radius: 24px; border-top: 2px solid var(--accent-gold); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); padding: 25px 20px 40px; box-sizing: border-box; animation: slideUpMenu 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
         body.light-theme .dropdown-menu { box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
         @keyframes slideUpMenu { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
         .dropdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--accent-gold); font-family: 'Playfair Display'; font-size: 22px; font-weight: bold; }
         .dropdown-close { background: rgba(255,255,255,0.1); border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; transition: 0.2s; }
-        .dropdown-close:active { background: rgba(255,255,255,0.3); }
-        
         .dropdown-item { display: block; width: 100%; text-align: left; padding: 18px; margin-bottom: 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: var(--text-main); font-family: 'Jost', sans-serif; cursor: pointer; transition: all 0.2s; }
-        .dropdown-item:last-child { margin-bottom: 0; }
-        .dropdown-item:active { background: rgba(232, 184, 75, 0.2); border-color: var(--accent-gold); transform: scale(0.98); }
-        body.light-theme .dropdown-item { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
-        body.light-theme .dropdown-item:active { background: rgba(232, 184, 75, 0.2); }
-        
         .dropdown-title { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
         .dropdown-desc { font-size: 12px; color: #8a7a62; margin-top: 6px; padding-left: 35px; line-height: 1.4; font-weight: 500; }
         
-        /* TIMELINE E CONFLITTI */
         .timeline-wrapper { position: relative; width: 100%; height: 35px; margin: 10px 0 25px 0; }
         .timeline-track { position: absolute; top: 10px; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
         .timeline-marker { position: absolute; top: 2px; width: 18px; height: 18px; background: var(--card-bg); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 9px; font-weight: bold; color: var(--accent-gold); transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2; cursor: pointer; }
         .timeline-marker.conflict { border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
-        .timeline-time-label { position: absolute; top: 24px; font-size: 9px; color: #8a7a62; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
+        .timeline-time-label { position: absolute; font-size: 9px; color: #8a7a62; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
         .card.conflict-card { border: 1px solid #e74c3c !important; box-shadow: 0 0 10px rgba(231, 76, 60, 0.2); }
         .conflict-badge { display: inline-block; background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 6px; border: 1px solid rgba(231, 76, 60, 0.4); vertical-align: middle; }
+
+        /* VISTA COMPATTA */
+        .compact-mode .wallet-box, .compact-mode .btn-row, .compact-mode .note-box, .compact-mode .photo-preview-container, .compact-mode .day-ctrl, .compact-mode .ticket-btn { display: none !important; }
+        .compact-mode .card { padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; }
+        .compact-mode .drag-handle { font-size: 16px; padding-right: 6px; }
+        .compact-mode .card b { font-size: 14px !important; }
     </style>
 </head>
 <body>
@@ -323,7 +316,10 @@
             <button class="btn-action" style="background: var(--accent-blue); color: white; border: none; width: 100%;" onclick="askAI()">CHIEDI CONSIGLIO</button>
         </div>
 
-        <input type="text" id="cityInput" class="search-input" placeholder="Cerca Comune (es: Modena)">
+        <div style="position: relative; margin-bottom: 10px;">
+            <input type="text" id="cityInput" class="search-input" style="margin-bottom: 0;" placeholder="Cerca Comune (es: Modena)" oninput="onCityInput()" autocomplete="off">
+            <div id="city-autocomplete" class="autocomplete-container"></div>
+        </div>
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
             <button class="btn-action primary" style="flex: 1;" onclick="searchCity()">ESPLORA</button>
             <button class="btn-action primary" style="flex: 1; background: var(--accent-blue); color: white;" onclick="exploreNearby()">DINTORNI</button>
@@ -358,6 +354,7 @@
                 <h2 style="font-family: 'Playfair Display'; margin: 0; font-size: 22px;">Itinerario</h2>
                 <div style="display:flex; gap:6px; align-items:center;">
                     <select id="tripSelector" class="trip-selector" onchange="changeActiveTrip()" style="display:none;"></select>
+                    <button id="btnCompactToggle" onclick="toggleCompactMode()" style="display:none; background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:10px; font-weight:bold;">📄 VISTA COMPATTA</button>
                     <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:#8a7a62; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario" aria-label="Gestisci itinerario">⚙️</button>
                 </div>
             </div>
@@ -413,6 +410,7 @@
                 <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="backupData()">💾 BACKUP</button>
                 <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('restoreFile').click()">📂 RIPRISTINA</button>
             </div>
+            <div id="storage-usage" style="font-size:11px; color:#8a7a62; margin-top:8px; text-align:center;"></div>
         </div>
     </div>
 </main>
@@ -525,7 +523,7 @@
             localStorage.setItem(key, value);
         } catch (e) {
             if (e.name === 'QuotaExceededError' || e.code === 22) {
-                showToast("⚠️ Spazio di archiviazione esaurito! Scarica un backup e libera spazio.", "error");
+                showToast("⚠️ Spazio di archiviazione esaurito! Rimuovi qualche foto o scarica un backup.", "error");
             } else {
                 console.error("Errore localStorage:", e);
             }
@@ -535,6 +533,7 @@
     function saveAllData() {
         safeLocalStorageSave('travel_db_v18', JSON.stringify(AppState.db));
         safeLocalStorageSave('travel_meta_v1', JSON.stringify(AppState.meta));
+        calculateStorageUsage();
     }
 
     let map = null;
@@ -543,6 +542,8 @@
     let routeCache = {};     
     let itineraryMarkersDict = {}; 
     let itineraryLinesDict = {};   
+    let isCompactMode = false;
+    let osrmWarned = false;
 
     try { userPersonalApiKey = localStorage.getItem('travel_api_key_v1') || ""; } catch(e) {}
     try { AppState.db = JSON.parse(localStorage.getItem('travel_db_v18')) || {}; } catch(e) { AppState.db = {}; saveAllData(); }
@@ -601,6 +602,19 @@
         }
     }
 
+    function toggleCompactMode() {
+        isCompactMode = !isCompactMode;
+        const btn = document.getElementById('btnCompactToggle');
+        const list = document.getElementById('myList');
+        if (isCompactMode) {
+            list.classList.add('compact-mode');
+            btn.innerText = '📂 VISTA ESTESA';
+        } else {
+            list.classList.remove('compact-mode');
+            btn.innerText = '📄 VISTA COMPATTA';
+        }
+    }
+
     function setRoutingMode(mode) {
         routingProfile = mode;
         const btnDrive = document.getElementById('route-mode-driving');
@@ -612,6 +626,18 @@
         showItineraryMarkers();
         if (document.body.classList.contains('nav-active')) renderNavStep();
         showToast("Modalità percorso: " + (mode === 'driving' ? "Auto" : "A piedi"));
+    }
+
+    function calculateStorageUsage() {
+        try {
+            const dbStr = JSON.stringify(AppState.db);
+            const kb = Math.round(dbStr.length / 1024);
+            const el = document.getElementById('storage-usage');
+            if(el) {
+                let color = kb > 4000 ? '#e74c3c' : (kb > 2500 ? '#e8b84b' : '#8a7a62');
+                el.innerHTML = `💾 Storage Locale: <span style="color:${color}; font-weight:bold;">${kb} KB</span> / ~5000 KB stime<br><span style="font-size:9px;">(Attenzione: troppe foto possono bloccare il salvataggio)</span>`;
+            }
+        } catch(e) {}
     }
 
     const AI_WIZARD_SCHEMA = {
@@ -802,7 +828,14 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 const coords = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
                 routeCache[cacheKey] = coords; return coords;
             }
-        } catch (e) { if (e.name === 'AbortError') return null; console.warn("Errore OSRM routing, uso fallback rettilineo:", e); }
+        } catch (e) { 
+            if (e.name === 'AbortError') return null; 
+            if (!osrmWarned) {
+                showToast("⚠️ OSRM routing offline: uso linee rette provvisorie.", "error");
+                osrmWarned = true;
+                setTimeout(() => osrmWarned = false, 60000);
+            }
+        }
         return null; 
     }
 
@@ -814,6 +847,40 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     function toggleRestoMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('resto-dropdown').style.display = 'block'; }
     function toggleHotelMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('hotel-dropdown').style.display = 'block'; }
+
+    // Autocomplete per ricerca città
+    let cityDebounceTimer;
+    function onCityInput() {
+        clearTimeout(cityDebounceTimer);
+        const val = document.getElementById('cityInput').value.trim();
+        const box = document.getElementById('city-autocomplete');
+        if(val.length < 3) { box.style.display = 'none'; return; }
+        
+        cityDebounceTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(val)}&limit=5`);
+                const data = await res.json();
+                box.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(d => {
+                        box.innerHTML += `<div class="autocomplete-item" onclick="selectCityAuto('${escapeHtml(d.display_name)}', ${d.lat}, ${d.lon})">📍 ${escapeHtml(d.display_name)}</div>`;
+                    });
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            } catch(e) { box.style.display = 'none'; }
+        }, 500);
+    }
+    
+    function selectCityAuto(name, lat, lon) {
+        const shortName = name.split(',')[0];
+        document.getElementById('cityInput').value = shortName;
+        document.getElementById('city-autocomplete').style.display = 'none';
+        currentActiveCity = shortName;
+        if(map) map.flyTo([lat, lon], 14);
+        exploreNearby();
+    }
 
     async function getCityFromMap() {
         if (!map) return null; const center = map.getCenter();
@@ -875,7 +942,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         showToast(`✅ Giorno ${day} ottimizzato (ore ${nowTime}): libere ordinate ${gpsNote}${pastNote}.`);
     }
 
-    // NUOVA FUNZIONE MIGLIORATA: Apri Singolo Giorno su Google Maps
     function openDayInGoogleMaps(city, day) {
         let arr = AppState.db[city];
         if (!arr) return;
@@ -889,16 +955,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             openDirections(dayItems[0].lt, dayItems[0].ln); return;
         }
 
-        // 1. Omettiamo 'origin' in modo che Google Maps usi la "Posizione Attuale" (GPS) dell'utente per calcolare la rotta in tempo reale e sbloccare il tasto "Avvia"
-        // 2. Usiamo 'dir_action=navigate' per forzare l'apertura immediata in modalità Navigazione (Turn-by-turn).
-        
         let destination = `${dayItems[dayItems.length - 1].lt},${dayItems[dayItems.length - 1].ln}`;
         let waypoints = "";
 
-        // Prendiamo come waypoints TUTTE le tappe intermedie (dalla prima in lista fino alla penultima)
         let middleItems = dayItems.slice(0, dayItems.length - 1);
         if (middleItems.length > 0) {
-            if (middleItems.length > 9) { // Maps di solito supporta max 9 waypoints intermedi
+            if (middleItems.length > 9) {
                 middleItems = middleItems.slice(0, 9);
                 showToast("⚠️ Limite di Maps raggiunto. Caricate solo le prime 10 tappe.", "error");
             }
@@ -912,7 +974,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
     
-    // AGGIORNATO ANCHE QUI PER COERENZA
     function openDirections(lat, lon) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate`, "_blank"); }
 
     function scrollToCard(idx) { let card = document.querySelector(`.card[data-idx="${idx}"]`); if (card) { if (!document.getElementById('view-itinerario').classList.contains('active')) { switchTab('itinerario'); setTimeout(() => performScroll(card), 200); } else { performScroll(card); } } }
@@ -937,7 +998,24 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const prompt = `Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}].`; const schema = { type: "OBJECT", properties: { places: { type: "ARRAY", items: { type: "OBJECT", properties: { title: {type:"STRING"}, lat: {type:"NUMBER"}, lon: {type:"NUMBER"}, desc: {type:"STRING"}, rating: {type:"NUMBER"}, type: {type:"STRING"} } } } } }; const data = await callAI(prompt, schema); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
     
     async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}].`, {type:"OBJECT", properties:{places:{type:"ARRAY", items:{type:"OBJECT", properties:{title:{type:"STRING"}, lat:{type:"NUMBER"}, lon:{type:"NUMBER"}, desc:{type:"STRING"}, rating:{type:"NUMBER"}}}}}}); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
-    async function loadWiki(lat, lon, t = 'monument') { try { const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); const d = await res.json(); if(d.query?.geosearch) { for(let p of d.query.geosearch) { const sRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); const s = await sRes.json(); currentSuggestions.push({ title: p.title, lat: p.lat, lon: p.lon, desc: s.extract || "Monumento", type: t }); } } } catch(e) { console.error(e); } }
+    
+    async function loadWiki(lat, lon, t = 'monument') { 
+        try { 
+            const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); 
+            const d = await res.json(); 
+            if(d.query?.geosearch) { 
+                // Filtro base per escludere risultati generici non "monumentali"
+                const blacklist = ['Fiume', 'Stazione', 'Provincia', 'Regione', 'Quartiere', 'Comune', 'Via '];
+                const validPoints = d.query.geosearch.filter(p => !blacklist.some(b => p.title.includes(b))).slice(0, 10);
+                
+                for(let p of validPoints) { 
+                    const sRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); 
+                    const s = await sRes.json(); 
+                    currentSuggestions.push({ title: p.title, lat: p.lat, lon: p.lon, desc: s.extract || "Monumento / Punto di interesse storico", type: t }); 
+                } 
+            } 
+        } catch(e) { console.error(e); } 
+    }
     
     function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
 
@@ -1012,7 +1090,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 let quality = 0.7; let dataUrl = canvas.toDataURL('image/jpeg', quality);
                 while (dataUrl.length > 500000 && quality > 0.3) { quality -= 0.1; dataUrl = canvas.toDataURL('image/jpeg', quality); }
-                if (dataUrl.length > 600000) { hideLoader(); showToast("⚠️ Foto troppo grande anche dopo compressione. Usa un'immagine più piccola.", "error"); return; }
+                if (dataUrl.length > 600000) { hideLoader(); showToast("⚠️ Foto troppo grande. Usa un'immagine più piccola.", "error"); return; }
                 const sizeKb = Math.round(dataUrl.length * 0.75 / 1024); AppState.db[city][idx].photo = dataUrl; saveAllData(); refreshList(); hideLoader(); showToast(`📸 Salvata! (${sizeKb} KB, qualità ${Math.round(quality*100)}%)`);
             }; img.src = e.target.result;
         }; reader.readAsDataURL(file);
@@ -1132,8 +1210,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${conflictBadge} ${costBadge}${paidBadge}${gpsDistBadge}</b>
                 </div>
                 <div style="display:flex; gap:5px; position:relative; z-index: 5;">
-                    <button onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;" aria-label="Sposta in alto">▲</button>
-                    <button onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;" aria-label="Sposta in basso">▼</button>
+                    <button class="day-ctrl" onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;" aria-label="Sposta in alto">▲</button>
+                    <button class="day-ctrl" onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;" aria-label="Sposta in basso">▼</button>
                     <button onclick="removeItem('${sCity}', ${i.idx})" style="color:red; background:none; border:none; font-size:20px;" aria-label="Rimuovi tappa">×</button>
                 </div>
             </div>
@@ -1179,12 +1257,16 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             let availableCities = Object.keys(AppState.db).filter(c => AppState.db[c] && AppState.db[c].length > 0);
             if (availableCities.length === 0) {
                 selector.style.display = actionsBox.style.display = aiActions.style.display = navBtn.style.display = routingToggleBox.style.display = 'none';
+                document.getElementById('btnCompactToggle').style.display = 'none';
                 document.getElementById('tripStats').style.display = document.getElementById('weatherWidget').style.display = document.getElementById('survivalWidget').style.display = document.getElementById('tripManageBtn').style.display = 'none';
-                b.innerHTML = `<div class="empty-state">Nessuna tappa salvata. Clicca su "🪄 AI Wizard" o "Esplora" per iniziare.</div>`; return;
+                b.innerHTML = `<div class="empty-state">Nessuna tappa salvata. Clicca su "🪄 AI Wizard" o "Esplora" per iniziare.</div>`; 
+                calculateStorageUsage();
+                return;
             }
             if (!AppState.activeTrip || !availableCities.includes(AppState.activeTrip)) AppState.activeTrip = availableCities[0];
             selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${c}" ${c === AppState.activeTrip ? 'selected' : ''}>${c.toUpperCase()}</option>`).join("");
             document.getElementById('tripManageBtn').style.display = 'block';
+            document.getElementById('btnCompactToggle').style.display = 'block';
             
             updateWeatherWidget(); 
             refreshStatsUI();
@@ -1243,7 +1325,9 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                         let tMins = getEffectiveMins(tp.time);
                         let percent = Math.max(0, Math.min(100, ((tMins - startMins) / totalMins) * 100));
                         let isConf = conflictingIndices.has(tp.idx);
-                        return `<div class="timeline-marker ${isConf ? 'conflict' : ''}" style="left: ${percent}%;" title="${escapeHtml(tp.n)}">${tp.dayIdx + 1}</div><div class="timeline-time-label" style="left: ${percent}%; ${isConf ? 'color:#e74c3c;' : ''}">${tp.time}</div>`;
+                        // Alterniamo l'altezza delle etichette orario per evitare sovrapposizioni su schermi piccoli
+                        let yOffset = tp.dayIdx % 2 === 0 ? '24px' : '-14px'; 
+                        return `<div class="timeline-marker ${isConf ? 'conflict' : ''}" style="left: ${percent}%;" title="${escapeHtml(tp.n)}">${tp.dayIdx + 1}</div><div class="timeline-time-label" style="left: ${percent}%; top: ${yOffset}; ${isConf ? 'color:#e74c3c;' : ''}">${tp.time}</div>`;
                     }).join('');
                     timelineHtml = `<div class="timeline-wrapper"><div class="timeline-track"></div>${markersHtml}</div>`;
                 }
@@ -1275,6 +1359,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     });
                 });
             }
+            calculateStorageUsage();
         } catch (error) { console.error("Errore Refresh: ", error); }
     }
 
@@ -1340,10 +1425,22 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function optimizeItinerary() { if (!AppState.activeTrip) return; showLoader("Ottimizzazione..."); try { let allPlaces = AppState.db[AppState.activeTrip].map((p) => ({ name: p.n, time: p.time || '' })); const prompt = `Ordina per logica territoriale rispettando orari: ${JSON.stringify(allPlaces)}.`; const schema = { type: "OBJECT", properties: { optimizedOrder: { type: "ARRAY", items: { type: "STRING" } } } }; const data = await callAI(prompt, schema); let newArr = []; let oldArr = [...AppState.db[AppState.activeTrip]]; data.optimizedOrder.forEach(aiName => { let idx = oldArr.findIndex(p => p.n === aiName); if (idx !== -1) { newArr.push(oldArr[idx]); oldArr.splice(idx, 1); } }); AppState.db[AppState.activeTrip] = [...newArr, ...oldArr]; saveAllData(); refreshList(); showItineraryMarkers(); } catch(e) {} hideLoader(); }
 
     function changeDay(city, idx, newDay) { if(newDay < 1) return; AppState.db[city][idx].day = newDay; saveAllData(); refreshList(); showItineraryMarkers(); }
-    function removeItem(c, i) { AppState.db[c].splice(i, 1); if(!AppState.db[c].length) delete AppState.db[c]; saveAllData(); refreshList(); showItineraryMarkers(); }
+    
+    function removeItem(c, i) { 
+        if(!confirm("⚠️ Sicuro di voler eliminare questa tappa?\nTutti i dati associati (note, foto, spese) andranno persi.")) return;
+        AppState.db[c].splice(i, 1); if(!AppState.db[c].length) delete AppState.db[c]; 
+        saveAllData(); refreshList(); showItineraryMarkers(); showToast("🗑️ Tappa eliminata.");
+    }
+    
     function moveItem(city, index, direction) { let arr = AppState.db[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; saveAllData(); refreshList(); showItineraryMarkers(); } }
     
-    function updateTime(c, i, v) { AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); } 
+    function updateTime(c, i, v) { 
+        if (v && !/^([01]?\d|2[0-3]):([0-5]\d)$/.test(v)) {
+            showToast("⚠️ Formato orario non valido (Usa HH:MM)", "error");
+            refreshList(); return;
+        }
+        AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); 
+    } 
     function updateLink(c, i, v) { AppState.db[c][i].link = v; saveAllData(); } 
     function updateNote(c, i, v) { AppState.db[c][i].note = v; saveAllData(); }
     function updateCost(c, i, v) { 
@@ -1408,6 +1505,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         const a = document.createElement('a');
         a.href = url; a.download = "Viaggi_Backup.json";
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        showToast("✅ Backup scaricato! (Nota: la tua API Key non viene esportata per sicurezza)");
     }
     
     function handleRestore(e) {
@@ -1417,7 +1515,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
-                if(data.db) { AppState.db = data.db; if(data.meta) AppState.meta = data.meta; saveAllData(); refreshList(); showToast("✅ Dati ripristinati!"); }
+                if(data.db) { AppState.db = data.db; if(data.meta) AppState.meta = data.meta; saveAllData(); refreshList(); showToast("✅ Dati ripristinati! (Ricorda di rimettere la tua API Key se necessaria)"); }
             } catch(err) { showToast("⚠️ File non valido.", "error"); }
         };
         reader.readAsText(file);
@@ -1541,12 +1639,20 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             distBadge.innerText = `A ${distText} da te`;
             
             if (distKm <= 0.05 && !reachedDestinationAlerted) {
-                distBadge.innerText = "📍 SEI ARRIVATO!";
+                distBadge.innerText = "📍 SEI ARRIVATO! (Avanzamento tra 3s...)";
                 distBadge.style.background = "rgba(46, 204, 113, 0.2)"; distBadge.style.color = "#2ecc71";
                 showToast(`Sei arrivato a: ${p.n}! 🎉`);
                 reachedDestinationAlerted = true;
                 if (liveUserLine) map.removeLayer(liveUserLine);
+                
+                // AVANZAMENTO AUTOMATICO (Punto 2)
+                setTimeout(() => {
+                    if (document.body.classList.contains('nav-active') && reachedDestinationAlerted) {
+                        nextNavStep();
+                    }
+                }, 3500);
                 return;
+
             } else if (distKm > 0.05) {
                 distBadge.style.background = "rgba(231, 76, 60, 0.2)"; distBadge.style.color = "#e74c3c";
                 reachedDestinationAlerted = false;
