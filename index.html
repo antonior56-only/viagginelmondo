@@ -186,6 +186,30 @@
         .compact-mode .card { padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; }
         .compact-mode .drag-handle { font-size: 16px; padding-right: 6px; }
         .compact-mode .card b { font-size: 14px !important; }
+
+        /* ── STILI AI WIDGET E MODAL ── */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
+        .modal-overlay.open { display:flex; }
+        #chat-widget { position:fixed; bottom:20px; right:20px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; }
+        #chat-btn { background:linear-gradient(135deg,var(--accent-blue),var(--accent-gold)); color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:24px; box-shadow:0 4px 14px rgba(0,0,0,.5); cursor:pointer; transition:transform .2s; display:flex; align-items:center; justify-content:center; }
+        #chat-btn:hover { transform:scale(1.05); }
+        #chat-panel { display:none; width:340px; height:450px; max-height:80vh; max-width:calc(100vw - 40px); background:var(--card-bg); border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,.5); margin-bottom:14px; overflow:hidden; flex-direction:column; border:1px solid var(--border); }
+        #chat-panel.open { display:flex; }
+        #chat-header { background:var(--bg-dark); color:var(--accent-gold); padding:12px 16px; font-family:'Playfair Display',serif; font-size:18px; font-weight:700; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+        #chat-messages { flex:1; overflow-y:auto; padding:14px; background:var(--bg-dark); display:flex; flex-direction:column; gap:10px; }
+        .chat-bubble { max-width:85%; padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.4; color:var(--text-main); }
+        .chat-bubble.user { background:var(--accent-blue); color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+        .chat-bubble.ai { background:var(--card-bg); align-self:flex-start; border-bottom-left-radius:4px; border:1px solid var(--border); }
+        #chat-input-area { display:flex; padding:10px; background:var(--bg-dark); border-top:1px solid var(--border); gap:8px; }
+        #chat-input { flex:1; border:1px solid var(--border); border-radius:20px; padding:8px 14px; font-family:'Jost',sans-serif; font-size:13px; outline:none; background:var(--card-bg); color:var(--text-main); }
+        #chat-input:focus { border-color:var(--accent-gold); }
+        #chat-send { background:var(--accent-gold); color:#000; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:700; transition:transform .2s; }
+        #chat-send:active { transform:scale(.9); }
+        .ai-typing { display:flex; gap:4px; align-items:center; height:20px; padding:0 4px; }
+        .ai-typing span { width:6px; height:6px; background:#8a7a62; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
+        .ai-typing span:nth-child(1) { animation-delay:-0.32s; }
+        .ai-typing span:nth-child(2) { animation-delay:-0.16s; }
+        @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
     </style>
 </head>
 <body>
@@ -204,6 +228,8 @@
             <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: #8a7a62; font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
+            <input type="file" id="vision-upload" accept="image/*" style="display:none" onchange="analizzaFotoAI(event)"/>
+            <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">📸</button>
             <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
             <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
@@ -368,19 +394,19 @@
             <div style="display: flex; gap: 6px; margin-bottom: 5px;" id="ai-actions-box">
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="organizeDaysAI()" style="color: var(--accent-blue); border-color: var(--accent-blue); font-size:10px; padding: 10px 5px; width:100%;">DIVIDI GIORNI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI distribuisce le tappe sui giorni</span>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI distribuisce le tappe</span>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="optimizeItinerary()" style="color: var(--accent-gold); border-color: var(--accent-gold); font-size:10px; padding: 10px 5px; width:100%;">OTTIMIZZA AI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI riordina per logica e semantica</span>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI riordina per logica</span>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="analyzeWeatherAI()" style="color: #fff; background: var(--accent-blue); border: none; font-size:10px; padding: 10px 5px; width:100%;">🌤️ METEO AI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI consiglia in base alle previsioni</span>
+                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">Consigli sulle previsioni</span>
                 </div>
             </div>
             <div style="font-size:10px; color:#8a7a62; text-align:center; margin-bottom:12px; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius:6px; line-height:1.5;">
-                💡 <b style="color:var(--accent-gold)">Ottimizza AI</b> = prima della partenza, ragiona sul senso delle tappe &nbsp;|&nbsp; <b style="color:var(--accent-gold)">🧭 Ottimizza Giornata</b> = in viaggio, usa GPS e ora corrente
+                💡 <b style="color:var(--accent-gold)">Ottimizza AI</b> = prima della partenza, ragiona sul senso delle tappe  |  <b style="color:var(--accent-gold)">🧭 Ottimizza Giornata</b> = in viaggio, usa GPS e ora
             </div>
 
             <div id="routing-toggle-box" style="display: flex; gap: 8px; margin-top: 15px; justify-content: center; display: none;">
@@ -400,16 +426,18 @@
         </div>
 
         <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; padding-bottom: 90px;">
-            <div style="font-size: 11px; color: #8a7a62; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Motore Intelligenza Artificiale</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                <input type="text" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini..." style="flex: 2; border-color: var(--accent-gold);">
-                <button class="btn-action primary" style="flex: 1;" onclick="saveUserApiKey()">SALVA CHIAVE</button>
-            </div>
             <div style="font-size: 11px; color: #8a7a62; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Gestione Dati</div>
             <div style="display: flex; gap: 8px;">
                 <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="backupData()">💾 BACKUP</button>
                 <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('restoreFile').click()">📂 RIPRISTINA</button>
             </div>
+            
+            <div style="font-size: 11px; color: #8a7a62; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Motore Intelligenza Artificiale</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="text" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini..." style="flex: 2; border-color: var(--accent-gold);">
+                <button class="btn-action primary" style="flex: 1;" onclick="saveUserApiKey()">SALVA CHIAVE</button>
+            </div>
+
             <div id="storage-usage" style="font-size:11px; color:#8a7a62; margin-top:8px; text-align:center;"></div>
         </div>
     </div>
@@ -502,6 +530,25 @@
     </div>
 </div>
 
+<!-- Chat Widget e Assistente Vocale AI -->
+<div id="chat-widget">
+  <div id="chat-panel">
+    <div id="chat-header">
+      <div>🤖 Assistente AI di Viaggio</div>
+      <button onclick="toggleChat()" style="background:none;border:none;color:var(--accent-gold);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="chat-messages">
+      <div class="chat-bubble ai">Ciao! Sono la tua guida di viaggio. Come posso aiutarti con il tuo itinerario oggi? Chiedimi consigli o chiedimi di analizzare una foto!</div>
+    </div>
+    <div id="chat-input-area">
+      <button id="chat-mic" onclick="avviaAscolto()" aria-label="Usa comando vocale" style="background:var(--card-bg);border:1px solid var(--border);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-main);transition:all .2s" title="Parla con l'assistente">🎤</button>
+      <input type="text" id="chat-input" placeholder="Chiedi qualcosa..." aria-label="Scrivi un messaggio all'assistente" onkeypress="if(event.key==='Enter') inviaMessaggioAI()" />
+      <button id="chat-send" aria-label="Invia messaggio" onclick="inviaMessaggioAI()">➤</button>
+    </div>
+  </div>
+  <button id="chat-btn" aria-label="Apri assistente virtuale AI" onclick="toggleChat()">🤖</button>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -579,7 +626,7 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     function toggleMapFullscreen() {
@@ -735,9 +782,77 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function showLoader(text) { document.getElementById('loader-text').innerText = text; document.getElementById('loader').style.display = 'flex'; }
     function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
+    function askForApiKeyModal() {
+        return new Promise(resolve => {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:var(--card-bg);padding:24px;border-radius:16px;width:90%;max-width:380px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.7);border:1px solid var(--border)">
+                    <h3 style="font-family:'Playfair Display',serif;color:var(--accent-gold);font-size:22px;margin-bottom:8px">🔑 API Key richiesta</h3>
+                    <p style="font-size:13px;color:var(--text-main);line-height:1.4;margin-bottom:16px">Inserisci la tua API Key gratuita di Gemini per attivare l'Intelligenza Artificiale.</p>
+                    <input type="text" id="temp-api-key" placeholder="Incolla qui la chiave..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;font-family:'Jost',sans-serif;outline:none;font-size:13px;background:var(--bg-dark);color:var(--text-main)">
+                    <div style="display:flex;gap:8px">
+                        <button id="btn-cancel-key" class="btn-action" style="flex:1;border-color:#666;color:#aaa;">Annulla</button>
+                        <button id="btn-save-key" class="btn-action primary" style="flex:1;">Salva</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            document.getElementById('btn-cancel-key').onclick = () => { document.body.removeChild(overlay); resolve(""); };
+            document.getElementById('btn-save-key').onclick = () => { const val = document.getElementById('temp-api-key').value.trim(); document.body.removeChild(overlay); resolve(val); };
+        });
+    }
+
+    async function fetchGeminiWithRetry(payload, isJson = false, isVision = false) {
+        let activeKey = userPersonalApiKey || apiKey;
+        if (!activeKey) {
+            activeKey = await askForApiKeyModal();
+            if(activeKey) {
+                localStorage.setItem('travel_api_key_v1', activeKey);
+                userPersonalApiKey = activeKey;
+            } else {
+                throw new Error("API Key annullata");
+            }
+        }
+        
+        if (isJson) {
+            payload.generationConfig = { responseMimeType: "application/json" };
+        }
+
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeKey}`;
+        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+        if (!response.ok) {
+            if (response.status === 400 || response.status === 403 || response.status === 401) {
+                const newKey = await askForApiKeyModal();
+                if (newKey) {
+                    localStorage.setItem('travel_api_key_v1', newKey);
+                    userPersonalApiKey = newKey;
+                    return fetchGeminiWithRetry(payload, isJson, isVision);
+                }
+                throw new Error("API Key annullata");
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        return isJson ? JSON.parse(textResult) : textResult;
+    }
+
     async function callAI(prompt, schema = null) {
-        const activeKey = userPersonalApiKey || apiKey;
-        if (!activeKey) { hideLoader(); showToast("⚠️ API Key mancante! Inseriscila nelle impostazioni in basso.", "error"); throw new Error("API Key mancante"); }
+        let activeKey = userPersonalApiKey || apiKey;
+        if (!activeKey) { 
+            activeKey = await askForApiKeyModal();
+            if(activeKey) {
+                localStorage.setItem('travel_api_key_v1', activeKey);
+                userPersonalApiKey = activeKey;
+                if(document.getElementById('userApiKeyInput')) document.getElementById('userApiKeyInput').value = activeKey;
+            } else {
+                hideLoader(); throw new Error("API Key mancante"); 
+            }
+        }
+        
         let modelToUse = 'gemini-2.5-flash-preview-09-2025';
         if (userPersonalApiKey) {
             if (!AppState.aiModel) {
@@ -763,7 +878,15 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({})); const googleMsg = errorData?.error?.message || "Errore sconosciuto";
                     if (response.status === 400) { lastErrorMsg = `⚠️ Errore Google (400): ${googleMsg.substring(0, 70)}...`; throw new Error("FATAL"); }
-                    if (response.status === 403 || response.status === 401) { lastErrorMsg = "⚠️ Chiave API negata."; throw new Error("FATAL"); }
+                    if (response.status === 403 || response.status === 401) { 
+                        lastErrorMsg = "⚠️ Chiave API negata."; 
+                        const newKey = await askForApiKeyModal();
+                        if(newKey) {
+                            localStorage.setItem('travel_api_key_v1', newKey); userPersonalApiKey = newKey;
+                            return callAI(prompt, schema);
+                        }
+                        throw new Error("FATAL"); 
+                    }
                     if (response.status === 429) { lastErrorMsg = "⚠️ Troppe richieste. Attendi qualche istante..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
                     if (response.status >= 500) { lastErrorMsg = "⚠️ Server Google offline. Riprovo..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
                     lastErrorMsg = `⚠️ Errore HTTP ${response.status}: ${googleMsg.substring(0,50)}`; throw new Error("FATAL");
@@ -848,7 +971,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function toggleRestoMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('resto-dropdown').style.display = 'block'; }
     function toggleHotelMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('hotel-dropdown').style.display = 'block'; }
 
-    // Autocomplete per ricerca città
     let cityDebounceTimer;
     function onCityInput() {
         clearTimeout(cityDebounceTimer);
@@ -1004,7 +1126,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); 
             const d = await res.json(); 
             if(d.query?.geosearch) { 
-                // Filtro base per escludere risultati generici non "monumentali"
                 const blacklist = ['Fiume', 'Stazione', 'Provincia', 'Regione', 'Quartiere', 'Comune', 'Via '];
                 const validPoints = d.query.geosearch.filter(p => !blacklist.some(b => p.title.includes(b))).slice(0, 10);
                 
@@ -1222,8 +1343,9 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             </div>
             <div class="btn-row" style="margin-top: 10px; margin-bottom: 10px;">
                 <button class="btn-action" onclick="openSavedDesc('${sCity}', ${i.idx})">DETTAGLI</button>
+                <button class="btn-action" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="generaEAscolta('${escapeHtml(i.n)}', '${escapeHtml(i.type)}', '${escapeHtml(i.note || '')}')">🎧 ASCOLTA</button>
                 <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
-                <button class="btn-action" style="border-color: #8a7a62; color: #8a7a62;" onclick="findAlternative('${sCity}', ${i.idx})">🔄 ALTERNATIVA</button>
+                <button class="btn-action" style="border-color: #8a7a62; color: #8a7a62;" onclick="findAlternative('${sCity}', ${i.idx})">🔄 ALT</button>
             </div>
             <div class="wallet-box">
                 <div class="wallet-row">
@@ -1325,7 +1447,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                         let tMins = getEffectiveMins(tp.time);
                         let percent = Math.max(0, Math.min(100, ((tMins - startMins) / totalMins) * 100));
                         let isConf = conflictingIndices.has(tp.idx);
-                        // Alterniamo l'altezza delle etichette orario per evitare sovrapposizioni su schermi piccoli
                         let yOffset = tp.dayIdx % 2 === 0 ? '24px' : '-14px'; 
                         return `<div class="timeline-marker ${isConf ? 'conflict' : ''}" style="left: ${percent}%;" title="${escapeHtml(tp.n)}">${tp.dayIdx + 1}</div><div class="timeline-time-label" style="left: ${percent}%; top: ${yOffset}; ${isConf ? 'color:#e74c3c;' : ''}">${tp.time}</div>`;
                     }).join('');
@@ -1680,6 +1801,99 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 });
             }
         }
+    }
+
+    function getAppDati() {
+        return JSON.stringify(AppState.db);
+    }
+
+    function toggleChat() { document.getElementById('chat-panel').classList.toggle('open'); }
+
+    async function inviaMessaggioAI() {
+        const input = document.getElementById('chat-input');
+        const txt = input.value.trim(); if (!txt) return;
+        const msgBox = document.getElementById('chat-messages');
+        msgBox.innerHTML += `<div class="chat-bubble user">${txt}</div>`; input.value = '';
+        const loaderId = 'loader-' + Date.now();
+        msgBox.innerHTML += `<div class="chat-bubble ai" id="${loaderId}"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+        msgBox.scrollTop = msgBox.scrollHeight;
+
+        const payload = {
+            contents: [{ parts: [{ text: txt }] }],
+            systemInstruction: { parts: [{ text: `Sei una guida turistica globale ed esperta integrata in un'app di viaggio. L'utente ha salvato queste tappe (JSON): ${getAppDati()}. Usa questi dati per contestualizzare se utile, MA sei assolutamente libero e incoraggiato ad attingere a TUTTA la tua conoscenza generale sul mondo, storia, cultura, geografia e consigli pratici per rispondere a qualsiasi domanda dell'utente (anche su luoghi non presenti nel JSON). Rispondi in modo conciso e amichevole in italiano.` }] }
+        };
+
+        try {
+            const risposta = await fetchGeminiWithRetry(payload, false);
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">${risposta.replace(/\n/g, '<br>')}</div>`;
+        } catch (e) {
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore AI. Controlla la API Key.</div>`;
+        }
+        msgBox.scrollTop = msgBox.scrollHeight;
+    }
+
+    function avviaAscolto() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { showToast("Il tuo browser non supporta il riconoscimento vocale."); return; }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'it-IT';
+        recognition.onstart = () => showToast("🎙️ In ascolto...");
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            document.getElementById('chat-input').value = transcript;
+            inviaMessaggioAI();
+        };
+        recognition.onerror = () => showToast("Errore con il microfono.");
+        recognition.start();
+    }
+
+    function leggiAdAltaVoce(testo) {
+        if(!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(testo);
+        u.lang = 'it-IT';
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+    }
+
+    async function generaEAscolta(nome, tipo, desc) {
+        showToast(`🎧 Genero audioguida per ${nome}...`);
+        try {
+            const prompt = `Sei una guida turistica. L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo e appassionante di massimo 3 frasi su questo luogo senza formattazione speciale.`;
+            const text = await fetchGeminiWithRetry({ contents: [{ parts: [{ text: prompt }] }] }, false);
+            leggiAdAltaVoce(text.replace(/\*/g, ''));
+            showToast("🔊 Riproduzione audioguida in corso...");
+        } catch (e) {
+            showToast("Errore di rete per l'audioguida. Controlla la API Key.", "error");
+        }
+    }
+
+    function analizzaFotoAI(event) {
+        const file = event.target.files[0]; if (!file) return;
+        showToast("⏳ Analisi foto in corso...");
+        document.getElementById('chat-panel').classList.add('open');
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64Data = e.target.result.split(',')[1];
+            const msgBox = document.getElementById('chat-messages');
+            msgBox.innerHTML += `<div class="chat-bubble user">📸 [Foto inviata]</div>`;
+            const loaderId = 'loader-' + Date.now();
+            msgBox.innerHTML += `<div class="chat-bubble ai" id="${loaderId}"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            const payload = {
+                contents: [{ role: "user", parts: [ { text: "Sei un esperto di viaggi. Identifica questo luogo, opera d'arte, cibo o panorama e dimmi cos'è in 2-3 frasi fornendo contesto." }, { inlineData: { mimeType: file.type, data: base64Data } }] }]
+            };
+
+            try {
+                const risposta = await fetchGeminiWithRetry(payload, false, true);
+                document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">👁️ <b>Analisi visiva:</b><br>${risposta.replace(/\n/g, '<br>')}</div>`;
+            } catch (err) {
+                document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore analisi foto.</div>`;
+            }
+            msgBox.scrollTop = msgBox.scrollHeight;
+        };
+        reader.readAsDataURL(file);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
