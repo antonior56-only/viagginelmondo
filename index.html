@@ -229,7 +229,9 @@
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <input type="file" id="vision-upload" accept="image/*" style="display:none" onchange="analizzaFotoAI(event)"/>
-            <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">📸</button>
+            <input type="file" id="camera-upload" accept="image/*" capture="environment" style="display:none" onchange="analizzaFotoAI(event)"/>
+            <button onclick="document.getElementById('camera-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Scatta Foto AI" aria-label="Scatta Foto AI">📷</button>
+            <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">🖼️</button>
             <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
             <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
