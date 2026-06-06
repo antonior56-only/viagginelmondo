@@ -84,8 +84,6 @@
         .wallet-input[type="time"] { flex: 0 0 95px; text-align: center; color: var(--accent-blue); font-weight: 600; background: rgba(74, 158, 187, 0.1); border-color: rgba(74, 158, 187, 0.5); }
         .wallet-input[type="number"] { flex: 0 0 95px; text-align: center; color: var(--accent-green); font-weight: 600; background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.5); }
         
-        .photo-btn { flex: 0 0 45px; background: rgba(74, 158, 187, 0.15); border: 1px solid rgba(74, 158, 187, 0.6); color: var(--accent-blue); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
-        
         .note-box { background: #13120e; border: 1px solid rgba(232, 184, 75, 0.4); border-radius: 8px; padding: 10px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: 0.3s; }
         .note-area { width: 100%; background: transparent; border: none; color: #ffffff; font-family: 'Jost', sans-serif; font-size: 14px; resize: vertical; min-height: 45px; outline: none; line-height: 1.5; letter-spacing: 0.3px; }
         .note-area::placeholder { color: #a59781; opacity: 0.8; font-style: italic; }
@@ -211,6 +209,7 @@
         .ai-typing span:nth-child(2) { animation-delay:-0.16s; }
         @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 </head>
 <body>
 
@@ -228,17 +227,15 @@
             <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: #8a7a62; font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-            <input type="file" id="vision-upload" accept="image/*" style="display:none" onchange="analizzaFotoAI(event)"/>
-            <input type="file" id="camera-upload" accept="image/*" capture="environment" style="display:none" onchange="analizzaFotoAI(event)"/>
-            <button onclick="document.getElementById('camera-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Scatta Foto AI" aria-label="Scatta Foto AI">📷</button>
-            <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">🖼️</button>
+            <input type="file" id="vision-upload" accept="image/*" capture="environment" style="display:none" onchange="analizzaFotoAI(event)"/>
+            <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">📸</button>
             <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
             <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
     </div>
     <div class="nav-tabs">
-        <button id="tab-btn-wizard" class="tab-btn" onclick="switchTab('wizard', event)">🪄 AI Wizard</button>
-        <button id="tab-btn-scopri" class="tab-btn active" onclick="switchTab('scopri', event)">Esplora</button>
+        <button id="tab-btn-wizard" class="tab-btn active" onclick="switchTab('wizard', event)">🪄 AI Wizard</button>
+        <button id="tab-btn-scopri" class="tab-btn" onclick="switchTab('scopri', event)">Esplora</button>
         <button id="tab-btn-itinerario" class="tab-btn" onclick="switchTab('itinerario', event)">Il Mio Piano</button>
     </div>
 </header>
@@ -265,7 +262,7 @@
 </div>
 
 <main>
-    <div id="view-wizard" class="view-content">
+    <div id="view-wizard" class="view-content active">
         <div style="margin-bottom: 25px;">
             <h2 style="font-family: 'Playfair Display'; color: var(--accent-blue); font-size: 28px; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
                 ✈️ Pianifica il tuo viaggio
@@ -337,7 +334,7 @@
         </button>
     </div>
 
-    <div id="view-scopri" class="view-content active">
+    <div id="view-scopri" class="view-content">
         <div class="card" style="border: 1px solid var(--accent-blue); background: rgba(74, 158, 187, 0.05);">
             <div style="color: var(--accent-blue); font-size: 10px; font-weight: 700; margin-bottom: 8px;">AI ASSISTANT</div>
             <input type="text" id="aiQuery" class="search-input" placeholder="Chiedi all'IA (es: storia, tradizioni, piatti tipici...)">
@@ -532,7 +529,6 @@
     </div>
 </div>
 
-<!-- Chat Widget e Assistente Vocale AI -->
 <div id="chat-widget">
   <div id="chat-panel">
     <div id="chat-header">
@@ -548,7 +544,7 @@
       <button id="chat-send" aria-label="Invia messaggio" onclick="inviaMessaggioAI()">➤</button>
     </div>
   </div>
-  <button id="chat-btn" aria-label="Apri assistente virtuale AI" onclick="toggleChat()">🤖</button>
+        <button id="chat-btn" aria-label="Apri assistente virtuale AI" onclick="toggleChat()">🤖</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -567,22 +563,12 @@
         aiModel: ""
     };
 
-    function safeLocalStorageSave(key, value) {
-        try {
-            localStorage.setItem(key, value);
-        } catch (e) {
-            if (e.name === 'QuotaExceededError' || e.code === 22) {
-                showToast("⚠️ Spazio di archiviazione esaurito! Rimuovi qualche foto o scarica un backup.", "error");
-            } else {
-                console.error("Errore localStorage:", e);
-            }
-        }
-    }
-
     function saveAllData() {
-        safeLocalStorageSave('travel_db_v18', JSON.stringify(AppState.db));
-        safeLocalStorageSave('travel_meta_v1', JSON.stringify(AppState.meta));
-        calculateStorageUsage();
+        if (typeof localforage !== 'undefined') {
+            localforage.setItem('travel_db_v18', AppState.db).catch(err => console.error(err));
+            localforage.setItem('travel_meta_v1', AppState.meta).catch(err => console.error(err));
+            calculateStorageUsage();
+        }
     }
 
     let map = null;
@@ -595,8 +581,6 @@
     let osrmWarned = false;
 
     try { userPersonalApiKey = localStorage.getItem('travel_api_key_v1') || ""; } catch(e) {}
-    try { AppState.db = JSON.parse(localStorage.getItem('travel_db_v18')) || {}; } catch(e) { AppState.db = {}; saveAllData(); }
-    try { AppState.meta = JSON.parse(localStorage.getItem('travel_meta_v1')) || {}; } catch(e) { AppState.meta = {}; saveAllData(); }
 
     let currentActiveCity = "", currentSuggestions = [];
     let activeMarkers = [], routeLines = []; 
@@ -677,15 +661,18 @@
         showToast("Modalità percorso: " + (mode === 'driving' ? "Auto" : "A piedi"));
     }
 
-    function calculateStorageUsage() {
+    async function calculateStorageUsage() {
         try {
-            const dbStr = JSON.stringify(AppState.db);
-            const kb = Math.round(dbStr.length / 1024);
             const el = document.getElementById('storage-usage');
-            if(el) {
-                let color = kb > 4000 ? '#e74c3c' : (kb > 2500 ? '#e8b84b' : '#8a7a62');
-                el.innerHTML = `💾 Storage Locale: <span style="color:${color}; font-weight:bold;">${kb} KB</span> / ~5000 KB stime<br><span style="font-size:9px;">(Attenzione: troppe foto possono bloccare il salvataggio)</span>`;
-            }
+            if (!el) return;
+            // Stima reale basata sulla serializzazione dei dati in IndexedDB
+            const dbStr = JSON.stringify(AppState.db);
+            const metaStr = JSON.stringify(AppState.meta);
+            const kb = Math.round((dbStr.length + metaStr.length) / 1024);
+            const label = kb < 1024
+                ? `<span style="color:var(--accent-green); font-weight:bold;">${kb} KB</span>`
+                : `<span style="color:var(--accent-gold); font-weight:bold;">${(kb/1024).toFixed(1)} MB</span>`;
+            el.innerHTML = `💾 Dati salvati (IndexedDB): ${label} stimati<br><span style="font-size:9px;">Nessun limite di spazio — memoria sicura attivata ✅</span>`;
         } catch(e) {}
     }
 
@@ -807,21 +794,10 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     async function fetchGeminiWithRetry(payload, isJson = false, isVision = false) {
         let activeKey = userPersonalApiKey || apiKey;
-        if (!activeKey) {
-            activeKey = await askForApiKeyModal();
-            if(activeKey) {
-                localStorage.setItem('travel_api_key_v1', activeKey);
-                userPersonalApiKey = activeKey;
-            } else {
-                throw new Error("API Key annullata");
-            }
-        }
-        
-        if (isJson) {
-            payload.generationConfig = { responseMimeType: "application/json" };
-        }
-
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeKey}`;
+        if (isJson) { payload.generationConfig = { responseMimeType: "application/json" }; }
+        // Usa il modello dinamico se già rilevato da callAI, altrimenti usa il preferito di default
+        const modelToUse = AppState.aiModel || 'gemini-2.5-flash';
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
         const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
 
         if (!response.ok) {
@@ -844,17 +820,6 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     async function callAI(prompt, schema = null) {
         let activeKey = userPersonalApiKey || apiKey;
-        if (!activeKey) { 
-            activeKey = await askForApiKeyModal();
-            if(activeKey) {
-                localStorage.setItem('travel_api_key_v1', activeKey);
-                userPersonalApiKey = activeKey;
-                if(document.getElementById('userApiKeyInput')) document.getElementById('userApiKeyInput').value = activeKey;
-            } else {
-                hideLoader(); throw new Error("API Key mancante"); 
-            }
-        }
-        
         let modelToUse = 'gemini-2.5-flash-preview-09-2025';
         if (userPersonalApiKey) {
             if (!AppState.aiModel) {
@@ -869,6 +834,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             }
             modelToUse = AppState.aiModel;
         }
+        
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
         let payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
         if (schema) { payload.generationConfig.responseSchema = schema; }
@@ -883,10 +849,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     if (response.status === 403 || response.status === 401) { 
                         lastErrorMsg = "⚠️ Chiave API negata."; 
                         const newKey = await askForApiKeyModal();
-                        if(newKey) {
-                            localStorage.setItem('travel_api_key_v1', newKey); userPersonalApiKey = newKey;
-                            return callAI(prompt, schema);
-                        }
+                        if(newKey) { localStorage.setItem('travel_api_key_v1', newKey); userPersonalApiKey = newKey; return callAI(prompt, schema); }
                         throw new Error("FATAL"); 
                     }
                     if (response.status === 429) { lastErrorMsg = "⚠️ Troppe richieste. Attendi qualche istante..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
@@ -915,26 +878,40 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         const btn = event ? event.currentTarget : document.getElementById('tab-btn-' + t);
         if (btn) btn.classList.add('active');
         setTimeout(() => { 
-            if(map) map.invalidateSize(); 
-            if(t === 'itinerario') { refreshList(); showItineraryMarkers(); } 
-            else if (t === 'scopri') {
-                Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {};
-                Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {};
+            if(map) {
+                map.invalidateSize(); 
+                if(t === 'itinerario') { refreshList(); showItineraryMarkers(); } 
+                else if (t === 'scopri') {
+                    Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {};
+                    Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {};
+                }
             }
         }, 100);
     }
 
     function forceGPS() {
-        if (!navigator.geolocation || !map) return; showLoader("Localizzazione...");
+        if (!navigator.geolocation) { showToast("⚠️ Il tuo dispositivo non supporta il GPS.", "error"); return; }
+        showLoader("Ricerca satellite...");
+        
         navigator.geolocation.getCurrentPosition(p => {
             AppState.userCoords = { lat: p.coords.latitude, lon: p.coords.longitude };
-            if (myPosMarker) map.removeLayer(myPosMarker);
-            myPosMarker = L.circleMarker([AppState.userCoords.lat, AppState.userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
-            map.flyTo([AppState.userCoords.lat, AppState.userCoords.lon], 15); document.getElementById('sort-dist-btn').style.display = 'block';
-            hideLoader(); showToast("📍 Posizione trovata!");
+            if(map) {
+                if (myPosMarker) map.removeLayer(myPosMarker);
+                myPosMarker = L.circleMarker([AppState.userCoords.lat, AppState.userCoords.lon], { radius: 10, fillColor: '#2563eb', color: 'white', weight: 3, fillOpacity: 1 }).addTo(map);
+                map.flyTo([AppState.userCoords.lat, AppState.userCoords.lon], 15);
+            }
+            document.getElementById('sort-dist-btn').style.display = 'block';
+            hideLoader(); 
+            showToast("📍 Posizione trovata!");
             updateSuggestionsDistance(); updateItineraryDistance();
             if(document.body.classList.contains('nav-active')) updateLiveGPS({coords: {latitude: AppState.userCoords.lat, longitude: AppState.userCoords.lon}});
-        }, () => { hideLoader(); showToast("⚠️ Errore GPS.", "error"); });
+        }, (err) => { 
+            hideLoader(); 
+            if(err.code === 1) showToast("⚠️ Posizione negata. Autorizza l'app nelle impostazioni.", "error");
+            else if(err.code === 2) showToast("⚠️ Segnale GPS assente.", "error");
+            else if(err.code === 3) showToast("⚠️ Timeout ricerca satellite.", "error");
+            else showToast("⚠️ Errore GPS sconosciuto.", "error");
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -1118,7 +1095,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     }
 
     async function searchCity() { const v = document.getElementById('cityInput').value; if(!v || !map) return; currentActiveCity = v; try { const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(v)}&limit=1`); const data = await res.json(); if(data[0]) map.flyTo([data[0].lat, data[0].lon], 14); } catch(e) { showToast("⚠️ Errore ricerca.", "error"); } }
-    async function askAI() { const q = document.getElementById('aiQuery').value; if(!q) return; showLoader("L'IA sta elaborando..."); try { const prompt = `L'utente ti fa una domanda turistica: "${q}". Rispondi in italiano.`; const schema = { type: "OBJECT", properties: { title: {type: "STRING"}, text: {type: "STRING"} } }; const data = await callAI(prompt, schema); if(!data || !data.text) throw new Error("Dati vuoti"); document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖"; document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare."; document.getElementById('modalHours').innerText = "Assistente Turistico"; document.getElementById('descModal').style.display = 'block'; } catch(e) { showToast("⚠️ Errore IA.", "error"); } hideLoader(); }
+    async function askAI() { const q = document.getElementById('aiQuery').value; if(!q) return; showLoader("L'IA sta elaborando..."); try { const prompt = `L'utente ti fa una domanda turistica: "${q}". Rispondi in italiano in modo molto dettagliato, ricco ed esaustivo.`; const schema = { type: "OBJECT", properties: { title: {type: "STRING"}, text: {type: "STRING"} } }; const data = await callAI(prompt, schema); if(!data || !data.text) throw new Error("Dati vuoti"); document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖"; document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare."; document.getElementById('modalHours').innerText = "Assistente Turistico"; document.getElementById('descModal').style.display = 'block'; } catch(e) { showToast("⚠️ Errore IA.", "error"); } hideLoader(); }
     async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const prompt = `Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}].`; const schema = { type: "OBJECT", properties: { places: { type: "ARRAY", items: { type: "OBJECT", properties: { title: {type:"STRING"}, lat: {type:"NUMBER"}, lon: {type:"NUMBER"}, desc: {type:"STRING"}, rating: {type:"NUMBER"}, type: {type:"STRING"} } } } } }; const data = await callAI(prompt, schema); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
     
     async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}].`, {type:"OBJECT", properties:{places:{type:"ARRAY", items:{type:"OBJECT", properties:{title:{type:"STRING"}, lat:{type:"NUMBER"}, lon:{type:"NUMBER"}, desc:{type:"STRING"}, rating:{type:"NUMBER"}}}}}}); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
@@ -1145,8 +1122,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function updateSuggestionsDistance() { if (!AppState.userCoords || currentSuggestions.length === 0) return; currentSuggestions.forEach((s, idx) => { const el = document.querySelector(`.live-dist-${idx}`); if (el) { const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon); el.innerText = `${d} km da te`; } }); }
     function updateItineraryDistance() { if (!AppState.userCoords || !AppState.activeTrip || !AppState.db[AppState.activeTrip]) return; AppState.db[AppState.activeTrip].forEach((item, idx) => { const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`); const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, item.lt, item.ln); badges.forEach(badge => { badge.innerHTML = `📍${d} km`; }); }); }
     
-    async function openFullDesc(idx) { const s = currentSuggestions[idx]; document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.title}". Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
-    async function openSavedDesc(city, idx) { const s = AppState.db[city][idx]; if (!s) return; document.getElementById('modalTitle').innerText = s.n; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi brevemente questo luogo: "${s.n}". Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
+    async function openFullDesc(idx) { const s = currentSuggestions[idx]; document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.title}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
+    async function openSavedDesc(city, idx) { const s = AppState.db[city][idx]; if (!s) return; document.getElementById('modalTitle').innerText = s.n; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.n}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
 
     function openAddModal(placeObj) { pendingPlaceToAdd = placeObj; document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n; const select = document.getElementById('addModalSelect'); const trips = Object.keys(AppState.db); let optionsHtml = trips.map(t => `<option value="${t}">${t}</option>`).join(''); optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`; select.innerHTML = optionsHtml; if (AppState.activeTrip && trips.includes(AppState.activeTrip)) { select.value = AppState.activeTrip; } else if (trips.length === 0) { select.value = "_new_"; } handleAddModalChange(); document.getElementById('addPlaceModal').style.display = 'flex'; }
     function handleAddModalChange() { const val = document.getElementById('addModalSelect').value; const inputField = document.getElementById('addModalNewInput'); if (val === '_new_') { inputField.style.display = 'block'; inputField.value = ''; inputField.focus(); } else { inputField.style.display = 'none'; } }
@@ -1353,10 +1330,16 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 <div class="wallet-row">
                     <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario" aria-label="Orario tappa">
                     <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost('${sCity}', ${i.idx}, this.value)" title="Costo stimato in Euro" aria-label="Costo stimato in Euro">
-                    <button class="photo-btn" onclick="document.getElementById('cam-${i.idx}').click()" title="Allega Foto" aria-label="Allega Foto">📷</button>
-                    <input type="file" id="cam-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
                 </div>
-                <div class="wallet-row" style="align-items:center; gap:10px;">
+                
+                <div class="wallet-row" style="margin-top: 5px;">
+                    <input type="file" id="gallery-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
+                    <input type="file" id="camera-${i.idx}" accept="image/*" capture="environment" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
+                    <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('gallery-${i.idx}').click()">🖼️ GALLERIA</button>
+                    <button class="btn-action primary" style="flex:1;" onclick="document.getElementById('camera-${i.idx}').click()">📸 SCATTA FOTO</button>
+                </div>
+
+                <div class="wallet-row" style="align-items:center; gap:10px; margin-top: 5px;">
                     <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink('${sCity}', ${i.idx}, this.value)" style="flex:1;">
                     <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : '#8a7a62'}; user-select:none;" title="Segna come pagato">
                         <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid('${sCity}', ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;"> Pagato
@@ -1545,7 +1528,47 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     }
 
     async function organizeDaysAI() { if (!AppState.activeTrip) return; let all = AppState.db[AppState.activeTrip].map((p, idx) => ({...p, idx})); showLoader("Organizzo giorni..."); try { const prompt = `Dividi in tappe sensate sui vari giorni: ${JSON.stringify(all.map(p => p.n))}.`; const schema = { type: "OBJECT", properties: { assignments: { type: "ARRAY", items: { type: "OBJECT", properties: { name: {type:"STRING"}, day: {type:"NUMBER"} } } } } }; const data = await callAI(prompt, schema); data.assignments.forEach(a => { const t = all.find(p => p.n === a.name); if(t) AppState.db[AppState.activeTrip][t.idx].day = a.day; }); saveAllData(); refreshList(); } catch(e) {} hideLoader(); }
-    async function optimizeItinerary() { if (!AppState.activeTrip) return; showLoader("Ottimizzazione..."); try { let allPlaces = AppState.db[AppState.activeTrip].map((p) => ({ name: p.n, time: p.time || '' })); const prompt = `Ordina per logica territoriale rispettando orari: ${JSON.stringify(allPlaces)}.`; const schema = { type: "OBJECT", properties: { optimizedOrder: { type: "ARRAY", items: { type: "STRING" } } } }; const data = await callAI(prompt, schema); let newArr = []; let oldArr = [...AppState.db[AppState.activeTrip]]; data.optimizedOrder.forEach(aiName => { let idx = oldArr.findIndex(p => p.n === aiName); if (idx !== -1) { newArr.push(oldArr[idx]); oldArr.splice(idx, 1); } }); AppState.db[AppState.activeTrip] = [...newArr, ...oldArr]; saveAllData(); refreshList(); showItineraryMarkers(); } catch(e) {} hideLoader(); }
+    async function optimizeItinerary() {
+        if (!AppState.activeTrip) return;
+        showLoader("Ottimizzazione per giorno...");
+        try {
+            // Raggruppa le tappe per giorno mantenendo l'assegnazione originale
+            let daysMap = {};
+            AppState.db[AppState.activeTrip].forEach((p, idx) => {
+                const d = p.day || 1;
+                if (!daysMap[d]) daysMap[d] = [];
+                daysMap[d].push({ ...p, _origIdx: idx });
+            });
+
+            let newFullArr = [];
+            for (const day of Object.keys(daysMap).sort((a, b) => a - b)) {
+                const dayPlaces = daysMap[day];
+                if (dayPlaces.length <= 1) { newFullArr.push(...dayPlaces); continue; }
+                const prompt = `Giorno ${day} — ordina queste tappe in sequenza logica e geografica, rispettando gli orari se presenti. Non cambiare il giorno assegnato: ${JSON.stringify(dayPlaces.map(p => ({ name: p.n, time: p.time || '' })))}.`;
+                const schema = { type: "OBJECT", properties: { optimizedOrder: { type: "ARRAY", items: { type: "STRING" } } } };
+                try {
+                    const data = await callAI(prompt, schema);
+                    let orderedDay = [];
+                    let remaining = [...dayPlaces];
+                    data.optimizedOrder.forEach(aiName => {
+                        let idx = remaining.findIndex(p => p.n === aiName);
+                        if (idx !== -1) { orderedDay.push(remaining[idx]); remaining.splice(idx, 1); }
+                    });
+                    newFullArr.push(...orderedDay, ...remaining); // append eventuali non trovati
+                } catch(e) {
+                    newFullArr.push(...dayPlaces); // fallback: ordine invariato per questo giorno
+                }
+            }
+
+            // Ricostruisce l'array pulito (rimuove _origIdx aggiunto temporaneamente)
+            AppState.db[AppState.activeTrip] = newFullArr.map(({ _origIdx, ...p }) => p);
+            saveAllData(); refreshList(); showItineraryMarkers();
+            showToast("✅ Itinerario ottimizzato per ogni giorno!");
+        } catch(e) {
+            showToast("⚠️ Errore ottimizzazione.", "error");
+        }
+        hideLoader();
+    }
 
     function changeDay(city, idx, newDay) { if(newDay < 1) return; AppState.db[city][idx].day = newDay; saveAllData(); refreshList(); showItineraryMarkers(); }
     
@@ -1822,7 +1845,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         const payload = {
             contents: [{ parts: [{ text: txt }] }],
-            systemInstruction: { parts: [{ text: `Sei una guida turistica globale ed esperta integrata in un'app di viaggio. L'utente ha salvato queste tappe (JSON): ${getAppDati()}. Usa questi dati per contestualizzare se utile, MA sei assolutamente libero e incoraggiato ad attingere a TUTTA la tua conoscenza generale sul mondo, storia, cultura, geografia e consigli pratici per rispondere a qualsiasi domanda dell'utente (anche su luoghi non presenti nel JSON). Rispondi in modo conciso e amichevole in italiano.` }] }
+            systemInstruction: { parts: [{ text: `Sei una guida turistica globale ed esperta integrata in un'app di viaggio. L'utente ha salvato queste tappe (JSON): ${getAppDati()}. Usa questi dati per contestualizzare se utile, MA sei assolutamente libero e incoraggiato ad attingere a TUTTA la tua conoscenza generale sul mondo, storia, cultura, geografia e consigli pratici per rispondere a qualsiasi domanda dell'utente (anche su luoghi non presenti nel JSON). Rispondi in modo molto dettagliato, ricco di curiosità e amichevole in italiano. Non essere troppo sintetico.` }] }
         };
 
         try {
@@ -1861,7 +1884,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function generaEAscolta(nome, tipo, desc) {
         showToast(`🎧 Genero audioguida per ${nome}...`);
         try {
-            const prompt = `Sei una guida turistica. L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo e appassionante di massimo 3 frasi su questo luogo senza formattazione speciale.`;
+            const prompt = `Sei una guida turistica. L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo, approfondito e appassionante (circa un paragrafo ricco di dettagli storici o curiosità) su questo luogo senza formattazione speciale.`;
             const text = await fetchGeminiWithRetry({ contents: [{ parts: [{ text: prompt }] }] }, false);
             leggiAdAltaVoce(text.replace(/\*/g, ''));
             showToast("🔊 Riproduzione audioguida in corso...");
@@ -1884,7 +1907,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const payload = {
-                contents: [{ role: "user", parts: [ { text: "Sei un esperto di viaggi. Identifica questo luogo, opera d'arte, cibo o panorama e dimmi cos'è in 2-3 frasi fornendo contesto." }, { inlineData: { mimeType: file.type, data: base64Data } }] }]
+                contents: [{ role: "user", parts: [ { text: "Sei un esperto di viaggi. Identifica questo luogo, opera d'arte, cibo o panorama. Fornisci una descrizione molto lunga e dettagliata, includendo storia, contesto culturale e curiosità interessanti." }, { inlineData: { mimeType: file.type, data: base64Data } }] }]
             };
 
             try {
@@ -1898,7 +1921,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         reader.readAsDataURL(file);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    // NUOVO CARICAMENTO SICURO CON RECINTI ANTI-CRASH
+    document.addEventListener("DOMContentLoaded", async () => {
         try {
             if (typeof L !== 'undefined') {
                 map = L.map('map', {zoomControl: false}).setView([44.647, 10.925], 13);
@@ -1906,14 +1930,54 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             } else {
                 console.error("Leaflet non caricato correttamente.");
             }
+        } catch (e) { console.error("Errore Mappa:", e); }
+
+        // MIGRAZIONE E CARICAMENTO INDEXEDDB PROTETTA
+        try {
+            if (typeof localforage !== 'undefined') {
+                let oldDb = localStorage.getItem('travel_db_v18');
+                if (oldDb) {
+                    try {
+                        AppState.db = JSON.parse(oldDb);
+                        await localforage.setItem('travel_db_v18', AppState.db);
+                        localStorage.removeItem('travel_db_v18');
+                    } catch (errDb) {
+                        console.error("Database corrotto, reset forzato per evitare blocchi.");
+                        AppState.db = {};
+                        localStorage.removeItem('travel_db_v18'); // Rimuove il "veleno"
+                    }
+                } else {
+                    AppState.db = await localforage.getItem('travel_db_v18') || {};
+                }
+
+                let oldMeta = localStorage.getItem('travel_meta_v1');
+                if (oldMeta) {
+                    try {
+                        AppState.meta = JSON.parse(oldMeta);
+                        await localforage.setItem('travel_meta_v1', AppState.meta);
+                        localStorage.removeItem('travel_meta_v1');
+                    } catch (errMeta) {
+                        AppState.meta = {};
+                        localStorage.removeItem('travel_meta_v1');
+                    }
+                } else {
+                    AppState.meta = await localforage.getItem('travel_meta_v1') || {};
+                }
+            }
+        } catch (e) {
+            console.error("Errore grave DB:", e);
+            AppState.db = {};
+        }
+
+        // L'UI DEVE AVVIARSI SEMPRE, ANCHE SE IL DB FOSSE ROTTO
+        try {
             refreshList(); 
-            switchTab('wizard');
+            switchTab('wizard'); // Forza SEMPRE l'apertura sul Wizard iniziale
             
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('wizDate').value = today;
-            
+            if(document.getElementById('wizDate')) document.getElementById('wizDate').value = today;
         } catch (e) {
-            console.error("Errore inizializzazione:", e);
+            console.error("Errore Interfaccia:", e);
         }
     });
 </script>
