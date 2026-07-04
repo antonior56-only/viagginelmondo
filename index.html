@@ -820,7 +820,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     async function callAI(prompt, schema = null) {
         let activeKey = userPersonalApiKey || apiKey;
-        let modelToUse = 'gemini-2.5-flash-preview-09-2025';
+        let modelToUse = 'gemini-2.5-flash';
         if (userPersonalApiKey) {
             if (!AppState.aiModel) {
                 try {
@@ -1934,6 +1934,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         // MIGRAZIONE E CARICAMENTO INDEXEDDB PROTETTA
         try {
+            if (typeof localforage === 'undefined') {
+                // Libreria di salvataggio non caricata (CDN irraggiungibile): avvisa l'utente
+                setTimeout(() => {
+                    showToast("⚠️ Salvataggio dati NON disponibile! Controlla la connessione e ricarica la pagina (⟳).", "error");
+                }, 1500);
+            }
             if (typeof localforage !== 'undefined') {
                 let oldDb = localStorage.getItem('travel_db_v18');
                 if (oldDb) {
