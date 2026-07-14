@@ -208,6 +208,12 @@
         .ai-typing span:nth-child(1) { animation-delay:-0.32s; }
         .ai-typing span:nth-child(2) { animation-delay:-0.16s; }
         @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+    /* ─── Grounding Google Search: badge e fonti ─── */
+    .grounding-badge { display:inline-block; font-size:10px; padding:3px 9px; border-radius:10px; margin-top:8px; font-weight:bold; letter-spacing:.3px; }
+    .grounding-badge.ok { background:rgba(46,204,113,.15); color:var(--accent-green); border:1px solid var(--accent-green); }
+    .grounding-badge.warn { background:rgba(232,184,75,.12); color:var(--accent-gold); border:1px solid var(--accent-gold); }
+    .fonti-box { font-size:10px; margin-top:5px; opacity:.9; line-height:1.6; word-break:break-word; }
+    .fonti-box a { color:var(--accent-blue); text-decoration:underline; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 </head>
@@ -817,6 +823,49 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
         return isJson ? JSON.parse(textResult) : textResult;
     }
+
+    // ═══════════════ INFRASTRUTTURA GROUNDING GOOGLE SEARCH ═══════════════
+    const PROMPT_ANTI_ALLUCINAZIONE = "REGOLA FONDAMENTALE ANTI-ALLUCINAZIONE: per informazioni su luoghi, locali, ristoranti, orari, prezzi, piatti ed eventi reali, basati ESCLUSIVAMENTE sui risultati della ricerca Google forniti dal tool. Se le fonti non contengono un'informazione richiesta, dichiaralo esplicitamente (es. 'Non ho trovato informazioni verificate su questo') invece di inventare dettagli. Non inventare MAI nomi di piatti, orari di apertura, prezzi o indirizzi non presenti nelle fonti.";
+
+    // Chiama Gemini con il tool google_search attivo. Ritorna { text, sources, grounded }.
+    // In caso di errore (quota grounding esaurita, modello incompatibile, rete) esegue
+    // automaticamente il fallback alla chiamata standard senza grounding.
+    async function fetchGeminiGrounded(payload) {
+        let activeKey = userPersonalApiKey || apiKey;
+        const modelToUse = AppState.aiModel || 'gemini-2.5-flash';
+        const groundedPayload = JSON.parse(JSON.stringify(payload));
+        groundedPayload.tools = [{ google_search: {} }];
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+        try {
+            const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groundedPayload) });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            const cand = data.candidates?.[0];
+            const text = cand?.content?.parts?.map(p => p.text || '').join('') || '';
+            if (!text) throw new Error("Risposta vuota dal grounding");
+            const gm = cand.groundingMetadata;
+            const sources = (gm?.groundingChunks || [])
+                .map(c => ({ uri: c.web?.uri, title: c.web?.title }))
+                .filter(s => s.uri);
+            return { text, sources, grounded: sources.length > 0 };
+        } catch (e) {
+            // Fallback trasparente: risposta senza grounding, segnalata dal badge
+            const text = await fetchGeminiWithRetry(payload, false);
+            return { text, sources: [], grounded: false };
+        }
+    }
+
+    // Genera l'HTML del badge di verifica + elenco fonti cliccabili
+    function renderGroundingBadge(result) {
+        if (result.grounded) {
+            const fonti = result.sources.slice(0, 4)
+                .map(s => `<a href="${s.uri}" target="_blank" rel="noopener">${escapeHtml(s.title || 'Fonte')}</a>`)
+                .join(' · ');
+            return `<div class="grounding-badge ok">🔎 Verificato con Google Search</div><div class="fonti-box">Fonti: ${fonti}</div>`;
+        }
+        return `<div class="grounding-badge warn">⚠️ Risposta non verificata (grounding non disponibile)</div>`;
+    }
+    // ═══════════════════════════════════════════════════════════════════════
 
     async function callAI(prompt, schema = null) {
         let activeKey = userPersonalApiKey || apiKey;
@@ -1845,12 +1894,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         const payload = {
             contents: [{ parts: [{ text: txt }] }],
-            systemInstruction: { parts: [{ text: `Sei una guida turistica globale ed esperta integrata in un'app di viaggio. L'utente ha salvato queste tappe (JSON): ${getAppDati()}. Usa questi dati per contestualizzare se utile, MA sei assolutamente libero e incoraggiato ad attingere a TUTTA la tua conoscenza generale sul mondo, storia, cultura, geografia e consigli pratici per rispondere a qualsiasi domanda dell'utente (anche su luoghi non presenti nel JSON). Rispondi in modo molto dettagliato, ricco di curiosità e amichevole in italiano. Non essere troppo sintetico.` }] }
+            systemInstruction: { parts: [{ text: `Sei una guida turistica globale ed esperta integrata in un'app di viaggio. L'utente ha salvato queste tappe (JSON): ${getAppDati()}. Usa questi dati per contestualizzare se utile, MA sei assolutamente libero e incoraggiato ad attingere a TUTTA la tua conoscenza generale sul mondo, storia, cultura, geografia e consigli pratici per rispondere a qualsiasi domanda dell'utente (anche su luoghi non presenti nel JSON). Rispondi in modo molto dettagliato, ricco di curiosità e amichevole in italiano. Non essere troppo sintetico. ${PROMPT_ANTI_ALLUCINAZIONE}` }] }
         };
 
         try {
-            const risposta = await fetchGeminiWithRetry(payload, false);
-            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">${risposta.replace(/\n/g, '<br>')}</div>`;
+            const result = await fetchGeminiGrounded(payload);
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">${result.text.replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
         } catch (e) {
             document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore AI. Controlla la API Key.</div>`;
         }
@@ -1884,10 +1933,22 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function generaEAscolta(nome, tipo, desc) {
         showToast(`🎧 Genero audioguida per ${nome}...`);
         try {
-            const prompt = `Sei una guida turistica. L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo, approfondito e appassionante (circa un paragrafo ricco di dettagli storici o curiosità) su questo luogo senza formattazione speciale.`;
-            const text = await fetchGeminiWithRetry({ contents: [{ parts: [{ text: prompt }] }] }, false);
-            leggiAdAltaVoce(text.replace(/\*/g, ''));
+            const payload = {
+                contents: [{ parts: [{ text: `L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo, approfondito e appassionante (circa un paragrafo ricco di dettagli storici o curiosità) su questo luogo senza formattazione speciale.` }] }],
+                systemInstruction: { parts: [{ text: `Sei una guida turistica esperta. ${PROMPT_ANTI_ALLUCINAZIONE}` }] }
+            };
+            const result = await fetchGeminiGrounded(payload);
+            leggiAdAltaVoce(result.text.replace(/\*/g, ''));
             showToast("🔊 Riproduzione audioguida in corso...");
+            // Mostra testo + badge fonti nel pannello chat, così l'utente sa
+            // se l'audio è basato su fonti verificate da Google Search
+            const chatPanel = document.getElementById('chat-panel');
+            const msgBox = document.getElementById('chat-messages');
+            if (chatPanel && msgBox) {
+                chatPanel.classList.add('open');
+                msgBox.innerHTML += `<div class="chat-bubble ai">🎧 <b>Audioguida — ${escapeHtml(nome)}</b><br>${result.text.replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }
         } catch (e) {
             showToast("Errore di rete per l'audioguida. Controlla la API Key.", "error");
         }
