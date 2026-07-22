@@ -214,8 +214,23 @@
     .grounding-badge.warn { background:rgba(232,184,75,.12); color:var(--accent-gold); border:1px solid var(--accent-gold); }
     .fonti-box { font-size:10px; margin-top:5px; opacity:.9; line-height:1.6; word-break:break-word; }
     .fonti-box a { color:var(--accent-blue); text-decoration:underline; }
+    /* ─── Passaporto di viaggio ─── */
+    .badge-unlocked { background:rgba(46,204,113,.15); color:var(--accent-green); border:1px solid var(--accent-green); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; }
+    .badge-locked { background:rgba(255,255,255,.05); color:#888; border:1px dashed #555; padding:4px 10px; border-radius:10px; font-size:11px; }
+    /* ─── Valutazione tappe ─── */
+    .rating-btns span { cursor:pointer; font-size:18px; opacity:.35; transition:opacity .15s; }
+    .rating-btns span.on { opacity:1; }
+    /* ─── Accessibilita': focus visibile da tastiera ───
+       Specificita' alta per battere gli outline:none dichiarati sopra.
+       :focus-visible non si attiva col tocco/mouse, quindi non altera l'aspetto su mobile. */
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+    textarea:focus-visible, [tabindex]:focus-visible, .btn-action:focus-visible,
+    .tab:focus-visible, .pill:focus-visible, .chip:focus-visible {
+        outline: 2px solid var(--accent-blue) !important;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 </head>
 <body>
 
@@ -235,6 +250,7 @@
         <div style="display: flex; gap: 15px; align-items: center;">
             <input type="file" id="vision-upload" accept="image/*" capture="environment" style="display:none" onchange="analizzaFotoAI(event)"/>
             <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">📸</button>
+            <button onclick="mostraPassaporto()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Passaporto di Viaggio" aria-label="Passaporto di Viaggio">🎒</button>
             <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
             <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
@@ -364,7 +380,12 @@
             <input type="text" id="mSearch" class="search-input" placeholder="Cerca luogo o indirizzo">
             <button class="btn-action primary" style="width: 100%; margin-bottom: 10px;" onclick="searchAndSaveManual()">CERCA E SALVA</button>
             <input type="text" id="mName" class="search-input" placeholder="Nome manuale">
-            <button class="btn-action" style="width: 100%; border-color: var(--accent-gold);" onclick="saveManual()">SALVA POSIZIONE MAPPA</button>
+            <button class="btn-action" style="width: 100%; border-color: var(--accent-gold); margin-bottom: 14px;" onclick="saveManual()">SALVA POSIZIONE MAPPA</button>
+            <div style="border-top: 1px dashed var(--accent-blue); padding-top: 12px;">
+                <input type="text" id="mGmapsUrl" class="search-input" placeholder="📋 Incolla link Google Maps (URL completo)">
+                <button class="btn-action" style="width: 100%; border-color: var(--accent-blue); color: var(--accent-blue);" onclick="importaDaGMaps()">📍 IMPORTA DA GOOGLE MAPS</button>
+                <div id="mGmapsMsg" style="font-size: 11px; margin-top: 6px; min-height: 14px;"></div>
+            </div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
@@ -442,6 +463,7 @@
                 <input type="text" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini..." style="flex: 2; border-color: var(--accent-gold);">
                 <button class="btn-action primary" style="flex: 1;" onclick="saveUserApiKey()">SALVA CHIAVE</button>
             </div>
+            <div style="font-size: 10px; color: #8a7a62; margin-bottom: 10px; line-height: 1.5;">🔒 La chiave resta salvata solo su questo dispositivo, nel browser che stai usando. Non viene inviata a nessun server tranne quelli di Google quando usi le funzioni AI.</div>
 
             <div id="storage-usage" style="font-size:11px; color:#8a7a62; margin-top:8px; text-align:center;"></div>
         </div>
@@ -493,6 +515,16 @@
         <div id="modalHours" style="color: var(--accent-blue); font-size: 14px; margin-bottom: 15px; font-weight: 600;"></div>
         <p id="modalBody" style="line-height: 1.8; color: #ccc; font-size: 16px;"></p>
         <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('descModal').style.display='none'">CHIUDI</button>
+    </div>
+</div>
+
+<div id="passportModal" class="modal">
+    <div style="max-width: 600px; margin: auto;">
+        <h2 style="color: var(--accent-gold); font-family: 'Playfair Display'">🎒 Passaporto di Viaggio</h2>
+        <div style="font-size: 14px; margin-bottom: 10px;">Luoghi visitati: <b id="passaporto-count" style="color: var(--accent-green); font-size: 18px;">0</b></div>
+        <div id="passaporto-badges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;"></div>
+        <ul id="passaporto-list" style="list-style: none; padding: 0; max-height: 40vh; overflow-y: auto;"></ul>
+        <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('passportModal').style.display='none'">CHIUDI</button>
     </div>
 </div>
 
@@ -569,13 +601,220 @@
         aiModel: ""
     };
 
-    function saveAllData() {
-        if (typeof localforage !== 'undefined') {
-            localforage.setItem('travel_db_v18', AppState.db).catch(err => console.error(err));
-            localforage.setItem('travel_meta_v1', AppState.meta).catch(err => console.error(err));
-            calculateStorageUsage();
-        }
+    // ═══════════ INDEXEDDB NATIVO (nessuna dipendenza esterna) ═══════════
+    const IDB_NAME = 'viaggi_nel_mondo_db';
+    const IDB_STORE = 'kv';
+    const IDB_VER = 1;
+    let _idb = null;
+
+    function openIDB() {
+        if (_idb) return Promise.resolve(_idb);
+        return new Promise((res, rej) => {
+            const req = indexedDB.open(IDB_NAME, IDB_VER);
+            req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+            req.onsuccess = e => { _idb = e.target.result; res(_idb); };
+            req.onerror = e => rej(e.target.error);
+        });
     }
+    async function idbSet(key, value) {
+        const db = await openIDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).put(value, key);
+            tx.oncomplete = () => res();
+            tx.onerror = e => rej(e.target.error);
+        });
+    }
+    async function idbGet(key) {
+        const db = await openIDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(IDB_STORE, 'readonly');
+            const rq = tx.objectStore(IDB_STORE).get(key);
+            rq.onsuccess = () => res(rq.result);
+            rq.onerror = e => rej(e.target.error);
+        });
+    }
+    async function idbDelete(key) {
+        const db = await openIDB();
+        return new Promise((res, rej) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).delete(key);
+            tx.oncomplete = () => res();
+            tx.onerror = e => rej(e.target.error);
+        });
+    }
+    // Migrazione una-tantum dal database creato da localforage (versione precedente).
+    // localforage salvava in IDB 'localforage' store 'keyvaluepairs'. Se trova il dato,
+    // lo copia nel nuovo store nativo e lo restituisce.
+    async function migraDaLocalforage(key) {
+        try {
+            const oldDb = await new Promise((res, rej) => {
+                const rq = indexedDB.open('localforage');
+                rq.onsuccess = e => res(e.target.result);
+                rq.onerror = () => res(null);
+                rq.onupgradeneeded = e => { e.target.transaction.abort(); res(null); };
+            });
+            if (!oldDb || !oldDb.objectStoreNames.contains('keyvaluepairs')) return null;
+            const val = await new Promise((res) => {
+                const tx = oldDb.transaction('keyvaluepairs', 'readonly');
+                const rq = tx.objectStore('keyvaluepairs').get(key);
+                rq.onsuccess = () => res(rq.result);
+                rq.onerror = () => res(null);
+            });
+            oldDb.close();
+            if (val) { await idbSet(key, val); }
+            return val || null;
+        } catch (e) { return null; }
+    }
+    // ═════════════════════════════════════════════════════════════════════
+
+    function saveAllData() {
+        idbSet('travel_db_v18', AppState.db).catch(err => console.error(err));
+        idbSet('travel_meta_v1', AppState.meta).catch(err => console.error(err));
+        calculateStorageUsage();
+    }
+
+    // ═══════════ ACCESSIBILITA' MODALI (D16/D17) ═══════════
+    // Modulo autonomo: non modifica le funzioni che aprono/chiudono i modali.
+    // Osserva l'attributo style (qui i modali si aprono con display block/flex),
+    // sposta il focus dentro all'apertura e lo ripristina alla chiusura.
+    // Escape chiude il modale in cima; Tab resta intrappolato dentro (focus-trap).
+    // Scelta prudente: NESSUNA chiusura al click sullo sfondo, per non perdere dati nei form.
+    let _lastFocusBeforeModal = null;
+
+    function _modalVisible(m) {
+        return m && m.style.display && m.style.display !== 'none';
+    }
+    function _focusables(m) {
+        return Array.from(m.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+                    .filter(el => el.offsetParent !== null);
+    }
+    function _topModal() {
+        const open = Array.from(document.querySelectorAll('.modal')).filter(_modalVisible);
+        return open.length ? open[open.length - 1] : null;
+    }
+
+    function setupModalA11y() {
+        document.querySelectorAll('.modal').forEach(m => {
+            m.setAttribute('role', 'dialog');
+            m.setAttribute('aria-modal', 'true');
+            new MutationObserver(() => {
+                if (_modalVisible(m)) {
+                    if (!m.dataset.a11yOpen) {
+                        m.dataset.a11yOpen = '1';
+                        _lastFocusBeforeModal = document.activeElement;
+                        const f = _focusables(m);
+                        if (f.length) setTimeout(() => f[0].focus(), 50);
+                    }
+                } else if (m.dataset.a11yOpen) {
+                    delete m.dataset.a11yOpen;
+                    if (_lastFocusBeforeModal && document.contains(_lastFocusBeforeModal)) {
+                        _lastFocusBeforeModal.focus();
+                        _lastFocusBeforeModal = null;
+                    }
+                }
+            }).observe(m, { attributes: true, attributeFilter: ['style'] });
+        });
+
+        document.addEventListener('keydown', e => {
+            const m = _topModal();
+            if (!m) return;
+            if (e.key === 'Escape') { e.preventDefault(); m.style.display = 'none'; return; }
+            if (e.key === 'Tab') {
+                const f = _focusables(m);
+                if (!f.length) return;
+                const first = f[0], last = f[f.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        });
+    }
+    // ═══════════════════════════════════════════════════════
+
+    // ═══════════ CHECK-IN GPS + PASSAPORTO DI VIAGGIO ═══════════
+    function getCheckins() {
+        if (!AppState.meta.checkins) AppState.meta.checkins = [];
+        return AppState.meta.checkins;
+    }
+
+    function isCheckedIn(nome) {
+        return getCheckins().includes(nome);
+    }
+
+    function eseguiCheckIn(nome, lat, lng, btnEl) {
+        if (!navigator.geolocation) { showToast("Il tuo dispositivo non supporta il GPS per il check-in.", "error"); return; }
+        if (isCheckedIn(nome)) { showToast("✅ Già visitato!"); return; }
+        if (btnEl) { btnEl.innerHTML = '⏳ Verifica...'; btnEl.disabled = true; }
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            const dist = parseFloat(calculateDistance(pos.coords.latitude, pos.coords.longitude, lat, lng)) * 1000; // metri
+            if (dist <= 300) {
+                getCheckins().push(nome);
+                saveAllData();
+                showToast(`🎉 Check-in effettuato a ${nome}!`);
+                if (btnEl) { btnEl.innerHTML = '✅ Visitato'; btnEl.style.borderColor = 'var(--accent-green)'; btnEl.style.color = 'var(--accent-green)'; }
+            } else {
+                const distTxt = dist >= 1000 ? `${(dist/1000).toFixed(1)} km` : `${Math.round(dist)} m`;
+                showToast(`Sei a ${distTxt} di distanza! Avvicinati a meno di 300 m per fare check-in.`, "error");
+                if (btnEl) { btnEl.innerHTML = '📍 CHECK-IN'; btnEl.disabled = false; }
+            }
+        }, () => {
+            showToast("Impossibile ottenere la posizione GPS.", "error");
+            if (btnEl) { btnEl.innerHTML = '📍 CHECK-IN'; btnEl.disabled = false; }
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    function mostraPassaporto() {
+        const list = document.getElementById('passaporto-list');
+        const checkins = getCheckins();
+        document.getElementById('passaporto-count').textContent = checkins.length;
+
+        if (checkins.length === 0) {
+            list.innerHTML = '<li style="padding:10px 0; color:#888;">🌱 Nessun luogo ancora visitato. Quando sei vicino a una tappa (meno di 300 m), premi 📍 CHECK-IN sulla sua scheda!</li>';
+        } else {
+            list.innerHTML = checkins
+                .map(nome => `<li style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.1);">✅ <b>${escapeHtml(nome)}</b></li>`)
+                .join('');
+        }
+
+        const traguardi = [
+            { count: 1,  name: "Esploratore Novizio",  icon: "🌱" },
+            { count: 5,  name: "Viaggiatore Seriale",  icon: "🧭" },
+            { count: 15, name: "Globetrotter",          icon: "✈️" },
+            { count: 30, name: "Leggenda del Viaggio",  icon: "👑" }
+        ];
+        document.getElementById('passaporto-badges').innerHTML = traguardi.map(t =>
+            checkins.length >= t.count
+                ? `<span class="badge-unlocked" title="Sbloccato con ${t.count} visite">${t.icon} ${t.name}</span>`
+                : `<span class="badge-locked" title="Richiede ${t.count} visite">🔒 ${t.count} visite</span>`
+        ).join('');
+
+        document.getElementById('passportModal').style.display = 'block';
+    }
+
+    // ═══════════ VALUTAZIONI PERSONALI TAPPE ═══════════
+    function getRatings() {
+        if (!AppState.meta.ratings) AppState.meta.ratings = {};
+        return AppState.meta.ratings;
+    }
+
+    function setValutazione(nome, val) {
+        const r = getRatings();
+        if (r[nome] === val) delete r[nome];  // secondo tocco sulla stessa stella = rimuove
+        else r[nome] = val;
+        saveAllData();
+        refreshList();
+    }
+
+    function renderRatingBtns(nome) {
+        const cur = getRatings()[nome] || 0;
+        let html = '<span class="rating-btns" style="display:inline-flex; gap:2px; margin-left:6px;">';
+        for (let v = 1; v <= 5; v++) {
+            html += `<span class="${v <= cur ? 'on' : ''}" onclick="event.stopPropagation(); setValutazione('${escapeHtml(nome).replace(/'/g, "\\'")}', ${v})" title="${v} stelle">⭐</span>`;
+        }
+        return html + '</span>';
+    }
+    // ═══════════════════════════════════════════════════════════
 
     let map = null;
     let routingProfile = 'driving'; 
@@ -598,6 +837,14 @@
     let lastRouteDest = null;
     let pendingPlaceToAdd = null;
     let osrmAbortController = null;
+    // Guard anti doppio-invio sulle funzioni AI conversazionali (chat, sommelier, audioguida,
+    // analisi foto): impedisce richieste sovrapposte e il consumo doppio di quota.
+    let aiBusy = false;
+    function aiLock(on) {
+        aiBusy = on;
+        const b = document.getElementById('chat-send');
+        if (b) { b.disabled = on; b.style.opacity = on ? '0.45' : '1'; }
+    }
     let liveRouteTimeout = null;
 
     function getEffectiveMins(t) {
@@ -608,17 +855,39 @@
         return h * 60 + m;
     }
 
+    // Timeout unico per le fetch che non hanno gia' un proprio AbortController.
+    // Senza questo, una rete lenta lascia la richiesta appesa a tempo indefinito.
+    function fetchTimeout(url, opts = {}, ms = 10000) {
+        const ctrl = new AbortController();
+        const id = setTimeout(() => ctrl.abort(), ms);
+        return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(id));
+    }
+
     async function throttledFetch(url, options = {}) {
         const now = Date.now();
         const elapsed = now - lastApiCallTime;
         if (elapsed < 1100) { await new Promise(r => setTimeout(r, 1100 - elapsed)); }
         lastApiCallTime = Date.now();
-        return fetch(url, options);
+        return fetchTimeout(url, options);
     }
 
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    // Accetta SOLO http/https: blocca javascript:, data:, vbscript: e simili,
+    // che altrimenti verrebbero eseguiti al click su un link costruito da dati
+    // esterni (campo link utente, fonti AI, import da Google Maps).
+    function safeUrl(u) {
+        let s = (u || '').toString().trim();
+        if (!s) return '';
+        if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)) s = 'https://' + s.replace(/^\/+/, '');
+        try {
+            const p = new URL(s);
+            if (p.protocol !== 'http:' && p.protocol !== 'https:') return '';
+            return p.href;
+        } catch (e) { return ''; }
     }
 
     function toggleMapFullscreen() {
@@ -803,8 +1072,9 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         if (isJson) { payload.generationConfig = { responseMimeType: "application/json" }; }
         // Usa il modello dinamico se già rilevato da callAI, altrimenti usa il preferito di default
         const modelToUse = AppState.aiModel || 'gemini-2.5-flash';
+        applyThinkingFix(payload, modelToUse);
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
-        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const response = await fetchTimeout(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }, 60000);
 
         if (!response.ok) {
             if (response.status === 400 || response.status === 403 || response.status === 401) {
@@ -812,6 +1082,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 if (newKey) {
                     localStorage.setItem('travel_api_key_v1', newKey);
                     userPersonalApiKey = newKey;
+                    AppState.aiModel = ""; // invalida la cache: la nuova chiave può avere modelli diversi
                     return fetchGeminiWithRetry(payload, isJson, isVision);
                 }
                 throw new Error("API Key annullata");
@@ -835,9 +1106,10 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         const modelToUse = AppState.aiModel || 'gemini-2.5-flash';
         const groundedPayload = JSON.parse(JSON.stringify(payload));
         groundedPayload.tools = [{ google_search: {} }];
+        applyThinkingFix(groundedPayload, modelToUse);
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
         try {
-            const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groundedPayload) });
+            const response = await fetchTimeout(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(groundedPayload) }, 60000);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             const cand = data.candidates?.[0];
@@ -859,13 +1131,23 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function renderGroundingBadge(result) {
         if (result.grounded) {
             const fonti = result.sources.slice(0, 4)
-                .map(s => `<a href="${s.uri}" target="_blank" rel="noopener">${escapeHtml(s.title || 'Fonte')}</a>`)
+                .map(s => `<a href="${safeUrl(s.uri)}" target="_blank" rel="noopener">${escapeHtml(s.title || 'Fonte')}</a>`)
                 .join(' · ');
             return `<div class="grounding-badge ok">🔎 Verificato con Google Search</div><div class="fonti-box">Fonti: ${fonti}</div>`;
         }
-        return `<div class="grounding-badge warn">⚠️ Risposta non verificata (grounding non disponibile)</div>`;
+        return `<div class="grounding-badge warn">💡 Risposta dalla conoscenza AI</div>`;
     }
     // ═══════════════════════════════════════════════════════════════════════
+
+    // Su Gemini 2.5 il "thinking" aumenta latenza e consumo token senza vantaggi per
+    // questi task strutturati. Lo disattiva (thinkingBudget 0) solo sui modelli 2.5.
+    function applyThinkingFix(payload, model) {
+        if (model && model.includes('2.5')) {
+            if (!payload.generationConfig) payload.generationConfig = {};
+            payload.generationConfig.thinkingConfig = { thinkingBudget: 0 };
+        }
+        return payload;
+    }
 
     async function callAI(prompt, schema = null) {
         let activeKey = userPersonalApiKey || apiKey;
@@ -873,7 +1155,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         if (userPersonalApiKey) {
             if (!AppState.aiModel) {
                 try {
-                    const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${activeKey}`);
+                    const listRes = await fetchTimeout(`https://generativelanguage.googleapis.com/v1beta/models?key=${activeKey}`);
                     const listData = await listRes.json();
                     const availableModels = listData.models.map(m => m.name.replace('models/', ''));
                     const preferredModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
@@ -887,11 +1169,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
         let payload = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } };
         if (schema) { payload.generationConfig.responseSchema = schema; }
+        applyThinkingFix(payload, modelToUse);
 
         let lastErrorMsg = "⚠️ Errore di connessione."; let delay = 1000; 
         for (let i = 0; i < 3; i++) { 
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const response = await fetchTimeout(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }, 60000);
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({})); const googleMsg = errorData?.error?.message || "Errore sconosciuto";
                     if (response.status === 400) { lastErrorMsg = `⚠️ Errore Google (400): ${googleMsg.substring(0, 70)}...`; throw new Error("FATAL"); }
@@ -1008,7 +1291,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         
         cityDebounceTimer = setTimeout(async () => {
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(val)}&limit=5`);
+                const res = await fetchTimeout(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(val)}&limit=5`);
                 const data = await res.json();
                 box.innerHTML = '';
                 if (data.length > 0) {
@@ -1144,21 +1427,21 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     }
 
     async function searchCity() { const v = document.getElementById('cityInput').value; if(!v || !map) return; currentActiveCity = v; try { const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(v)}&limit=1`); const data = await res.json(); if(data[0]) map.flyTo([data[0].lat, data[0].lon], 14); } catch(e) { showToast("⚠️ Errore ricerca.", "error"); } }
-    async function askAI() { const q = document.getElementById('aiQuery').value; if(!q) return; showLoader("L'IA sta elaborando..."); try { const prompt = `L'utente ti fa una domanda turistica: "${q}". Rispondi in italiano in modo molto dettagliato, ricco ed esaustivo.`; const schema = { type: "OBJECT", properties: { title: {type: "STRING"}, text: {type: "STRING"} } }; const data = await callAI(prompt, schema); if(!data || !data.text) throw new Error("Dati vuoti"); document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖"; document.getElementById('modalBody').innerHTML = data.text ? data.text.replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare."; document.getElementById('modalHours').innerText = "Assistente Turistico"; document.getElementById('descModal').style.display = 'block'; } catch(e) { showToast("⚠️ Errore IA.", "error"); } hideLoader(); }
+    async function askAI() { const q = document.getElementById('aiQuery').value; if(!q) return; showLoader("L'IA sta elaborando..."); try { const prompt = `L'utente ti fa una domanda turistica: "${q}". Rispondi in italiano in modo molto dettagliato, ricco ed esaustivo.`; const schema = { type: "OBJECT", properties: { title: {type: "STRING"}, text: {type: "STRING"} } }; const data = await callAI(prompt, schema); if(!data || !data.text) throw new Error("Dati vuoti"); document.getElementById('modalTitle').innerText = data.title || "L'esperto risponde 🤖"; document.getElementById('modalBody').innerHTML = data.text ? escapeHtml(data.text).replace(/\n/g, '<br>') : "Mi dispiace, non ho potuto elaborare."; document.getElementById('modalHours').innerText = "Assistente Turistico"; document.getElementById('descModal').style.display = 'block'; } catch(e) { showToast("⚠️ Errore IA.", "error"); } hideLoader(); }
     async function exploreNearby() { showLoader("Esploro i dintorni..."); if(!map) return; const c = map.getCenter(); try { const prompt = `Trova 10 punti d'interesse vicino a [${c.lat}, ${c.lng}].`; const schema = { type: "OBJECT", properties: { places: { type: "ARRAY", items: { type: "OBJECT", properties: { title: {type:"STRING"}, lat: {type:"NUMBER"}, lon: {type:"NUMBER"}, desc: {type:"STRING"}, rating: {type:"NUMBER"}, type: {type:"STRING"} } } } } }; const data = await callAI(prompt, schema); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)) })); renderSuggestions(); } catch(e) {} hideLoader(); }
     
     async function setFilter(f) { currentSuggestions = []; if(!map) return; const center = map.getCenter(); showLoader("Ricerca " + f + "..."); if (f === 'nature') { try { const data = await callAI(`Trova 10 luoghi naturali vicino a [${center.lat}, ${center.lng}].`, {type:"OBJECT", properties:{places:{type:"ARRAY", items:{type:"OBJECT", properties:{title:{type:"STRING"}, lat:{type:"NUMBER"}, lon:{type:"NUMBER"}, desc:{type:"STRING"}, rating:{type:"NUMBER"}}}}}}); currentSuggestions = data.places.map(p => ({ ...p, stars: "★".repeat(Math.round(p.rating || 4)), type: 'nature' })); renderSuggestions(); } catch(e) {} } else if (f === 'monument') { await loadWiki(center.lat, center.lng, 'monument'); renderSuggestions(); } else { try { const q = f === 'food' ? 'restaurant' : 'hotel'; const res = await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&bounded=1&viewbox=${center.lng-0.05},${center.lat+0.05},${center.lng+0.05},${center.lat-0.05}&limit=30`); const data = await res.json(); currentSuggestions = data.map(item => ({ title: item.display_name.split(',')[0], lat: parseFloat(item.lat), lon: parseFloat(item.lon), desc: item.display_name, stars: "★★★★☆", type: f })); renderSuggestions(); } catch(e) {} } hideLoader(); }
     
     async function loadWiki(lat, lon, t = 'monument') { 
         try { 
-            const res = await fetch(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); 
+            const res = await fetchTimeout(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=5000&gscoord=${lat}|${lon}&format=json&origin=*`); 
             const d = await res.json(); 
             if(d.query?.geosearch) { 
                 const blacklist = ['Fiume', 'Stazione', 'Provincia', 'Regione', 'Quartiere', 'Comune', 'Via '];
                 const validPoints = d.query.geosearch.filter(p => !blacklist.some(b => p.title.includes(b))).slice(0, 10);
                 
                 for(let p of validPoints) { 
-                    const sRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); 
+                    const sRes = await fetchTimeout(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.title)}`); 
                     const s = await sRes.json(); 
                     currentSuggestions.push({ title: p.title, lat: p.lat, lon: p.lon, desc: s.extract || "Monumento / Punto di interesse storico", type: t }); 
                 } 
@@ -1166,7 +1449,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         } catch(e) { console.error(e); } 
     }
     
-    function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
+    function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a><button class="btn-action" style="font-size:11px; padding:7px 10px; border-color:#b05fc4; color:#b05fc4;" onclick="chiediSommelierAI('${escapeHtml(s.title).replace(/'/g, "\\'")}', '${escapeHtml((s.desc || '').split(',')[1] || '').replace(/'/g, "\\'").trim()}')">🍷 COSA ORDINO?</button>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
 
     function updateSuggestionsDistance() { if (!AppState.userCoords || currentSuggestions.length === 0) return; currentSuggestions.forEach((s, idx) => { const el = document.querySelector(`.live-dist-${idx}`); if (el) { const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon); el.innerText = `${d} km da te`; } }); }
     function updateItineraryDistance() { if (!AppState.userCoords || !AppState.activeTrip || !AppState.db[AppState.activeTrip]) return; AppState.db[AppState.activeTrip].forEach((item, idx) => { const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`); const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, item.lt, item.ln); badges.forEach(badge => { badge.innerHTML = `📍${d} km`; }); }); }
@@ -1174,7 +1457,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function openFullDesc(idx) { const s = currentSuggestions[idx]; document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.title}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
     async function openSavedDesc(city, idx) { const s = AppState.db[city][idx]; if (!s) return; document.getElementById('modalTitle').innerText = s.n; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.n}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
 
-    function openAddModal(placeObj) { pendingPlaceToAdd = placeObj; document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n; const select = document.getElementById('addModalSelect'); const trips = Object.keys(AppState.db); let optionsHtml = trips.map(t => `<option value="${t}">${t}</option>`).join(''); optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`; select.innerHTML = optionsHtml; if (AppState.activeTrip && trips.includes(AppState.activeTrip)) { select.value = AppState.activeTrip; } else if (trips.length === 0) { select.value = "_new_"; } handleAddModalChange(); document.getElementById('addPlaceModal').style.display = 'flex'; }
+    function openAddModal(placeObj) { pendingPlaceToAdd = placeObj; document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n; const select = document.getElementById('addModalSelect'); const trips = Object.keys(AppState.db); let optionsHtml = trips.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join(''); optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`; select.innerHTML = optionsHtml; if (AppState.activeTrip && trips.includes(AppState.activeTrip)) { select.value = AppState.activeTrip; } else if (trips.length === 0) { select.value = "_new_"; } handleAddModalChange(); document.getElementById('addPlaceModal').style.display = 'flex'; }
     function handleAddModalChange() { const val = document.getElementById('addModalSelect').value; const inputField = document.getElementById('addModalNewInput'); if (val === '_new_') { inputField.style.display = 'block'; inputField.value = ''; inputField.focus(); } else { inputField.style.display = 'none'; } }
     function closeAddModal() { document.getElementById('addPlaceModal').style.display = 'none'; pendingPlaceToAdd = null; }
 
@@ -1227,6 +1510,65 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     
     function saveManual() { if(!map) return; const c = map.getCenter(); openAddModal({ n: document.getElementById('mName').value || "Punto Custom", lt: c.lat, ln: c.lng, note: "", time: "", link: "", photo: "", cost: "", type: 'other' }); toggleManual(); }
 
+    // ═══════════ IMPORTA TAPPA DA LINK GOOGLE MAPS ═══════════
+    // Estrae nome e coordinate da un URL completo di Google Maps.
+    // STEP 1: regex (veloce, senza AI). STEP 2 (fallback): chiede all'AI di estrarre i dati.
+    async function importaDaGMaps() {
+        const input = document.getElementById('mGmapsUrl');
+        const msgEl = document.getElementById('mGmapsMsg');
+        const testo = (input?.value || '').trim();
+
+        const ok   = (m) => { msgEl.style.color = 'var(--accent-green)'; msgEl.textContent = '✅ ' + m; };
+        const err  = (m) => { msgEl.style.color = '#e74c3c'; msgEl.textContent = '❌ ' + m; };
+        const info = (m) => { msgEl.style.color = 'var(--accent-blue)'; msgEl.textContent = '⏳ ' + m; };
+
+        if (!testo) { err('Incolla un link Google Maps completo.'); return; }
+
+        if (/(maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(testo)) {
+            err("Link breve non supportato: aprilo nel browser, poi copia l'URL completo dalla barra degli indirizzi e incollalo qui.");
+            return;
+        }
+
+        // ── STEP 1: estrazione con regex ──
+        let lat = null, lng = null, nome = '';
+
+        let m = testo.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (m) { lat = parseFloat(m[1]); lng = parseFloat(m[2]); }
+        if (lat === null) {
+            const m3 = testo.match(/!3d(-?\d+\.\d+)/), m4 = testo.match(/!4d(-?\d+\.\d+)/);
+            if (m3 && m4) { lat = parseFloat(m3[1]); lng = parseFloat(m4[1]); }
+        }
+        // Il blocco !3d/!4d indica il POI esatto: se presente, ha priorità su @ (centro visuale)
+        const m3b = testo.match(/!3d(-?\d+\.\d+)/), m4b = testo.match(/!4d(-?\d+\.\d+)/);
+        if (m3b && m4b) { lat = parseFloat(m3b[1]); lng = parseFloat(m4b[1]); }
+
+        const mp = testo.match(/\/place\/([^\/@?]+)/);
+        if (mp) { nome = decodeURIComponent(mp[1].replace(/\+/g, ' ')).trim(); }
+
+        if (lat !== null && lng !== null) {
+            ok(`Trovato${nome ? ': ' + nome : ''} (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+            openAddModal({ n: nome || 'Luogo da Google Maps', lt: lat, ln: lng, note: '', time: '', link: '', photo: '', cost: '', type: 'other' });
+            input.value = '';
+            return;
+        }
+
+        // ── STEP 2: fallback AI ──
+        info('Coordinate non trovate nel link: provo con l\'AI...');
+        try {
+            const schema = { type: "OBJECT", properties: { nome: { type: "STRING" }, lat: { type: "NUMBER" }, lng: { type: "NUMBER" } } };
+            const data = await callAI(`Estrai dal seguente testo o URL il nome del luogo e le sue coordinate geografiche (lat, lng). Se il testo contiene solo un nome di luogo noto, fornisci le sue coordinate reali. Testo: ${testo}`, schema);
+            if (data && typeof data.lat === 'number' && typeof data.lng === 'number' && Math.abs(data.lat) <= 90 && Math.abs(data.lng) <= 180) {
+                ok(`Trovato con AI: ${data.nome || 'luogo'}`);
+                openAddModal({ n: data.nome || 'Luogo importato', lt: data.lat, ln: data.lng, note: '', time: '', link: '', photo: '', cost: '', type: 'other' });
+                input.value = '';
+            } else {
+                err('Impossibile estrarre le coordinate. Usa CERCA E SALVA con il nome del luogo.');
+            }
+        } catch (e) {
+            err('Estrazione AI fallita. Verifica la API Key o usa CERCA E SALVA.');
+        }
+    }
+
     function changeActiveTrip() { AppState.activeTrip = document.getElementById('tripSelector').value; refreshList(); showItineraryMarkers(); }
 
     function compressAndSavePhoto(event, city, idx) {
@@ -1255,14 +1597,28 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         askAI();
     }
 
+    // Cache meteo: evita di richiamare Open-Meteo per le stesse coordinate
+    // entro 10 minuti (utile passando avanti e indietro tra itinerari).
+    const _weatherCache = new Map();
+    const WEATHER_TTL = 10 * 60 * 1000;
+
     async function updateWeatherWidget() {
         const wBox = document.getElementById('weatherWidget');
         if(!AppState.activeTrip || !AppState.db[AppState.activeTrip] || AppState.db[AppState.activeTrip].length === 0) { wBox.style.display = 'none'; return; }
         if (AppState.activeTrip === lastWeatherTrip && wBox.innerHTML !== "") { wBox.style.display = 'flex'; return; }
         const firstPlace = AppState.db[AppState.activeTrip][0]; if(!firstPlace || !firstPlace.lt) return;
         try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${firstPlace.lt}&longitude=${firstPlace.ln}&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`);
-            const data = await res.json(); currentWeatherForecast = data; lastWeatherTrip = AppState.activeTrip;
+            const wKey = `${(+firstPlace.lt).toFixed(2)},${(+firstPlace.ln).toFixed(2)}`;
+            const cached = _weatherCache.get(wKey);
+            let data;
+            if (cached && (Date.now() - cached.ts) < WEATHER_TTL) {
+                data = cached.data;
+            } else {
+            const res = await fetchTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${firstPlace.lt}&longitude=${firstPlace.ln}&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`);
+                data = await res.json();
+                _weatherCache.set(wKey, { ts: Date.now(), data });
+            }
+            currentWeatherForecast = data; lastWeatherTrip = AppState.activeTrip;
             const today = data.daily; const sunrise = today.sunrise[0].split('T')[1]; const sunset = today.sunset[0].split('T')[1];
             const maxT = today.temperature_2m_max[0]; const minT = today.temperature_2m_min[0]; const code = today.weathercode[0];
             let emoji = '☀️'; if([1,2,3].includes(code)) emoji = '⛅'; else if([45,48].includes(code)) emoji = '🌫️'; else if([51,53,55,61,63,65,80,81,82].includes(code)) emoji = '🌧️'; else if([71,73,75,85,86].includes(code)) emoji = '❄️'; else if([95,96,99].includes(code)) emoji = '⛈️';
@@ -1292,7 +1648,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         if (AppState.meta[AppState.activeTrip] && AppState.meta[AppState.activeTrip].survival) {
             let s = AppState.meta[AppState.activeTrip].survival;
-            survivalWidget.innerHTML = `<div style="background: rgba(232, 184, 75, 0.08); border: 1px dashed var(--accent-gold); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px;"><div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">🎒 Kit di Sopravvivenza Locale</div><div style="margin-bottom: 4px;">💸 <b>Valuta:</b> <span style="color:#ccc">${s.currency || '--'}</span></div><div style="margin-bottom: 4px;">🤝 <b>Mance:</b> <span style="color:#ccc">${s.tips || '--'}</span></div><div style="margin-bottom: 4px;">🔌 <b>Prese:</b> <span style="color:#ccc">${s.plugs || '--'}</span></div><div>🆘 <b>Info Utili:</b> <span style="color:#ccc">${s.emergency || '--'}</span></div></div>`;
+            survivalWidget.innerHTML = `<div style="background: rgba(232, 184, 75, 0.08); border: 1px dashed var(--accent-gold); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px;"><div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">🎒 Kit di Sopravvivenza Locale</div><div style="margin-bottom: 4px;">💸 <b>Valuta:</b> <span style="color:#ccc">${escapeHtml(s.currency) || '--'}</span></div><div style="margin-bottom: 4px;">🤝 <b>Mance:</b> <span style="color:#ccc">${escapeHtml(s.tips) || '--'}</span></div><div style="margin-bottom: 4px;">🔌 <b>Prese:</b> <span style="color:#ccc">${escapeHtml(s.plugs) || '--'}</span></div><div>🆘 <b>Info Utili:</b> <span style="color:#ccc">${escapeHtml(s.emergency) || '--'}</span></div></div>`;
             survivalWidget.style.display = 'block';
         } else { survivalWidget.style.display = 'none'; }
         
@@ -1374,7 +1730,11 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 <button class="btn-action" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="generaEAscolta('${escapeHtml(i.n)}', '${escapeHtml(i.type)}', '${escapeHtml(i.note || '')}')">🎧 ASCOLTA</button>
                 <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
                 <button class="btn-action" style="border-color: #8a7a62; color: #8a7a62;" onclick="findAlternative('${sCity}', ${i.idx})">🔄 ALT</button>
+                ${isCheckedIn(i.n)
+                    ? `<button class="btn-action" style="border-color: var(--accent-green); color: var(--accent-green);" disabled>✅ Visitato</button>`
+                    : `<button class="btn-action" style="border-color: var(--accent-blue); color: var(--accent-blue);" onclick="eseguiCheckIn('${escapeHtml(i.n).replace(/'/g, "\\'")}', ${i.lt}, ${i.ln}, this)">📍 CHECK-IN</button>`}
             </div>
+            <div style="margin-top:2px; font-size:11px; color:#a59781;">La tua valutazione: ${renderRatingBtns(i.n)}</div>
             <div class="wallet-box">
                 <div class="wallet-row">
                     <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario" aria-label="Orario tappa">
@@ -1395,7 +1755,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     </label>
                 </div>
             </div>
-            ${i.link ? `<a href="${escapeHtml(i.link)}" target="_blank" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
+            ${safeUrl(i.link) ? `<a href="${safeUrl(i.link)}" target="_blank" rel="noopener" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
             ${photoHtml}
             <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote('${sCity}', ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
         </div>`;
@@ -1420,7 +1780,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 return;
             }
             if (!AppState.activeTrip || !availableCities.includes(AppState.activeTrip)) AppState.activeTrip = availableCities[0];
-            selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${c}" ${c === AppState.activeTrip ? 'selected' : ''}>${c.toUpperCase()}</option>`).join("");
+            selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${escapeHtml(c)}" ${c === AppState.activeTrip ? 'selected' : ''}>${escapeHtml(c.toUpperCase())}</option>`).join("");
             document.getElementById('tripManageBtn').style.display = 'block';
             document.getElementById('btnCompactToggle').style.display = 'block';
             
@@ -1464,7 +1824,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     let dist = calculateDistance(timedPlaces[i].lt, timedPlaces[i].ln, timedPlaces[i+1].lt, timedPlaces[i+1].ln);
                     let requiredMins = Math.max(45, dist * 4);
                     if (diffMins < requiredMins) { 
-                        dayWarnings.push(`Tempi stretti tra "${timedPlaces[i].n}" e "${timedPlaces[i+1].n}".`); conflictingIndices.add(timedPlaces[i].idx); conflictingIndices.add(timedPlaces[i+1].idx);
+                        dayWarnings.push(`Tempi stretti tra "${escapeHtml(timedPlaces[i].n)}" e "${escapeHtml(timedPlaces[i+1].n)}".`); conflictingIndices.add(timedPlaces[i].idx); conflictingIndices.add(timedPlaces[i+1].idx);
                     }
                 }
 
@@ -1636,7 +1996,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         }
         AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); 
     } 
-    function updateLink(c, i, v) { AppState.db[c][i].link = v; saveAllData(); } 
+    function updateLink(c, i, v) { AppState.db[c][i].link = safeUrl(v) || v.trim(); saveAllData(); } 
     function updateNote(c, i, v) { AppState.db[c][i].note = v; saveAllData(); }
     function updateCost(c, i, v) { 
         AppState.db[c][i].cost = v; saveAllData(); refreshStatsUI(); 
@@ -1884,10 +2244,12 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function toggleChat() { document.getElementById('chat-panel').classList.toggle('open'); }
 
     async function inviaMessaggioAI() {
+        if (aiBusy) { showToast("⏳ Attendi la risposta precedente..."); return; }
         const input = document.getElementById('chat-input');
         const txt = input.value.trim(); if (!txt) return;
+        aiLock(true);
         const msgBox = document.getElementById('chat-messages');
-        msgBox.innerHTML += `<div class="chat-bubble user">${txt}</div>`; input.value = '';
+        msgBox.innerHTML += `<div class="chat-bubble user">${escapeHtml(txt)}</div>`; input.value = '';
         const loaderId = 'loader-' + Date.now();
         msgBox.innerHTML += `<div class="chat-bubble ai" id="${loaderId}"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
         msgBox.scrollTop = msgBox.scrollHeight;
@@ -1899,10 +2261,11 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         try {
             const result = await fetchGeminiGrounded(payload);
-            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">${result.text.replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">${escapeHtml(result.text).replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
         } catch (e) {
             document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore AI. Controlla la API Key.</div>`;
         }
+        aiLock(false);
         msgBox.scrollTop = msgBox.scrollHeight;
     }
 
@@ -1931,6 +2294,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     }
 
     async function generaEAscolta(nome, tipo, desc) {
+        if (aiBusy) { showToast("⏳ Attendi la risposta precedente..."); return; }
+        aiLock(true);
         showToast(`🎧 Genero audioguida per ${nome}...`);
         try {
             const payload = {
@@ -1946,12 +2311,42 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             const msgBox = document.getElementById('chat-messages');
             if (chatPanel && msgBox) {
                 chatPanel.classList.add('open');
-                msgBox.innerHTML += `<div class="chat-bubble ai">🎧 <b>Audioguida — ${escapeHtml(nome)}</b><br>${result.text.replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
+                msgBox.innerHTML += `<div class="chat-bubble ai">🎧 <b>Audioguida — ${escapeHtml(nome)}</b><br>${escapeHtml(result.text).replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
             }
         } catch (e) {
             showToast("Errore di rete per l'audioguida. Controlla la API Key.", "error");
         }
+        aiLock(false);
+    }
+
+    // ═══════════ SOMMELIER AI: cosa ordinare al ristorante ═══════════
+    // Con grounding Google Search attivo: se le fonti non contengono i piatti
+    // del locale, il PROMPT_ANTI_ALLUCINAZIONE fa dichiarare la mancanza di
+    // informazioni verificate invece di inventare.
+    async function chiediSommelierAI(nome, zona) {
+        if (aiBusy) { showToast("⏳ Attendi la risposta precedente..."); return; }
+        aiLock(true);
+        const chatPanel = document.getElementById('chat-panel');
+        const msgBox = document.getElementById('chat-messages');
+        if (chatPanel) chatPanel.classList.add('open');
+        msgBox.innerHTML += `<div class="chat-bubble user">🍷 Cosa mi consigli di ordinare da ${escapeHtml(nome)}?</div>`;
+        const loaderId = 'loader-' + Date.now();
+        msgBox.innerHTML += `<div class="chat-bubble ai" id="${loaderId}"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+        msgBox.scrollTop = msgBox.scrollHeight;
+
+        try {
+            const payload = {
+                contents: [{ parts: [{ text: `L'utente chiede cosa ordinare al ristorante "${nome}"${zona ? ' in zona ' + zona : ''}. Cerca informazioni reali su questo locale (menu, specialità, recensioni) e suggerisci 2-3 piatti specifici con un abbinamento di vino locale. Se non trovi informazioni verificate sul locale specifico, dillo chiaramente e suggerisci invece i piatti tipici della zona.` }] }],
+                systemInstruction: { parts: [{ text: `Sei un sommelier e critico gastronomico esperto. Rispondi in italiano in modo appassionato ma conciso. ${PROMPT_ANTI_ALLUCINAZIONE}` }] }
+            };
+            const result = await fetchGeminiGrounded(payload);
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">🍷 <b>Il Sommelier consiglia:</b><br>${escapeHtml(result.text).replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
+        } catch (e) {
+            document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore AI. Controlla la API Key.</div>`;
+        }
+        aiLock(false);
+        msgBox.scrollTop = msgBox.scrollHeight;
     }
 
     function analizzaFotoAI(event) {
@@ -1973,7 +2368,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
             try {
                 const risposta = await fetchGeminiWithRetry(payload, false, true);
-                document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">👁️ <b>Analisi visiva:</b><br>${risposta.replace(/\n/g, '<br>')}</div>`;
+                document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai">👁️ <b>Analisi visiva:</b><br>${escapeHtml(risposta).replace(/\n/g, '<br>')}</div>`;
             } catch (err) {
                 document.getElementById(loaderId).outerHTML = `<div class="chat-bubble ai" style="color:var(--accent-gold)">Errore analisi foto.</div>`;
             }
@@ -1993,20 +2388,21 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             }
         } catch (e) { console.error("Errore Mappa:", e); }
 
-        // MIGRAZIONE E CARICAMENTO INDEXEDDB PROTETTA
+        setupModalA11y();
+
+        // MIGRAZIONE E CARICAMENTO INDEXEDDB NATIVO (nessuna dipendenza CDN)
         try {
-            if (typeof localforage === 'undefined') {
-                // Libreria di salvataggio non caricata (CDN irraggiungibile): avvisa l'utente
+            if (!window.indexedDB) {
                 setTimeout(() => {
-                    showToast("⚠️ Salvataggio dati NON disponibile! Controlla la connessione e ricarica la pagina (⟳).", "error");
+                    showToast("⚠️ Salvataggio dati NON disponibile su questo browser.", "error");
                 }, 1500);
-            }
-            if (typeof localforage !== 'undefined') {
+            } else {
+                // Migrazione da vecchio localStorage (versioni molto vecchie)
                 let oldDb = localStorage.getItem('travel_db_v18');
                 if (oldDb) {
                     try {
                         AppState.db = JSON.parse(oldDb);
-                        await localforage.setItem('travel_db_v18', AppState.db);
+                        await idbSet('travel_db_v18', AppState.db);
                         localStorage.removeItem('travel_db_v18');
                     } catch (errDb) {
                         console.error("Database corrotto, reset forzato per evitare blocchi.");
@@ -2014,21 +2410,22 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                         localStorage.removeItem('travel_db_v18'); // Rimuove il "veleno"
                     }
                 } else {
-                    AppState.db = await localforage.getItem('travel_db_v18') || {};
+                    // Migrazione da localforage (chiavi con prefisso interno) o lettura diretta
+                    AppState.db = await idbGet('travel_db_v18') || await migraDaLocalforage('travel_db_v18') || {};
                 }
 
                 let oldMeta = localStorage.getItem('travel_meta_v1');
                 if (oldMeta) {
                     try {
                         AppState.meta = JSON.parse(oldMeta);
-                        await localforage.setItem('travel_meta_v1', AppState.meta);
+                        await idbSet('travel_meta_v1', AppState.meta);
                         localStorage.removeItem('travel_meta_v1');
                     } catch (errMeta) {
                         AppState.meta = {};
                         localStorage.removeItem('travel_meta_v1');
                     }
                 } else {
-                    AppState.meta = await localforage.getItem('travel_meta_v1') || {};
+                    AppState.meta = await idbGet('travel_meta_v1') || await migraDaLocalforage('travel_meta_v1') || {};
                 }
             }
         } catch (e) {
