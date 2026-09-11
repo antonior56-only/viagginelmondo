@@ -1176,6 +1176,14 @@
         const ignored=new Set(['di','del','della','dei','degli','da','in','al','alla','the','and','e']);
         return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(w=>w.length>1&&!ignored.has(w));
     }
+    function sameItineraryPlace(a,b) {
+        const wa=normalizedPlaceWords(a.n), wb=normalizedPlaceWords(b.n);
+        const near=Number(calculateDistance(a.lt,a.ln,b.lt,b.ln))<0.15;
+        if(wa.join(' ')===wb.join(' '))return true;
+        const shared=wa.filter(w=>wb.includes(w)).length;
+        const abbey=wa.includes('abbazia')&&wb.includes('abbazia');
+        return near && (abbey || (shared>=2 && shared/Math.min(wa.length,wb.length)>=0.8));
+    }
     async function verifyGeneratedPlace(place,destination) {
         const words=normalizedPlaceWords(place.n);if(!words.length)return null;
         try{
@@ -1276,21 +1284,24 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
             const candidates=allPlaces.filter(p=>isValidCoord(p.lt,p.ln)),formattedPlaces=[];
             for(let i=0;i<candidates.length;i++){
                 document.getElementById('loader-text').innerText=`Verifica luogo ${i+1} di ${candidates.length}…`;
-                const verified=candidates[i].verified?candidates[i]:await verifyGeneratedPlace(candidates[i],dest);if(verified)formattedPlaces.push(verified);
+                const verified=candidates[i].verified?candidates[i]:await verifyGeneratedPlace(candidates[i],dest);if(verified&&!formattedPlaces.some(p=>sameItineraryPlace(p,verified)))formattedPlaces.push(verified);
             }
             const skipped=allPlaces.length-formattedPlaces.length,targetMinimum=Math.max(4,(parseInt(AppState.wizard.days)||1)*4);
             if(formattedPlaces.length<targetMinimum){
                 try{
                     document.getElementById('loader-text').innerText='Completo le giornate con fonti pubbliche…';
                     const supplement=await buildPublicItinerary(dest,AppState.wizard.days,AppState.wizard.interests),known=new Set(formattedPlaces.map(p=>placeKey(p.n,p.lt,p.ln)));
-                    for(const p of supplement.places){const key=placeKey(p.n,p.lt,p.ln);if(!known.has(key)){formattedPlaces.push({...p,cost:generatedPlaceCost(p),link:'',photo:''});known.add(key);}if(formattedPlaces.length>=Math.max(targetMinimum,(parseInt(AppState.wizard.days)||1)*6))break;}
+                    for(const p of supplement.places){const key=placeKey(p.n,p.lt,p.ln);if(!known.has(key)&&!formattedPlaces.some(existing=>sameItineraryPlace(existing,p))){formattedPlaces.push({...p,cost:generatedPlaceCost(p),link:'',photo:''});known.add(key);}if(formattedPlaces.length>=Math.max(targetMinimum,(parseInt(AppState.wizard.days)||1)*6))break;}
                     if(generationSource==='ai-verified'&&formattedPlaces.length>allPlaces.length-skipped)generationSource='hybrid-sources';
                 }catch(e){console.warn('Completamento itinerario non riuscito',e);}
             }
             if(formattedPlaces.length===0)throw new Error("Nessuna tappa verificabile sulle mappe pubbliche");
             if(skipped>0)showToast(`⚠️ ${skipped} tappa/e non verificata/e e quindi esclusa/e.`,"error");
 
-            AppState.db[tripName] = sortTripChronologically(formattedPlaces);
+            const plannedDays = [...new Set(formattedPlaces.map(p=>p.day||1))].sort((a,b)=>a-b).map(day=>planGeographicDay(formattedPlaces.filter(p=>(p.day||1)===day),AppState.userCoords));
+            AppState.db[tripName] = plannedDays.flatMap(p=>p.items);
+            const planningWarnings=plannedDays.flatMap(p=>p.warnings);
+            if(planningWarnings.length)showToast(planningWarnings.join(' · '),'error');
             if(!AppState.meta[tripName]) AppState.meta[tripName] = {};
             AppState.meta[tripName].destination = dest;
             AppState.meta[tripName].startDate = AppState.wizard.date || '';
@@ -1650,66 +1661,88 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
 
     function sortByDistance() { if(!AppState.userCoords) return; currentSuggestions.forEach(s => s.dist = parseFloat(calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon))); currentSuggestions.sort((a,b) => a.dist - b.dist); renderSuggestions(); }
 
-    function optimizeDayOrder(city, day) {
-        let arr = AppState.db[city]; if (!arr) return;
-        let dayItems = arr.filter(i => (i.day || 1) == day);
-        if (dayItems.length <= 1) { showToast("ℹ️ Servono almeno 2 tappe per ottimizzare.", "error"); return; }
-
-        const now = new Date(); const nowTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-        let startLat, startLon;
-        if (AppState.userCoords) { startLat = AppState.userCoords.lat; startLon = AppState.userCoords.lon; } 
-        else { const firstFuture = dayItems.find(i => i.time && i.time >= nowTime) || dayItems[0]; startLat = firstFuture.lt; startLon = firstFuture.ln; }
-
-        const past = dayItems.filter(i => i.time && i.time < nowTime).sort((a, b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
-        const future = dayItems.filter(i => i.time && i.time >= nowTime).sort((a, b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
-        let free = dayItems.filter(i => !i.time);
-
-        const anchors = [{ lt: startLat, ln: startLon, _virtual: true }, ...future]; let result = [];
-        for (let a = 0; a < anchors.length; a++) {
-            const from = anchors[a]; const to = anchors[a + 1];
-            if (!from._virtual) result.push(from);
-            if (free.length === 0) continue;
-            let slot = []; let remaining = [...free]; let curLat = from.lt, curLon = from.ln;
-            const slotsLeft = anchors.length - a;
-            const freeInSlot = a === anchors.length - 1 ? remaining.length : Math.round(remaining.length / slotsLeft);
-
-            for (let k = 0; k < freeInSlot && remaining.length > 0; k++) {
-                let bestIdx = 0; let bestScore = Infinity;
-                remaining.forEach((item, idx) => {
-                    const dFrom = parseFloat(calculateDistance(curLat, curLon, item.lt, item.ln)) || 9999;
-                    const dTo = to ? (parseFloat(calculateDistance(item.lt, item.ln, to.lt, to.ln)) || 9999) : 0;
-                    const score = dFrom + dTo * 0.3;
-                    if (score < bestScore) { bestScore = score; bestIdx = idx; }
-                });
-                const chosen = remaining.splice(bestIdx, 1)[0]; slot.push(chosen); curLat = chosen.lt; curLon = chosen.ln;
-            }
-            result = result.concat(slot); free = free.filter(f => !slot.includes(f));
+    function planGeographicDay(items, gps = null) {
+        const pending = items.filter(p => !p.done).map(p => ({...p}));
+        const result = items.filter(p => p.done).map(p => ({...p})), warnings = [];
+        let current = gps ? {lt:gps.lat, ln:gps.lon} : (result[result.length-1] || pending[0]);
+        let clock = 9 * 60;
+        for (const visited of result) {
+            const time = minutesOf(visited.time);
+            if (time !== null) clock = Math.max(clock, time + visitMinutes(visited));
         }
-
-        result = [...result, ...past];
-        const otherDays = arr.filter(i => (i.day || 1) != day);
-        result.forEach(item => item.day = parseInt(day));
-        AppState.db[city] = [...otherDays, ...result].sort((a, b) => (a.day || 1) - (b.day || 1));
-        saveAllData(); refreshList(); showItineraryMarkers();
-        const gpsNote = AppState.userCoords ? "dalla tua posizione GPS" : "dalla prima tappa futura";
-        const pastNote = past.length > 0 ? `, ${past.length} tappa/e già passate messe in fondo` : '';
-        showToast(`✅ Giorno ${day} ottimizzato (ore ${nowTime}): libere ordinate ${gpsNote}${pastNote}.`);
+        const fixedTime = p => (p.booking || p.timeLocked) ? minutesOf(p.time) : null;
+        const distance = (a,b) => {
+            const km = Number(calculateDistance(a.lt,a.ln,b.lt,b.ln));
+            return Number.isFinite(km) ? km : Infinity;
+        };
+        const travel = (a,b) => Math.max(0, Math.ceil(distance(a,b) / (routingProfile === 'foot' ? 4 : 25) * 60));
+        while(pending.length) {
+            const anchors = pending.filter(p => fixedTime(p)!==null).sort((a,b)=>fixedTime(a)-fixedTime(b));
+            const nextAnchor = anchors[0];
+            const options = pending.map(p => {
+                const arrival = clock + travel(current,p);
+                const start = Math.max(arrival, minutesOf(p.opening) ?? 0, fixedTime(p) ?? 0);
+                const end = start + visitMinutes(p);
+                const close = minutesOf(p.closing);
+                const feasible = (close===null || end<=close) && (fixedTime(p)===null || arrival<=fixedTime(p)) &&
+                    (!nextAnchor || p===nextAnchor || end+travel(p,nextAnchor)<=fixedTime(nextAnchor));
+                return {p,start,end,feasible,km:distance(current,p)};
+            });
+            const available = options.filter(o=>o.feasible);
+            available.sort((a,b)=>a.km-b.km || a.start-b.start);
+            const chosen = available[0] || options.find(o=>o.p===nextAnchor) || options.sort((a,b)=>a.km-b.km)[0];
+            const {p,start,end} = chosen;
+            if(!chosen.feasible)warnings.push(p.n + ': orari da verificare');
+            if(start>=1440) warnings.push(p.n + ': giornata troppo lunga');
+            if(fixedTime(p)===null) {
+                const t=Math.min(1439,start);
+                p.time=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+            }
+            result.push(p);current=p;clock=end;pending.splice(pending.indexOf(p),1);
+        }
+        return {items:result,warnings};
+    }
+    function optimizeDayOrder(city, day) {
+        const arr=AppState.db[city];if(!arr)return;
+        const planned=planGeographicDay(arr.filter(p=>(p.day||1)==day),AppState.userCoords);
+        AppState.db[city]=[...arr.filter(p=>(p.day||1)!=day),...planned.items].sort((a,b)=>(a.day||1)-(b.day||1));
+        saveAllData();refreshList();showItineraryMarkers();
+        showToast(planned.warnings.length ? planned.warnings.join(' · ') : 'Percorso riordinato per vicinanza; orari ricalcolati con durate e spostamenti stimati.', planned.warnings.length ? 'error' : undefined);
     }
 
-    function openDayInGoogleMaps(city, day) {
+    function openDayInGoogleMaps(city, day, openInCurrentTab = false) {
         let arr = AppState.db[city];
         if (!arr) return;
+        if (!arr.some(i => (i.day || 1) == day)) { showToast('Nessuna tappa in questo giorno.', 'error'); return; }
+        const gps = AppState.userCoords;
+        if (!gps || !Number.isFinite(gps.lat) || !Number.isFinite(gps.lon)) {
+            if (!navigator.geolocation) { showToast('GPS non disponibile: impossibile impostare la partenza.', 'error'); return; }
+            showToast('Rilevo la posizione GPS prima di aprire Google Maps…');
+            navigator.geolocation.getCurrentPosition(position => {
+                AppState.userCoords = {lat: position.coords.latitude, lon: position.coords.longitude};
+                if (!Number.isFinite(AppState.userCoords.lat) || !Number.isFinite(AppState.userCoords.lon)) {
+                    showToast('Posizione GPS non valida. Riprova.', 'error'); return;
+                }
+                // Geolocation is asynchronous: navigate this tab rather than opening
+                // a popup outside the click event or leaving a blank tab waiting.
+                openDayInGoogleMaps(city, day, true);
+            }, () => { showToast('Posizione GPS non ottenuta. Consenti la posizione nel browser e riprova.', 'error'); }, {enableHighAccuracy:true, maximumAge:0, timeout:15000});
+            return;
+        }
         
         let dayItems = arr.filter(i => (i.day || 1) == day);
+        dayItems = dayItems.filter((item, index, items) => !items.slice(0, index).some(previous => sameItineraryPlace(previous, item)));
         
         if (dayItems.length === 0) {
             showToast("⚠️ Nessuna tappa in questo giorno.", "error"); return;
         }
-        if (dayItems.length === 1) {
-            openDirections(dayItems[0].lt, dayItems[0].ln, dayItems[0].n, getTripDestination(city)); return;
-        }
 
         const tripDestination = getTripDestination(city);
+        if (dayItems.length > 10) {
+            dayItems = dayItems.slice(0, 10);
+            showToast('Limite di Google Maps: aperte le prime 10 tappe della giornata.');
+        }
+        const origin = encodeURIComponent(`${gps.lat},${gps.lon}`);
         const lastItem = dayItems[dayItems.length - 1];
         let destination = encodeURIComponent(googleMapsPlaceQuery(lastItem.n, lastItem.lt, lastItem.ln, tripDestination));
         let waypoints = "";
@@ -1724,8 +1757,9 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
         }
         
         let mode = routingProfile === 'foot' ? 'walking' : 'driving';
-        let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}${waypoints}&travelmode=${mode}&dir_action=navigate`;
-        window.open(url, '_blank');
+        let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints}&travelmode=${mode}`;
+        if (openInCurrentTab) window.location.href = url;
+        else if (!window.open(url, '_blank')) window.location.href = url;
     }
 
     function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
@@ -1733,6 +1767,14 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
     function googleMapsPlaceQuery(name, lat, lon, destination = '') {
         const placeName = String(name || '').trim();
         const area = String(destination || '').trim();
+        // Coordinates from the user's working Maps link. Avoid the museum's
+        // named intermediate waypoint, which reproduces a spurious route line.
+        const words = normalizedPlaceWords(placeName);
+        const inNonantola = /nonantola/i.test(area + ' ' + placeName) ||
+            (Math.abs(Number(lat) - 44.6779066) < 0.01 && Math.abs(Number(lon) - 11.0430867) < 0.01);
+        if (inNonantola && words.includes('museo') && words.some(w => w.startsWith('benedettin') || w.startsWith('diocesan'))) {
+            return '44.6779066,11.0430867';
+        }
         if (placeName) return area ? `${placeName}, ${area}` : placeName;
         return `${lat},${lon}`;
     }
@@ -2407,7 +2449,7 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
                             <span style="font-size:8px; color:var(--text-muted);">(Max 10 tappe)</span>
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
-                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder(${jsArg(AppState.activeTrip)}, ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA</button>
+                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder(${jsArg(AppState.activeTrip)}, ${d})" title="Raggruppa le visite vicine e ricalcola gli orari proposti, rispettando quelli inseriti e le prenotazioni">🧭 OTTIMIZZA</button>
                             <span style="font-size:8px; color:var(--text-muted);">GPS + ora</span>
                         </div>
                     </div>
@@ -2621,7 +2663,7 @@ Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe
             showToast("⚠️ Formato orario non valido (Usa HH:MM)", "error");
             refreshList(); return;
         }
-        AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); 
+        AppState.db[c][i].time = v; AppState.db[c][i].timeLocked = !!v; saveAllData(); refreshList(); showItineraryMarkers(); 
     } 
     function updateLink(c, i, v) {
         const url = safeUrl(v);
