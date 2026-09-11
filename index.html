@@ -8,20 +8,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-dark: #0a0a08; 
-            --card-bg: #26241d; 
-            --accent-gold: #e8b84b; 
-            --accent-blue: #4a9ebb; 
-            --accent-green: #2ecc71; 
-            --text-main: #f5efe0; 
-            --border: rgba(232, 184, 75, 0.4); 
+            color-scheme: dark;
+            --bg-dark: #18272d;
+            --card-bg: #263940;
+            --surface-raised: #30474f;
+            --accent-gold: #f4ca64;
+            --accent-blue: #6bcbed;
+            --accent-green: #52dc8a;
+            --text-main: #f8f5ec;
+            --text-muted: #d2cbc0;
+            --border: rgba(244, 202, 100, 0.52);
         }
         
         /* TEMA CHIARO */
         body.light-theme {
+            color-scheme: light;
             --bg-dark: #f0f0f0; 
             --card-bg: #ffffff; 
             --text-main: #1a1a1a; 
+            --text-muted: #5f594f;
+            --accent-gold: #946900;
+            --accent-blue: #176b89;
+            --accent-green: #147a43;
             --border: rgba(0, 0, 0, 0.15);
         }
         body.light-theme header { background: #e8e8e8; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -34,17 +42,17 @@
         body.light-theme #addModalSelect option { background: #fff; color: #000; }
 
         body { margin: 0; font-family: 'Jost', sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
-        header { background: #1a1914; padding: 15px 20px 10px; border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: 0.3s; }
-        .nav-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+        header { background: #213239; padding: 15px 20px 10px; border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.35); transition: 0.3s; }
+        .nav-tabs { display: flex; gap: 5px; background: #19282e; padding: 5px; border:1px solid rgba(255,255,255,.1); border-radius: 12px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
         .nav-tabs::-webkit-scrollbar { display: none; }
-        .tab-btn { flex: 1; padding: 12px 8px; border: none; background: transparent; color: #8a7a62; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap; transition: 0.3s; }
-        .tab-btn.active { background: rgba(232, 184, 75, 0.15); color: var(--accent-gold); }
+        .tab-btn { flex: 1; padding: 12px 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap; transition: 0.3s; }
+        .tab-btn.active { background: rgba(244,202,100,.18); color: var(--accent-gold); box-shadow:inset 0 0 0 1px rgba(244,202,100,.18); }
         
         #map-container { height: 32vh; width: 100%; position: relative; border-bottom: 1px solid var(--border); transition: height 0.4s ease; flex-shrink: 0; }
         #map { height: 100%; width: 100%; background: #ffffff; }
         .map-control-btn { position: absolute; bottom: 15px; right: 15px; z-index: 1000; background: var(--card-bg); border: 2px solid var(--accent-gold); color: var(--accent-gold); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; }
         
-        .map-close-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(0,0,0,0.7); border: 2px solid #e74c3c; color: #ff5c5c; width: 40px; height: 40px; border-radius: 50%; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); cursor: pointer; transition: 0.3s; backdrop-filter: blur(4px); }
+        .map-close-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(24,39,45,.9); border: 2px solid #ff6b6b; color: #ff8a8a; width: 40px; height: 40px; border-radius: 50%; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; backdrop-filter: blur(4px); }
         body.map-fullscreen .map-close-btn { display: flex; }
 
         body.map-fullscreen #map-container { position: fixed; top: 65px; left: 0; width: 100vw; height: calc(100vh - 65px); z-index: 9000; }
@@ -56,7 +64,7 @@
         .view-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 8px 16px rgba(0,0,0,0.6); transition: 0.3s; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 8px 18px rgba(0,0,0,.42); transition: 0.3s; }
         
         .highlight-card { border-color: var(--accent-gold) !important; box-shadow: 0 0 20px rgba(232, 184, 75, 0.5) !important; background-color: rgba(232, 184, 75, 0.1) !important; }
         .highlight-marker-inner { border-color: var(--accent-gold) !important; box-shadow: 0 0 25px var(--accent-gold) !important; transform: scale(1.5) !important; }
@@ -67,7 +75,7 @@
 
         .card-title { font-family: 'Playfair Display'; font-size: 19px; color: var(--accent-gold); margin: 0 0 5px 0; }
         .rating { color: #ffcc00; font-size: 14px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
-        .desc-preview { font-size: 13px; color: #bbb; line-height: 1.5; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .desc-preview { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .btn-action { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 11px 12px; border-radius: 8px; cursor: pointer; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex: 1; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: 0.2s; }
         .btn-action.primary { background: var(--accent-gold); color: #000; border: none; font-size: 12px; padding: 14px;}
@@ -77,14 +85,14 @@
         .wallet-box { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
         .wallet-row { display: flex; gap: 8px; align-items: stretch; width: 100%; }
         
-        .wallet-input { flex: 1; background: #13120e; border: 1px solid rgba(232, 184, 75, 0.5); color: #ffffff; padding: 12px 10px; border-radius: 8px; font-family: 'Jost'; font-size: 14px; outline: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
+        .wallet-input { flex: 1; background: #1d3037; border: 1px solid rgba(244,202,100,.58); color: #ffffff; padding: 12px 10px; border-radius: 8px; font-family: 'Jost'; font-size: 14px; outline: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.25); }
         .wallet-input::placeholder { color: #a59781; opacity: 1; font-weight: 400; }
         .wallet-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px rgba(232, 184, 75, 0.6); }
         
         .wallet-input[type="time"] { flex: 0 0 95px; text-align: center; color: var(--accent-blue); font-weight: 600; background: rgba(74, 158, 187, 0.1); border-color: rgba(74, 158, 187, 0.5); }
         .wallet-input[type="number"] { flex: 0 0 95px; text-align: center; color: var(--accent-green); font-weight: 600; background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.5); }
         
-        .note-box { background: #13120e; border: 1px solid rgba(232, 184, 75, 0.4); border-radius: 8px; padding: 10px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: 0.3s; }
+        .note-box { background: #1d3037; border: 1px solid rgba(244,202,100,.52); border-radius: 8px; padding: 10px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); transition: 0.3s; }
         .note-area { width: 100%; background: transparent; border: none; color: #ffffff; font-family: 'Jost', sans-serif; font-size: 14px; resize: vertical; min-height: 45px; outline: none; line-height: 1.5; letter-spacing: 0.3px; }
         .note-area::placeholder { color: #a59781; opacity: 0.8; font-style: italic; }
 
@@ -95,7 +103,7 @@
         .photo-preview-container { position: relative; margin-top: 12px; width: 100%; height: 160px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .photo-preview-container.active { display: block; }
         .photo-preview { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .remove-photo-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; border: 1px solid var(--accent-gold); border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .remove-photo-btn { position: absolute; top: 8px; right: 8px; background: rgba(24,39,45,.92); color: white; border: 1px solid var(--accent-gold); border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
         .search-input { width: 100%; padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px; color: white; margin-bottom: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
         
@@ -106,14 +114,22 @@
         body.light-theme .autocomplete-container { border-color: #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         body.light-theme .autocomplete-item { border-bottom-color: rgba(0,0,0,0.1); }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000; padding: 30px; overflow-y: auto; }
+        .modal { display: none; position: fixed; inset: 0; background: #17262c; z-index: 2000; padding: clamp(18px,4vw,42px); overflow-y: auto; overscroll-behavior:contain; }
+        #descModal { background:radial-gradient(circle at 50% 0,#35505a 0,#22363e 42%,#17262c 100%); }
+        .details-panel { max-width:760px; margin:auto; padding:clamp(22px,4vw,42px); background:#253b43; border:1px solid rgba(107,203,237,.42); border-radius:18px; box-shadow:0 22px 60px rgba(5,16,20,.4); }
+        #modalTitle { margin:0 0 8px; font-size:clamp(26px,4vw,36px); line-height:1.15; }
+        #modalHours { padding:9px 12px; background:rgba(107,203,237,.09); border-left:3px solid var(--accent-blue); border-radius:6px; }
+        #modalBody { color:#edf1f2 !important; font-size:clamp(16px,2vw,18px) !important; line-height:1.75 !important; white-space:pre-wrap; text-align:left; }
+        body.light-theme #descModal { background:radial-gradient(circle at 50% 0,#dbeaf0 0,#edf2f4 45%,#e4e9eb 100%); }
+        body.light-theme .details-panel { background:#fff; border-color:rgba(23,107,137,.3); box-shadow:0 22px 60px rgba(31,49,56,.2); }
+        body.light-theme #modalBody { color:#20272a !important; }
         
         .day-label { color: var(--accent-gold); font-size: 11px; font-weight: 700; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-end; text-transform: uppercase; }
         .day-ctrl { display: flex; align-items: center; gap: 6px; }
         .day-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: var(--text-main); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.2s; }
         .day-btn:active { background: rgba(255,255,255,0.3); }
 
-        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(13,35,43,.92); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid var(--accent-gold); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
@@ -123,20 +139,20 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: #8a7a62; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         
         .trip-selector { background: rgba(255,255,255,0.1); color: var(--accent-gold); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; max-width: 150px; font-family: 'Jost'; font-weight: 600; outline: none; cursor: pointer; }
         .trip-selector option { background: var(--bg-dark); color: var(--text-main); }
-        .trip-stats { font-size: 14px; color: var(--text-main); opacity: 0.9; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border-left: 3px solid var(--accent-blue); display: none; margin-bottom: 10px; line-height: 1.6; }
+        .trip-stats { font-size: 14px; color: var(--text-main); background: var(--card-bg); padding: 12px 15px; border-radius: 10px; border:1px solid rgba(255,255,255,.09); border-left: 3px solid var(--accent-blue); display: none; margin-bottom: 10px; line-height: 1.6; box-shadow:0 5px 16px rgba(0,0,0,.25); }
 
         .weather-widget { display: none; justify-content: space-between; align-items: center; background: rgba(74, 158, 187, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(74, 158, 187, 0.3); margin-bottom: 15px; font-size: 13px; flex-direction: column; gap: 8px;}
         .weather-row { display: flex; justify-content: space-between; width: 100%; align-items: center; }
         .weather-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .weather-label { font-size: 10px; color: #8a7a62; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .weather-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .weather-val { font-size: 16px; font-weight: bold; }
         
         .wizard-section { margin-bottom: 25px; }
-        .wizard-label { color: #8a7a62; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .wizard-label { color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
         .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .pill { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; user-select: none; }
         .pill.selected { background: rgba(232, 184, 75, 0.15); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 600; }
@@ -160,22 +176,22 @@
         .nav-dash-dist { background: rgba(231, 76, 60, 0.2); color: #e74c3c; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 5px; display: inline-block;}
         .nav-controls { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
 
-        .dropdown-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 3999; backdrop-filter: blur(3px); animation: fadeInOverlay 0.3s; }
+        .dropdown-overlay { display: none; position: fixed; inset: 0; background: rgba(13,35,43,.82); z-index: 3999; backdrop-filter: blur(3px); animation: fadeInOverlay 0.3s; }
         @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
         .dropdown-menu { display: none; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 4000; background: var(--card-bg); border-top-left-radius: 24px; border-top-right-radius: 24px; border-top: 2px solid var(--accent-gold); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); padding: 25px 20px 40px; box-sizing: border-box; animation: slideUpMenu 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
         body.light-theme .dropdown-menu { box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
         @keyframes slideUpMenu { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .dropdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--accent-gold); font-family: 'Playfair Display'; font-size: 22px; font-weight: bold; }
         .dropdown-close { background: rgba(255,255,255,0.1); border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; transition: 0.2s; }
-        .dropdown-item { display: block; width: 100%; text-align: left; padding: 18px; margin-bottom: 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: var(--text-main); font-family: 'Jost', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .dropdown-item { display: block; width: 100%; text-align: left; padding: 18px; margin-bottom: 12px; background: rgba(13,35,43,.46); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; color: var(--text-main); font-family: 'Jost', sans-serif; cursor: pointer; transition: all 0.2s; }
         .dropdown-title { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-        .dropdown-desc { font-size: 12px; color: #8a7a62; margin-top: 6px; padding-left: 35px; line-height: 1.4; font-weight: 500; }
+        .dropdown-desc { font-size: 12px; color: var(--text-muted); margin-top: 6px; padding-left: 35px; line-height: 1.4; font-weight: 500; }
         
         .timeline-wrapper { position: relative; width: 100%; height: 35px; margin: 10px 0 25px 0; }
         .timeline-track { position: absolute; top: 10px; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
         .timeline-marker { position: absolute; top: 2px; width: 18px; height: 18px; background: var(--card-bg); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 9px; font-weight: bold; color: var(--accent-gold); transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2; cursor: pointer; }
         .timeline-marker.conflict { border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
-        .timeline-time-label { position: absolute; font-size: 9px; color: #8a7a62; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
+        .timeline-time-label { position: absolute; font-size: 9px; color: var(--text-muted); transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
         .card.conflict-card { border: 1px solid #e74c3c !important; box-shadow: 0 0 10px rgba(231, 76, 60, 0.2); }
         .conflict-badge { display: inline-block; background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 6px; border: 1px solid rgba(231, 76, 60, 0.4); vertical-align: middle; }
 
@@ -186,7 +202,7 @@
         .compact-mode .card b { font-size: 14px !important; }
 
         /* ── STILI AI WIDGET E MODAL ── */
-        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,35,43,.86); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
         .modal-overlay.open { display:flex; }
         #chat-widget { position:fixed; bottom:20px; right:20px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; }
         #chat-btn { background:linear-gradient(135deg,var(--accent-blue),var(--accent-gold)); color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:24px; box-shadow:0 4px 14px rgba(0,0,0,.5); cursor:pointer; transition:transform .2s; display:flex; align-items:center; justify-content:center; }
@@ -204,7 +220,7 @@
         #chat-send { background:var(--accent-gold); color:#000; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:700; transition:transform .2s; }
         #chat-send:active { transform:scale(.9); }
         .ai-typing { display:flex; gap:4px; align-items:center; height:20px; padding:0 4px; }
-        .ai-typing span { width:6px; height:6px; background:#8a7a62; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
+        .ai-typing span { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
         .ai-typing span:nth-child(1) { animation-delay:-0.32s; }
         .ai-typing span:nth-child(2) { animation-delay:-0.16s; }
         @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
@@ -230,9 +246,43 @@
         outline-offset: 2px;
         border-radius: 4px;
     }
-    </style>
+        .travel-panel { background:rgba(255,255,255,.035); border:1px solid var(--border); border-radius:12px; padding:12px; margin:10px 0; }
+        .travel-panel summary { cursor:pointer; color:var(--accent-gold); font-weight:700; font-size:12px; }
+        .travel-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+        .travel-grid label { font-size:10px; color:#a59781; display:flex; flex-direction:column; gap:4px; }
+        .travel-grid input,.travel-grid select { width:100%; box-sizing:border-box; }
+        .feasibility { margin:10px 0; padding:11px; border-radius:9px; background:rgba(46,204,113,.08); border-left:3px solid var(--accent-green); font-size:12px; line-height:1.55; }
+        .feasibility.warn { background:rgba(231,76,60,.11); border-left-color:#e74c3c; }
+        .ops-badge { font-size:9px; padding:2px 6px; border-radius:5px; background:rgba(232,184,75,.12); color:var(--accent-gold); margin-left:4px; }
+        .generation-source { display:flex; align-items:center; gap:7px; margin-top:9px; padding:8px 10px; border-radius:8px; font-size:11px; font-weight:700; }
+        .generation-source.ai { color:var(--accent-green); background:rgba(82,220,138,.1); border:1px solid rgba(82,220,138,.35); }
+        .generation-source.public { color:var(--accent-blue); background:rgba(107,203,237,.1); border:1px solid rgba(107,203,237,.35); }
+        .generation-source.unknown { color:var(--text-muted); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); }
+        @media (max-width:520px) { .travel-grid { grid-template-columns:1fr; } }
+        .manual-section { border:1px solid var(--border); border-radius:10px; margin:9px 0; background:rgba(255,255,255,.025); }
+        .manual-section summary { cursor:pointer; padding:13px; color:var(--accent-gold); font-weight:700; }
+        .manual-content { padding:0 14px 14px; color:#ccc; font-size:14px; line-height:1.65; }
+        .manual-content h4 { color:var(--accent-blue); margin:14px 0 5px; }
+        .manual-content ul,.manual-content ol { padding-left:20px; }
+        .settings-card { background:rgba(255,255,255,.035); border:1px solid var(--border); border-radius:12px; padding:14px; margin:12px 0; }
+        /* Contrasto ottimizzato per schermi desktop e luce ambientale intensa */
+        .desc-preview, .wizard-label, .weather-label, .dropdown-desc,
+        .timeline-time-label, .travel-grid label, .empty-state { color:var(--text-muted); }
+        .btn-action { background:rgba(255,255,255,.025); }
+        .btn-action:hover { background:rgba(244,202,100,.13); }
+        .wallet-input, .note-box { background:#1d3037; border-color:rgba(244,202,100,.58); }
+        .wallet-input::placeholder, .note-area::placeholder { color:var(--text-muted); opacity:.9; }
+        .trip-selector { background:#20343b; border-color:var(--accent-blue); }
+        .travel-panel, .settings-card, .manual-section { background:rgba(255,255,255,.055); }
+        body.light-theme .btn-action { background:rgba(0,0,0,.025); }
+        body.light-theme .btn-action:hover { background:rgba(148,105,0,.10); }
+        body.light-theme .trip-stats { background:#fff; border-color:rgba(0,0,0,.14); }
+        body.light-theme .trip-selector { background:#fff; }
+        body.light-theme .modal { background:#eef2f3; }
+</style>
 </head>
 <body>
+<div id="storage-status" role="status" aria-live="polite" hidden style="position:fixed;left:10px;right:10px;bottom:12px;z-index:99999;padding:12px;border-radius:8px;color:white;font:14px system-ui;box-shadow:0 2px 10px #0006"></div>
 
 <div id="loader" class="loading-overlay">
     <div class="spinner"></div>
@@ -245,12 +295,13 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; flex-direction: column; justify-content: center;">
             <div style="font-family: 'Playfair Display'; font-size: 24px; color: var(--accent-gold); line-height: 1.1; margin-top: -2px;">Viaggi nel mondo</div>
-            <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: #8a7a62; font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
+            <div style="font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px; margin-top: 2px;">Realizzato da Antonio R.</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <input type="file" id="vision-upload" accept="image/*" capture="environment" style="display:none" onchange="analizzaFotoAI(event)"/>
             <button onclick="document.getElementById('vision-upload').click()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cos'è questo? (Analisi Foto AI)" aria-label="Analisi Visiva">📸</button>
             <button onclick="mostraPassaporto()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Passaporto di Viaggio" aria-label="Passaporto di Viaggio">🎒</button>
+            <button onclick="openSettings()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Impostazioni" aria-label="Impostazioni">⚙️</button>
             <button onclick="document.body.classList.toggle('light-theme')" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Cambia Tema" aria-label="Cambia Tema">🌓</button>
             <button onclick="toggleMapFullscreen()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Mappa Schermo Intero" aria-label="Mappa Schermo Intero">🗺️</button>
         </div>
@@ -269,7 +320,7 @@
 </div>
 
 <div id="nav-dashboard" class="nav-dashboard">
-    <div style="font-size: 10px; color: #8a7a62; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;" id="nav-dash-step">NAVIGAZIONE IN CORSO</div>
+    <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;" id="nav-dash-step">NAVIGAZIONE IN CORSO</div>
     <div id="nav-stop-1" class="nav-stop active-stop">
         <span class="stop-name" id="name-stop-1">--</span>
         <span class="nav-dash-dist" id="nav-dist-1">Ricalcolo distanza...</span>
@@ -279,7 +330,8 @@
     <div id="nav-stop-3" class="nav-stop upcoming-stop"><span class="stop-name" id="name-stop-3">--</span></div>
     <div class="nav-controls">
         <button class="btn-action primary" style="background: #e74c3c; flex: 0.5;" onclick="stopNavigation()">ESCI</button>
-        <button class="btn-action primary" style="flex: 1; font-size: 14px;" onclick="nextNavStep()">📍 PROSSIMA ➔</button>
+        <button id="nav-next-btn" class="btn-action" style="flex: .7;" onclick="skipNavStep()" aria-label="Vai alla prossima tappa senza segnare quella corrente come completata">PROSSIMA</button>
+        <button class="btn-action primary" style="flex: 1; font-size: 14px;" onclick="completeNavStep()">✓ COMPLETATA</button>
     </div>
 </div>
 
@@ -289,7 +341,7 @@
             <h2 style="font-family: 'Playfair Display'; color: var(--accent-blue); font-size: 28px; margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
                 ✈️ Pianifica il tuo viaggio
             </h2>
-            <p style="color: #bbb; font-size: 14px; margin: 0;">Dimmi cosa ti piace e l'AI creerà un itinerario su misura.</p>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 0;">Dimmi cosa ti piace e l'AI creerà un itinerario su misura.</p>
         </div>
 
         <div class="wizard-section">
@@ -300,7 +352,7 @@
         <div class="wizard-section">
             <span class="wizard-label">DATA DI PARTENZA</span>
             <input type="date" id="wizDate" class="search-input" style="color: var(--accent-blue); font-weight: 600;">
-            <div style="font-size:11px; color:#8a7a62; margin-top:4px;">Aiuta l'AI a segnalare festività locali ed eventi stagionali</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Aiuta l'AI a segnalare festività locali ed eventi stagionali</div>
         </div>
 
         <div class="wizard-section">
@@ -351,7 +403,7 @@
             🤖 GENERA ITINERARIO CON AI
         </button>
         
-        <button class="btn-action" style="width: 100%; border: none; color: #8a7a62; margin-top: 10px;" onclick="switchTab('scopri')">
+        <button class="btn-action" style="width: 100%; border: none; color: var(--text-muted); margin-top: 10px;" onclick="switchTab('scopri')">
             ESPLORA MANUALMENTE ➔
         </button>
     </div>
@@ -407,11 +459,33 @@
                 <div style="display:flex; gap:6px; align-items:center;">
                     <select id="tripSelector" class="trip-selector" onchange="changeActiveTrip()" style="display:none;"></select>
                     <button id="btnCompactToggle" onclick="toggleCompactMode()" style="display:none; background:none; border:1px solid var(--accent-blue); color:var(--accent-blue); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:10px; font-weight:bold;">📄 VISTA COMPATTA</button>
-                    <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:#8a7a62; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario" aria-label="Gestisci itinerario">⚙️</button>
+                    <button id="tripManageBtn" onclick="openTripManager()" style="display:none; background:none; border:1px solid var(--border); color:var(--text-muted); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px;" title="Gestisci itinerario" aria-label="Gestisci itinerario">⚙️</button>
                 </div>
             </div>
             
             <div id="tripStats" class="trip-stats"></div>
+
+            <div class="travel-panel">
+                <label style="font-size:10px;color:#a59781">Destinazione reale del viaggio
+                    <input id="tripDestination" class="wallet-input" type="text" placeholder="Es. Lisbona, Portogallo" onchange="updateTripDestination(this.value)" style="width:100%;margin-top:5px;box-sizing:border-box">
+                </label>
+            </div>
+
+            <details id="traveler-profile" class="travel-panel">
+                <summary>👤 Profilo del viaggiatore</summary>
+                <div class="travel-grid">
+                    <label>Viaggiatori<select id="profile-who"><option>Solo</option><option>Coppia</option><option>Famiglia</option><option>Amici</option></select></label>
+                    <label>Massimo a piedi al giorno (km)<input id="profile-walk" class="wallet-input" type="number" min="1" max="50" step="1" value="10"></label>
+                    <label>Budget<select id="profile-budget"><option>Basso</option><option selected>Medio</option><option>Alto</option></select></label>
+                    <label>Preferenza meteo<select id="profile-indoor"><option value="mixed">Flessibile</option><option value="indoor">Preferisco luoghi al coperto</option><option value="outdoor">Preferisco attività all'aperto</option></select></label>
+                    <label><span><input id="profile-stroller" type="checkbox"> Passeggino</span></label>
+                    <label><span><input id="profile-pets" type="checkbox"> Animali al seguito</span></label>
+                    <label style="grid-column:1/-1">Esigenze, allergie o accessibilità<textarea id="profile-needs" class="note-area" maxlength="300" placeholder="Es. sedia a rotelle, evitare scale, allergia alle arachidi"></textarea></label>
+                </div>
+                <button class="btn-action primary" style="width:100%;margin-top:8px" onclick="saveTravelerProfile()">SALVA PROFILO</button>
+            </details>
+
+            <div id="tripFeasibility"></div>
             
             <div id="survivalWidget" style="display:none;"></div>
 
@@ -420,18 +494,22 @@
             <div style="display: flex; gap: 6px; margin-bottom: 5px;" id="ai-actions-box">
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="organizeDaysAI()" style="color: var(--accent-blue); border-color: var(--accent-blue); font-size:10px; padding: 10px 5px; width:100%;">DIVIDI GIORNI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI distribuisce le tappe</span>
+                    <span style="font-size:9px; color:var(--text-muted); text-align:center; line-height:1.3;">AI distribuisce le tappe</span>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="optimizeItinerary()" style="color: var(--accent-gold); border-color: var(--accent-gold); font-size:10px; padding: 10px 5px; width:100%;">OTTIMIZZA AI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">AI riordina per logica</span>
+                    <span style="font-size:9px; color:var(--text-muted); text-align:center; line-height:1.3;">AI riordina per logica</span>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <button class="btn-action" onclick="analyzeWeatherAI()" style="color: #fff; background: var(--accent-blue); border: none; font-size:10px; padding: 10px 5px; width:100%;">🌤️ METEO AI</button>
-                    <span style="font-size:9px; color:#8a7a62; text-align:center; line-height:1.3;">Consigli sulle previsioni</span>
+                    <span style="font-size:9px; color:var(--text-muted); text-align:center; line-height:1.3;">Consigli sulle previsioni</span>
                 </div>
             </div>
-            <div style="font-size:10px; color:#8a7a62; text-align:center; margin-bottom:12px; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius:6px; line-height:1.5;">
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:10px">
+                <button class="btn-action" onclick="verifyItineraryPlaces()">🔎 VERIFICA TAPPE</button>
+                <button class="btn-action" onclick="createPlanB()">☔ CREA PIANO B</button>
+            </div>
+            <div style="font-size:10px; color:var(--text-muted); text-align:center; margin-bottom:12px; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius:6px; line-height:1.5;">
                 💡 <b style="color:var(--accent-gold)">Ottimizza AI</b> = prima della partenza, ragiona sul senso delle tappe  |  <b style="color:var(--accent-gold)">🧭 Ottimizza Giornata</b> = in viaggio, usa GPS e ora
             </div>
 
@@ -449,24 +527,15 @@
         <div id="itinerary-actions" style="display: none; gap: 8px; margin-top: 20px;">
             <button class="btn-action primary" style="flex:1; background:#25d366;" onclick="shareItinerary()">WHATSAPP</button>
             <button class="btn-action primary" style="flex:1; background:var(--accent-blue);" onclick="downloadPDF()">SCARICA PDF</button>
+            <button class="btn-action" style="flex:1; border-color:var(--accent-gold);color:var(--accent-gold);" onclick="exportOfflineTrip()">📴 OFFLINE</button>
+        </div>
+        <div id="geo-exports" style="display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
+            <button class="btn-action" onclick="exportICS()">📅 ICS</button>
+            <button class="btn-action" onclick="exportGPX()">🧭 GPX</button>
+            <button class="btn-action" onclick="exportKML()">🌍 KML</button>
         </div>
 
-        <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; padding-bottom: 90px;">
-            <div style="font-size: 11px; color: #8a7a62; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Gestione Dati</div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="backupData()">💾 BACKUP</button>
-                <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('restoreFile').click()">📂 RIPRISTINA</button>
-            </div>
-            
-            <div style="font-size: 11px; color: #8a7a62; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Motore Intelligenza Artificiale</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <input type="text" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini..." style="flex: 2; border-color: var(--accent-gold);">
-                <button class="btn-action primary" style="flex: 1;" onclick="saveUserApiKey()">SALVA CHIAVE</button>
-            </div>
-            <div style="font-size: 10px; color: #8a7a62; margin-bottom: 10px; line-height: 1.5;">🔒 La chiave resta salvata solo su questo dispositivo, nel browser che stai usando. Non viene inviata a nessun server tranne quelli di Google quando usi le funzioni AI.</div>
-
-            <div id="storage-usage" style="font-size:11px; color:#8a7a62; margin-top:8px; text-align:center;"></div>
-        </div>
+        <div style="height:90px"></div>
     </div>
 </main>
 
@@ -509,12 +578,12 @@
 </div>
 
 <div id="descModal" class="modal">
-    <div style="max-width: 600px; margin: auto;">
+    <div class="details-panel">
         <h2 id="modalTitle" style="color: var(--accent-gold); font-family: 'Playfair Display'"></h2>
         <div id="modalRating" class="rating" style="font-size: 18px;"></div>
         <div id="modalHours" style="color: var(--accent-blue); font-size: 14px; margin-bottom: 15px; font-weight: 600;"></div>
         <p id="modalBody" style="line-height: 1.8; color: #ccc; font-size: 16px;"></p>
-        <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('descModal').style.display='none'">CHIUDI</button>
+        <button class="btn-action" style="width:100%; margin-top:20px;" onclick="closeDetails()">CHIUDI</button>
     </div>
 </div>
 
@@ -525,6 +594,102 @@
         <div id="passaporto-badges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;"></div>
         <ul id="passaporto-list" style="list-style: none; padding: 0; max-height: 40vh; overflow-y: auto;"></ul>
         <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('passportModal').style.display='none'">CHIUDI</button>
+    </div>
+</div>
+
+<div id="settingsModal" class="modal">
+    <div style="max-width:620px;margin:auto">
+        <h2 style="color:var(--accent-gold);font-family:'Playfair Display'">⚙️ Impostazioni</h2>
+        <div class="settings-card">
+            <h3 style="color:var(--accent-blue);margin-top:0">Gestione dati</h3>
+            <p style="font-size:12px;color:#aaa">Il backup comprende itinerari, profilo, informazioni operative, accessibilità, descrizioni salvate e avanzamento. La chiave API non viene esportata.</p>
+            <div style="display:flex;gap:8px">
+                <button class="btn-action" style="flex:1" onclick="backupData()">💾 BACKUP</button>
+                <button class="btn-action" style="flex:1" onclick="document.getElementById('restoreFile').click()">📂 RIPRISTINA</button>
+            </div>
+            <div id="storage-usage" style="font-size:11px;color:var(--text-muted);margin-top:10px;text-align:center"></div>
+        </div>
+        <div class="settings-card">
+            <h3 style="color:var(--accent-blue);margin-top:0">Google Gemini</h3>
+            <label style="font-size:11px;color:#aaa">API Key personale</label>
+            <div style="display:flex;gap:8px;margin-top:6px">
+                <input type="password" autocomplete="off" spellcheck="false" id="userApiKeyInput" class="wallet-input" placeholder="Incolla la tua API Key Gemini" style="flex:2;border-color:var(--accent-gold)">
+                <button class="btn-action primary" style="flex:1" onclick="saveUserApiKey()">SALVA</button>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.5">La chiave resta nel browser e viene inviata a Google soltanto quando utilizzi una funzione IA. Svuota il campo e premi Salva per rimuoverla.</div>
+        </div>
+        <div class="settings-card">
+            <h3 style="color:var(--accent-blue);margin-top:0">Aiuto</h3>
+            <button class="btn-action" style="width:100%" onclick="openManual()">📖 APRI MANUALE AGGIORNATO</button>
+        </div>
+        <button class="btn-action" style="width:100%;margin-top:14px" onclick="closeSettings()">CHIUDI</button>
+    </div>
+</div>
+
+<div id="manualModal" class="modal">
+    <div style="max-width:760px;margin:auto">
+        <h2 style="color:var(--accent-gold);font-family:'Playfair Display';margin-bottom:4px">📖 Manuale di Viaggi nel Mondo</h2>
+        <p style="color:var(--text-muted);margin-top:0">Edizione aggiornata · guida organizzata per sezioni</p>
+
+        <details class="manual-section" open><summary>1. Primo avvio e installazione</summary><div class="manual-content">
+            <p>Viaggi nel Mondo è un’applicazione HTML. Puoi aprirla dal browser senza installazione tradizionale. Per un accesso rapido, usa “Aggiungi a schermata Home” dal menu di Chrome su Android o dal menu Condividi di Safari su iPhone.</p>
+            <p>I dati sono salvati nel browser del dispositivo tramite IndexedDB. Non vengono sincronizzati automaticamente tra dispositivi. L’eliminazione dei dati del browser può cancellarli: crea periodicamente un backup da Impostazioni.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>2. Creare un viaggio con AI Wizard</summary><div class="manual-content">
+            <ol><li>Apri <b>AI Wizard</b>.</li><li>Inserisci destinazione e data.</li><li>Scegli durata, partecipanti, interessi e budget.</li><li>Premi <b>Genera itinerario con AI</b>.</li></ol>
+            <p>Il profilo del viaggiatore salvato in “Il Mio Piano” viene aggiunto alle preferenze del Wizard. L’IA può sbagliare nomi, orari e coordinate: usa sempre <b>Verifica tappe</b> e controlla le fonti ufficiali.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>3. Esplorare e aggiungere luoghi</summary><div class="manual-content">
+            <p>La scheda <b>Esplora</b> consente di cercare una città, usare il centro della mappa, visualizzare monumenti, ristoranti, hotel e natura, oppure aggiungere un punto manualmente. Puoi anche importare un collegamento completo di Google Maps.</p>
+            <p><b>Aggiungi</b> salva il risultato in un itinerario; <b>Dettagli</b> genera una scheda che viene memorizzata e riutilizzata; <b>Vai</b> apre le indicazioni; <b>Alternativa</b> prepara una richiesta per un luogo simile.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>4. Organizzare Il Mio Piano</summary><div class="manual-content">
+            <p>Imposta una <b>destinazione reale</b> anche se il viaggio ha un nome personale come “Vacanze settembre”. Usa i pulsanti − e + per cambiare giorno, ▲ e ▼ o la maniglia per riordinare, e la rotella accanto al selettore per rinominare, duplicare o eliminare l’itinerario.</p>
+            <p><b>Dividi giorni</b> distribuisce le tappe; <b>Ottimizza AI</b> riordina il programma; <b>Ottimizza giornata</b> usa posizione e ora; <b>Verifica tappe</b> controlla nomi e coordinate; <b>Crea Piano B</b> produce una copia con alternative al coperto.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>5. Orari, fattibilità e prenotazioni</summary><div class="manual-content">
+            <p>Per ogni tappa puoi inserire orario previsto, apertura, chiusura, durata della visita e necessità di prenotazione. L’app calcola per ciascun giorno visite, pause, trasferimenti e fine stimata, segnalando programmi troppo lunghi, chiusure incompatibili e prenotazioni prive di collegamento.</p>
+            <p>La prima cifra è una stima. Con connessione disponibile viene sostituita dai dati del percorso OSRM. Traffico, attese e orari pubblici possono cambiare.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>6. Profilo e accessibilità</summary><div class="manual-content">
+            <p>Nel profilo puoi salvare gruppo, budget, limite giornaliero a piedi, preferenza per interno o esterno, passeggino, animali ed esigenze personali. Per ogni luogo puoi annotare accesso, gradini, ascensore, bagno, parcheggio, passeggino e condizioni del fondo.</p>
+            <p>Queste informazioni sono osservazioni personali e non certificazioni. Per necessità importanti, contatta direttamente la struttura.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>7. Mappa e navigazione live</summary><div class="manual-content">
+            <p>Scegli auto o cammino prima di aprire il percorso. Il pulsante GPS centra la posizione; <b>Inizia navigazione live</b> mostra la tappa corrente e le successive. <b>Completata</b> registra la visita, <b>Prossima</b> passa alla tappa successiva senza completare quella corrente ed <b>Esci</b> interrompe il monitoraggio. Alla riapertura, il viaggio riparte dalla tappa rimasta.</p>
+            <p>La mappa integrata offre orientamento e percorso; per la navigazione turn-by-turn usa il pulsante Vai o Apri in Maps.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>8. Budget, foto, biglietti e passaporto</summary><div class="manual-content">
+            <p>Registra costo e stato “Pagato” per ogni tappa, oltre alle spese di viaggio e hotel. Puoi allegare una foto compressa, salvare note e inserire un link HTTP/HTTPS per biglietti o prenotazioni.</p>
+            <p>Il check-in richiede di trovarsi entro 300 metri dal luogo. Le visite e le valutazioni sono distinte tramite nome e coordinate e compaiono nel Passaporto.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>9. Esportare e usare il viaggio offline</summary><div class="manual-content">
+            <p><b>PDF</b> crea una copia stampabile; <b>Offline</b> genera un HTML consultabile senza l’app; <b>ICS</b> aggiunge gli appuntamenti al calendario; <b>GPX</b> e <b>KML</b> trasferiscono punti e percorso in applicazioni geografiche. WhatsApp prepara una condivisione testuale.</p>
+            <p>Il pacchetto offline contiene dati salvati e collegamenti, ma mappe, indicazioni, meteo e funzioni IA richiedono connessione.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>10. Impostazioni, backup e API Key</summary><div class="manual-content">
+            <h4>Backup e ripristino</h4><p>Apri ⚙️ Impostazioni e premi <b>Backup</b>. Il file JSON contiene tutti i viaggi e le preferenze, ma non la chiave API. <b>Ripristina</b> controlla il file e, dopo conferma, sostituisce i dati presenti.</p>
+            <h4>Chiave Gemini</h4><p>Crea una chiave in Google AI Studio, incollala nel campo e premi Salva. La chiave abilita Wizard, assistente, dettagli, ottimizzazione, verifica e Piano B. Per rimuoverla, svuota il campo e premi Salva.</p>
+            <h4>Servizi che richiedono internet</h4><p>Gemini, OpenStreetMap, Wikipedia, Open-Meteo, OSRM, Google Maps e i siti di prenotazione dipendono dalla rete e dai rispettivi servizi.</p>
+        </div></details>
+
+        <details class="manual-section"><summary>11. Risoluzione dei problemi e sicurezza</summary><div class="manual-content">
+            <ul><li>Se il GPS non funziona, verifica permesso di posizione e connessione sicura del sito.</li><li>Se l’IA non risponde, controlla la chiave, attendi in caso di limite richieste e riprova.</li><li>Se un salvataggio fallisce, non chiudere la pagina ed esporta un backup.</li><li>Non inserire dati sensibili nelle richieste all’IA.</li><li>Verifica sempre aperture, accessibilità, prenotazioni, meteo e trasporti sulle fonti ufficiali.</li></ul>
+        </div></details>
+
+        <div style="display:flex;gap:8px;margin-top:18px">
+            <button class="btn-action" style="flex:1" onclick="printManual()">🖨️ STAMPA / SALVA PDF</button>
+            <button class="btn-action primary" style="flex:1" onclick="closeManual()">CHIUDI</button>
+        </div>
     </div>
 </div>
 
@@ -551,7 +716,7 @@
         <p id="tripManagerName" style="color: var(--text-main); font-weight: 700; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></p>
 
         <div style="margin-bottom: 20px;">
-            <span style="font-size:11px; color:#8a7a62; font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Rinomina</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Rinomina</span>
             <div style="display:flex; gap:8px;">
                 <input type="text" id="tripRenameInput" class="search-input" placeholder="Nuovo nome..." style="flex:1; margin:0;">
                 <button class="btn-action primary" style="flex:0 0 auto; padding: 12px 14px;" onclick="confirmRenameTrip()">OK</button>
@@ -662,17 +827,47 @@
                 rq.onerror = () => res(null);
             });
             oldDb.close();
-            if (val) { await idbSet(key, val); }
+            // The caller commits database and metadata together after both are read.
             return val || null;
         } catch (e) { return null; }
     }
     // ═════════════════════════════════════════════════════════════════════
 
-    function saveAllData() {
-        idbSet('travel_db_v18', AppState.db).catch(err => console.error(err));
-        idbSet('travel_meta_v1', AppState.meta).catch(err => console.error(err));
-        calculateStorageUsage();
+    let storageQueue = Promise.resolve(), storagePending = 0, storageFailed = false, storageRecoveryNeeded = false;
+    function storageNotice(message, failed = false) {
+        storageFailed = failed;
+        const box = document.getElementById('storage-status');
+        if (box) { box.hidden = !message; box.textContent = message; box.style.background = failed ? '#842323' : '#254b60'; }
     }
+    async function writeSnapshot(snapshot) {
+        const db = await openIDB();
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite'), store = tx.objectStore(IDB_STORE);
+            store.put(snapshot.db, 'travel_db_v18'); store.put(snapshot.meta, 'travel_meta_v1');
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error('Salvataggio non riuscito'));
+            tx.onabort = () => reject(tx.error || new Error('Salvataggio annullato'));
+        });
+    }
+    function persistSnapshot(snapshot) {
+        storagePending++; storageNotice('Salvataggio in corso… Non chiudere questa pagina.');
+        const operation = storageQueue.then(() => writeSnapshot(snapshot));
+        storageQueue = operation.catch(() => {});
+        return operation.then(() => {
+            storagePending--; if (!storagePending) storageNotice(''); calculateStorageUsage(); return true;
+        }, err => {
+            storagePending--; console.error('Salvataggio:', err);
+            storageNotice('⚠️ Modifiche non salvate sul dispositivo. Mantieni aperta la pagina ed esporta un backup prima di chiuderla.', true); return false;
+        });
+    }
+    function saveAllData() {
+        if (storageRecoveryNeeded) { storageNotice("⚠️ Archivio non caricato. I dati precedenti sono conservati. Ricarica la pagina o importa un backup valido; il salvataggio è sospeso.", true); return Promise.resolve(false); }
+        try { personalPlaces(); return persistSnapshot(JSON.parse(JSON.stringify({ db: AppState.db, meta: AppState.meta }))); }
+        catch (err) { storageNotice('⚠️ Impossibile salvare i dati. Esporta un backup prima di chiudere.', true); return Promise.resolve(false); }
+    }
+    window.addEventListener('beforeunload', event => {
+        if (storagePending || storageFailed) { event.preventDefault(); event.returnValue = ''; }
+    });
 
     // ═══════════ ACCESSIBILITA' MODALI (D16/D17) ═══════════
     // Modulo autonomo: non modifica le funzioni che aprono/chiudono i modali.
@@ -732,34 +927,46 @@
     // ═══════════════════════════════════════════════════════
 
     // ═══════════ CHECK-IN GPS + PASSAPORTO DI VIAGGIO ═══════════
+    function placeKey(nome, lat, lon) {
+        if (lat == null || lon == null || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) return '';
+        return JSON.stringify([String(nome).trim(), Number(lat).toFixed(6), Number(lon).toFixed(6)]);
+    }
+    function personalPlaces() {
+        if (AppState.meta.__places_v2) return AppState.meta.__places_v2;
+        const state = { visited: {}, ratings: {}, legacyCheckins: [], legacyRatings: {} };
+        const matches = nome => [...new Map(Object.values(AppState.db).filter(Array.isArray).flat().filter(p => p.n === nome).map(p => [placeKey(p.n, p.lt, p.ln), p])).entries()].filter(([key]) => key);
+        for (const nome of (Array.isArray(AppState.meta.checkins) ? AppState.meta.checkins : [])) {
+            const found = matches(nome);
+            if (found.length === 1) state.visited[found[0][0]] = nome; else state.legacyCheckins.push(nome);
+        }
+        for (const [nome, value] of Object.entries(AppState.meta.ratings || {})) {
+            const found = matches(nome);
+            if (found.length === 1) state.ratings[found[0][0]] = value; else state.legacyRatings[nome] = value;
+        }
+        AppState.meta.__places_v2 = state; return state;
+    }
     function getCheckins() {
-        if (!AppState.meta.checkins) AppState.meta.checkins = [];
-        return AppState.meta.checkins;
+        const state = personalPlaces();
+        return [...Object.values(state.visited), ...state.legacyCheckins.map(n => n + ' (visita precedente: località non identificata)')];
     }
-
-    function isCheckedIn(nome) {
-        return getCheckins().includes(nome);
-    }
-
+    function isCheckedIn(nome, lat, lon) { return Object.hasOwn(personalPlaces().visited, placeKey(nome, lat, lon)); }
     function eseguiCheckIn(nome, lat, lng, btnEl) {
-        if (!navigator.geolocation) { showToast("Il tuo dispositivo non supporta il GPS per il check-in.", "error"); return; }
-        if (isCheckedIn(nome)) { showToast("✅ Già visitato!"); return; }
+        if (!navigator.geolocation) { showToast('Il tuo dispositivo non supporta il GPS per il check-in.', 'error'); return; }
+        if (isCheckedIn(nome, lat, lng)) { showToast('✅ Già visitato!'); return; }
         if (btnEl) { btnEl.innerHTML = '⏳ Verifica...'; btnEl.disabled = true; }
-
-        navigator.geolocation.getCurrentPosition(pos => {
-            const dist = parseFloat(calculateDistance(pos.coords.latitude, pos.coords.longitude, lat, lng)) * 1000; // metri
+        navigator.geolocation.getCurrentPosition(async pos => {
+            const dist = Number(calculateDistance(pos.coords.latitude, pos.coords.longitude, lat, lng)) * 1000;
             if (dist <= 300) {
-                getCheckins().push(nome);
-                saveAllData();
-                showToast(`🎉 Check-in effettuato a ${nome}!`);
-                if (btnEl) { btnEl.innerHTML = '✅ Visitato'; btnEl.style.borderColor = 'var(--accent-green)'; btnEl.style.color = 'var(--accent-green)'; }
+                personalPlaces().visited[placeKey(nome, lat, lng)] = nome;
+                const saved = await saveAllData();
+                if (btnEl) { btnEl.innerHTML = '✅ Visitato'; btnEl.style.color = 'var(--accent-green)'; }
+                if (saved) showToast('🎉 Check-in effettuato a ' + nome + '!');
             } else {
-                const distTxt = dist >= 1000 ? `${(dist/1000).toFixed(1)} km` : `${Math.round(dist)} m`;
-                showToast(`Sei a ${distTxt} di distanza! Avvicinati a meno di 300 m per fare check-in.`, "error");
+                showToast('Sei a ' + Math.round(dist) + ' m: avvicinati a meno di 300 m per fare check-in.', 'error');
                 if (btnEl) { btnEl.innerHTML = '📍 CHECK-IN'; btnEl.disabled = false; }
             }
         }, () => {
-            showToast("Impossibile ottenere la posizione GPS.", "error");
+            showToast('Impossibile ottenere la posizione GPS.', 'error');
             if (btnEl) { btnEl.innerHTML = '📍 CHECK-IN'; btnEl.disabled = false; }
         }, { enableHighAccuracy: true, timeout: 10000 });
     }
@@ -793,27 +1000,24 @@
     }
 
     // ═══════════ VALUTAZIONI PERSONALI TAPPE ═══════════
-    function getRatings() {
-        if (!AppState.meta.ratings) AppState.meta.ratings = {};
-        return AppState.meta.ratings;
+    function getRatings() { return personalPlaces().ratings; }
+    function setValutazione(nome, val, lat, lon) {
+        const r = getRatings(), key = placeKey(nome, lat, lon);
+        if (!key) return;
+        if (r[key] === val) delete r[key]; else r[key] = val;
+        saveAllData(); refreshList();
     }
-
-    function setValutazione(nome, val) {
-        const r = getRatings();
-        if (r[nome] === val) delete r[nome];  // secondo tocco sulla stessa stella = rimuove
-        else r[nome] = val;
-        saveAllData();
-        refreshList();
-    }
-
-    function renderRatingBtns(nome) {
-        const cur = getRatings()[nome] || 0;
+    function renderRatingBtns(nome, lat, lon) {
+        const cur = getRatings()[placeKey(nome, lat, lon)] || 0;
         let html = '<span class="rating-btns" style="display:inline-flex; gap:2px; margin-left:6px;">';
         for (let v = 1; v <= 5; v++) {
-            html += `<span class="${v <= cur ? 'on' : ''}" onclick="event.stopPropagation(); setValutazione('${escapeHtml(nome).replace(/'/g, "\\'")}', ${v})" title="${v} stelle">⭐</span>`;
+            html += '<span class="' + (v <= cur ? 'on' : '') + '" onclick="event.stopPropagation(); setValutazione(' + jsArg(nome) + ', ' + v + ', ' + Number(lat) + ', ' + Number(lon) + ')" title="' + v + ' stelle">⭐</span>';
         }
+        const legacy = personalPlaces().legacyRatings[nome];
+        if (legacy) html += '<small title="Valutazione precedente conservata; località non identificata"> · precedente: ' + escapeHtml(legacy) + '/5 (località da identificare)</small>';
         return html + '</span>';
     }
+
     // ═══════════════════════════════════════════════════════════
 
     let map = null;
@@ -854,6 +1058,13 @@
         if (h >= 0 && h <= 5) h += 24;
         return h * 60 + m;
     }
+    function normalizeGeneratedTime(value) {
+        const match=String(value||'').match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);if(!match)return '';
+        return String(Number(match[1])).padStart(2,'0')+':'+match[2];
+    }
+    function sortTripChronologically(items) {
+        return [...items].sort((a,b)=>(Number(a.day)||1)-(Number(b.day)||1)||getEffectiveMins(a.time)-getEffectiveMins(b.time));
+    }
 
     // Timeout unico per le fetch che non hanno gia' un proprio AbortController.
     // Senza questo, una rete lenta lascia la richiesta appesa a tempo indefinito.
@@ -871,8 +1082,9 @@
         return fetchTimeout(url, options);
     }
 
+    function jsArg(value) { return escapeHtml(JSON.stringify(String(value ?? ''))); }
     function escapeHtml(str) {
-        if (!str) return '';
+        if (str === null || str === undefined) return '';
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
@@ -932,6 +1144,7 @@
         btnFoot.style.background = mode === 'foot' ? 'var(--accent-gold)' : 'transparent';
         btnFoot.style.color = mode === 'foot' ? '#000' : 'var(--accent-gold)';
         showItineraryMarkers();
+        renderTripFeasibility();
         if (document.body.classList.contains('nav-active')) renderNavStep();
         showToast("Modalità percorso: " + (mode === 'driving' ? "Auto" : "A piedi"));
     }
@@ -955,9 +1168,73 @@
         type: "OBJECT",
         properties: {
             survival: { type: "OBJECT", properties: { currency: {type: "STRING"}, tips: {type: "STRING"}, plugs: {type: "STRING"}, emergency: {type: "STRING"} } },
-            places: { type: "ARRAY", items: { type: "OBJECT", properties: { n: {type: "STRING"}, lt: {type: "NUMBER"}, ln: {type: "NUMBER"}, day: {type: "NUMBER"}, time: {type: "STRING"}, cost: {type: "NUMBER"}, type: {type: "STRING"}, note: {type: "STRING"} } } }
+            places: { type: "ARRAY", items: { type: "OBJECT", properties: { n: {type: "STRING"}, lt: {type: "NUMBER"}, ln: {type: "NUMBER"}, day: {type: "NUMBER"}, time: {type: "STRING"}, duration: {type: "NUMBER"}, cost: {type: "NUMBER"}, type: {type: "STRING"}, note: {type: "STRING"} } } }
         }
     };
+
+    function normalizedPlaceWords(value) {
+        const ignored=new Set(['di','del','della','dei','degli','da','in','al','alla','the','and','e']);
+        return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(w=>w.length>1&&!ignored.has(w));
+    }
+    async function verifyGeneratedPlace(place,destination) {
+        const words=normalizedPlaceWords(place.n);if(!words.length)return null;
+        try{
+            const q=encodeURIComponent(place.n+', '+destination),res=await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=5&addressdetails=1&accept-language=it`),data=await res.json();
+            for(const item of Array.isArray(data)?data:[]){
+                const hay=new Set(normalizedPlaceWords(item.display_name||item.name)),matches=words.filter(w=>hay.has(w)).length;
+                if(matches/words.length<.6)continue;
+                const lt=Number(item.lat),ln=Number(item.lon);if(!Number.isFinite(lt)||!Number.isFinite(ln))continue;
+                const km=Number(calculateDistance(Number(place.lt),Number(place.ln),lt,ln));if(Number.isFinite(km)&&km>10)continue;
+                return {...place,lt,ln,verified:true,verifiedAddress:item.display_name||''};
+            }
+        }catch(e){console.warn('Verifica luogo non riuscita:',place.n,e);}
+        return null;
+    }
+    const INTEREST_SEARCHES={Arte:[{q:'museo',type:'monument'},{q:'galleria arte',type:'monument'}],Gastronomia:[{q:'ristorante',type:'food'},{q:'mercato alimentare',type:'food'}],Natura:[{q:'parco',type:'nature'},{q:'giardino',type:'nature'}],Storia:[{q:'monumento storico',type:'monument'}],Shopping:[{q:'mercato',type:'other'},{q:'centro commerciale',type:'other'}],Nightlife:[{q:'pub',type:'food'},{q:'teatro',type:'other'}],Relax:[{q:'parco',type:'nature'},{q:'spa',type:'other'}],Avventura:[{q:'parco avventura',type:'nature'},{q:'arrampicata',type:'other'}]};
+    const INTEREST_KEYWORDS={Arte:['arte','museo','galleria','palazzo','teatro','scultura','pittura'],Gastronomia:['ristorante','mercato','cucina','gastronomia','aceto','alimentare'],Natura:['parco','giardino','natura','fiume','orto'],Storia:['stor','duomo','chiesa','torre','castello','palazzo','monumento','abbazia'],Shopping:['mercato','shopping','negozio','commerciale','boutique'],Nightlife:['pub','teatro','musica','club','locale','cinema'],Relax:['parco','giardino','spa','terme','passeggiata'],Avventura:['avventura','arrampicata','trekking','sport','sentiero']};
+    function matchedInterests(place,interests){const text=(String(place.n||'')+' '+String(place.note||'')).toLowerCase();return interests.filter(i=>(INTEREST_KEYWORDS[i]||[]).some(k=>text.includes(k)));}
+    function isReligiousPlace(place){return /\b(chiesa|santuario|basilica|duomo|cattedrale|abbazia|cappella|parrocchia|monastero|convento)\b/i.test(String(place?.n||''));}
+    function generatedPlaceCost(place){return isReligiousPlace(place)?'':(place.cost||'');}
+    async function buildPublicItinerary(destination,dayCount,selectedInterests=[]) {
+        const days=Math.max(1,Math.min(14,parseInt(dayCount)||1)),wanted=days*6,pool=[];
+        const interests=Array.isArray(selectedInterests)&&selectedInterests.length?selectedInterests:['Arte','Storia','Gastronomia','Natura'];
+        let center=null;
+        try{const geo=await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destination)}&limit=5&addressdetails=1&accept-language=it`),geoData=await geo.json(),targetWords=normalizedPlaceWords(destination),preferred=(geoData||[]).find(x=>['city','town','village','municipality'].includes(x.addresstype)&&targetWords.every(w=>normalizedPlaceWords(x.display_name).includes(w)))||(geoData||[]).find(x=>['city','town','village','municipality'].includes(x.addresstype));if(preferred)center={lat:Number(preferred.lat),lon:Number(preferred.lon)};}catch(e){}
+        if(!center)try{const geo=await fetchTimeout(`https://photon.komoot.io/api/?q=${encodeURIComponent(destination)}&limit=1`),data=await geo.json(),coords=data.features?.[0]?.geometry?.coordinates;if(coords)center={lat:Number(coords[1]),lon:Number(coords[0])};}catch(e){}
+        if(!center)throw new Error('Destinazione non trovata sulle mappe');
+        const urbanRadiusKm=3,insideUrbanArea=(lat,lon)=>Number(calculateDistance(center.lat,center.lon,Number(lat),Number(lon)))<=urbanRadiusKm;
+        try{
+            const wikiRes=await fetchTimeout(`https://it.wikipedia.org/w/api.php?action=query&generator=geosearch&ggsradius=3000&ggslimit=${Math.min(100,wanted*4)}&ggscoord=${center.lat}|${center.lon}&prop=coordinates|description|extracts&exintro=1&explaintext=1&format=json&origin=*`),wiki=await wikiRes.json();
+            for(const p of Object.values(wiki.query?.pages||{})){
+                const coord=p.coordinates?.[0],description=String(p.description||''),extract=String(p.extract||'');
+                if(!coord||!insideUrbanArea(coord.lat,coord.lon)||/\b(comune italiano|frazione|località abitata|centro abitato)\b/i.test(description+' '+extract))continue;
+                const place={n:p.title,lt:Number(coord.lat),ln:Number(coord.lon),type:'monument',note:(extract.slice(0,360)||`Luogo documentato nel territorio urbano di ${destination}. Consulta Dettagli per approfondire la visita.`),verified:true,verifiedAddress:''};place.interestTags=matchedInterests(place,interests);pool.push(place);
+            }
+        }catch(e){}
+        if(pool.length<3){
+            try{
+                const wikiRes=await fetchTimeout(`https://it.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=3000&gslimit=${Math.min(100,wanted*5)}&gscoord=${center.lat}|${center.lon}&format=json&origin=*`),wiki=await wikiRes.json();
+                for(const p of wiki.query?.geosearch||[]){if(!insideUrbanArea(p.lat,p.lon)||/\b(comune|frazione|località)\b/i.test(p.title))continue;const place={n:p.title,lt:Number(p.lat),ln:Number(p.lon),type:'monument',note:`Luogo documentato da Wikipedia entro l'area urbana di ${destination}. Apri Dettagli per approfondire.`,verified:true,verifiedAddress:''};place.interestTags=matchedInterests(place,interests);pool.push(place);}
+            }catch(e){}
+        }
+        try{
+            const query=`[out:json][timeout:20];(nwr(around:3000,${center.lat},${center.lon})["name"]["tourism"];nwr(around:3000,${center.lat},${center.lon})["name"]["historic"];nwr(around:3000,${center.lat},${center.lon})["name"]["amenity"~"museum|theatre|arts_centre|restaurant|cafe"];nwr(around:3000,${center.lat},${center.lon})["name"]["leisure"~"park|garden"];);out center tags 100;`,overpass=await fetchTimeout(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,{},30000),osm=await overpass.json();
+            for(const item of osm.elements||[]){const tags=item.tags||{},lt=Number(item.lat??item.center?.lat),ln=Number(item.lon??item.center?.lon),name=tags['name:it']||tags.name;if(!name||!insideUrbanArea(lt,ln))continue;const type=/restaurant|cafe/.test(tags.amenity||'')?'food':/park|garden/.test(tags.leisure||'')?'nature':'monument',place={n:name,lt,ln,type,note:`Luogo presente su OpenStreetMap entro l'area urbana di ${destination}. Verifica orari e accesso prima della visita.`,verified:true,verifiedAddress:''};place.interestTags=matchedInterests(place,interests);pool.push(place);}
+        }catch(e){console.warn('Recupero Overpass non riuscito',e);}
+        const searches=[];for(const interest of interests)for(const spec of INTEREST_SEARCHES[interest]||[])if(!searches.some(x=>x.q===spec.q))searches.push({...spec,interest});
+        for(const category of searches){
+            try{
+                const res=await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(category.q+', '+destination)}&limit=${days*3}&addressdetails=1&accept-language=it`),items=await res.json();
+                for(const item of items||[]){const name=item.name||String(item.display_name||'').split(',')[0];if(name&&insideUrbanArea(item.lat,item.lon))pool.push({n:name,lt:Number(item.lat),ln:Number(item.lon),type:category.type,note:`Tappa verificata entro 3 km dal centro e scelta per l'interesse ${category.interest}. ${category.type==='food'?'Controlla menu, apertura e prenotazione.':'Consulta Dettagli per organizzare la visita.'}`,verified:true,verifiedAddress:item.display_name||'',interestTags:[category.interest]});}
+            }catch(e){}
+        }
+        const unique=[],seen=new Set();for(const p of pool){const key=normalizedPlaceWords(p.n).join(' ');if(!key||seen.has(key)||!Number.isFinite(p.lt)||!Number.isFinite(p.ln))continue;seen.add(key);unique.push(p);}
+        if(unique.length<Math.min(3,wanted))throw new Error('Poche tappe disponibili dalle fonti pubbliche');
+        unique.sort((a,b)=>(b.interestTags?.length||0)-(a.interestTags?.length||0));
+        const matched=unique.filter(p=>p.interestTags?.length),unmatched=unique.filter(p=>!p.interestTags?.length),ordered=[...matched,...unmatched];
+        const slots=['09:00','10:45','12:45','15:00','17:00','19:30'];
+        return {places:ordered.slice(0,wanted).map((p,i)=>({...p,day:(i%days)+1,time:slots[Math.floor(i/days)%slots.length],duration:p.type==='food'?90:75,cost:''})),survival:{currency:'Da verificare',tips:'Verifica le consuetudini locali',plugs:'Verifica per il Paese di destinazione',emergency:'Numero di emergenza locale da verificare'},interests};
+    }
 
     async function generateWizardItinerary() {
         const dest = document.getElementById('wizDest').value.trim();
@@ -968,17 +1245,22 @@
 
         showLoader("L'Intelligenza Artificiale sta creando il tuo viaggio su misura...");
 
+        const traveler = getTravelerProfile();
         const prompt = `Agisci da Travel Planner esperto. Genera un itinerario dettagliato per la destinazione: "${dest}".
 Parametri:
 - Durata: ${AppState.wizard.days} giorni
 - Viaggiatori: ${AppState.wizard.who}
 - Interessi: ${AppState.wizard.interests.join(', ')}
 - Budget: ${AppState.wizard.budget}
+- Profilo salvato: ${JSON.stringify(traveler)}
 ${dateInfo}
-Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln siano reali.`;
+Genera 6 tappe ben distribuite per ogni giorno, indicativamente tra le 09:00 e le 21:30. Alterna attrazioni principali, luoghi meno noti, quartieri o passeggiate, una pausa gastronomica reale e un'attività serale quando disponibile. Evita doppioni e luoghi troppo simili. Organizza gli orari in modo realistico, considera gli spostamenti e lascia una pausa adeguata tra mattina e pomeriggio. Per ogni tappa indica una durata realistica in minuti e una nota utile di almeno due frasi che spieghi perché visitarla e cosa osservare.
+Usa esclusivamente attività e luoghi realmente esistenti e presenti sulle mappe pubbliche; non inventare nomi commerciali o indirizzi. Non assegnare alcun costo a chiese, santuari, basiliche, duomi, cattedrali, abbazie o cappelle: lascia cost a 0, perché eventuali musei interni o visite speciali vanno verificati separatamente. Per gli altri luoghi indica un costo soltanto se affidabile. Rispetta le esigenze del profilo, senza presumere che un luogo sia accessibile o compatibile con allergie quando non hai una fonte. Assicurati che le coordinate lt e ln siano reali.`;
 
         try {
-            const data = await callAI(prompt, AI_WIZARD_SCHEMA);
+            let data,generationSource='ai-verified';
+            try{data=await callAI(prompt,AI_WIZARD_SCHEMA);}
+            catch(aiError){generationSource='public-sources';document.getElementById('loader-text').innerText='Gemini non disponibile: preparo il piano da mappe e Wikipedia…';data=await buildPublicItinerary(dest,AppState.wizard.days,AppState.wizard.interests);showToast('ℹ️ Piano creato da mappe e Wikipedia: nessuna quota AI necessaria.');}
             if (!data || !data.places || data.places.length === 0) throw new Error("Dati vuoti");
 
             let tripName = dest.charAt(0).toUpperCase() + dest.slice(1);
@@ -986,29 +1268,48 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
             const allPlaces = data.places.map(p => ({
                 n: p.n || "Tappa", lt: parseFloat(p.lt), ln: parseFloat(p.ln),
-                day: parseInt(p.day) || 1, time: p.time || "", cost: p.cost || "",
-                type: p.type || "other", note: p.note || "", link: "", photo: ""
+                day: parseInt(p.day) || 1, time: normalizeGeneratedTime(p.time), duration: Math.max(15, Math.min(240, parseInt(p.duration) || 60)), cost: generatedPlaceCost(p),
+                type: p.type || "other", note: p.note || "", link: "", photo: "",
+                verified: p.verified===true, verifiedAddress:p.verifiedAddress||'', interestTags:Array.isArray(p.interestTags)?p.interestTags:[]
             }));
 
-            const formattedPlaces = allPlaces.filter(p => isValidCoord(p.lt, p.ln));
-            const skipped = allPlaces.length - formattedPlaces.length;
-            if (formattedPlaces.length === 0) throw new Error("Nessuna coordinata valida restituita dall'AI");
-            if (skipped > 0) showToast(`⚠️ ${skipped} tappa/e scartata/e: coordinate non valide.`, "error");
+            const candidates=allPlaces.filter(p=>isValidCoord(p.lt,p.ln)),formattedPlaces=[];
+            for(let i=0;i<candidates.length;i++){
+                document.getElementById('loader-text').innerText=`Verifica luogo ${i+1} di ${candidates.length}…`;
+                const verified=candidates[i].verified?candidates[i]:await verifyGeneratedPlace(candidates[i],dest);if(verified)formattedPlaces.push(verified);
+            }
+            const skipped=allPlaces.length-formattedPlaces.length,targetMinimum=Math.max(4,(parseInt(AppState.wizard.days)||1)*4);
+            if(formattedPlaces.length<targetMinimum){
+                try{
+                    document.getElementById('loader-text').innerText='Completo le giornate con fonti pubbliche…';
+                    const supplement=await buildPublicItinerary(dest,AppState.wizard.days,AppState.wizard.interests),known=new Set(formattedPlaces.map(p=>placeKey(p.n,p.lt,p.ln)));
+                    for(const p of supplement.places){const key=placeKey(p.n,p.lt,p.ln);if(!known.has(key)){formattedPlaces.push({...p,cost:generatedPlaceCost(p),link:'',photo:''});known.add(key);}if(formattedPlaces.length>=Math.max(targetMinimum,(parseInt(AppState.wizard.days)||1)*6))break;}
+                    if(generationSource==='ai-verified'&&formattedPlaces.length>allPlaces.length-skipped)generationSource='hybrid-sources';
+                }catch(e){console.warn('Completamento itinerario non riuscito',e);}
+            }
+            if(formattedPlaces.length===0)throw new Error("Nessuna tappa verificabile sulle mappe pubbliche");
+            if(skipped>0)showToast(`⚠️ ${skipped} tappa/e non verificata/e e quindi esclusa/e.`,"error");
 
-            AppState.db[tripName] = formattedPlaces;
+            AppState.db[tripName] = sortTripChronologically(formattedPlaces);
+            if(!AppState.meta[tripName]) AppState.meta[tripName] = {};
+            AppState.meta[tripName].destination = dest;
+            AppState.meta[tripName].startDate = AppState.wizard.date || '';
+            AppState.meta[tripName].generationSource = generationSource;
+            AppState.meta[tripName].generatedAt = new Date().toISOString();
+            AppState.meta[tripName].selectedInterests = [...AppState.wizard.interests];
+            AppState.meta[tripName].chronologicalOrderVersion = 1;
             if (data.survival) {
-                if(!AppState.meta[tripName]) AppState.meta[tripName] = {};
                 AppState.meta[tripName].survival = data.survival;
             }
 
             saveAllData();
             AppState.activeTrip = tripName;
             
-            if(formattedPlaces[0] && formattedPlaces[0].lt && map) { map.flyTo([formattedPlaces[0].lt, formattedPlaces[0].ln], 13); }
+            const firstPlace=AppState.db[tripName][0];if(firstPlace&&firstPlace.lt&&map){map.flyTo([firstPlace.lt,firstPlace.ln],13);}
             hideLoader(); showToast("✨ Itinerario creato con successo!"); switchTab('itinerario');
 
         } catch (e) {
-            hideLoader(); showToast("⚠️ Errore durante la generazione. Riprova tra poco.", "error"); console.error(e);
+            hideLoader(); showToast("⚠️ Generazione non completata: "+(e.message||"servizi temporaneamente non disponibili")+".", "error"); console.error(e);
         }
     }
 
@@ -1033,14 +1334,15 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             else if (type === 'monument') { emoji = '🏛️'; color = '#e8b84b'; } 
             else if (type === 'nature') { emoji = '🌲'; color = '#27ae60'; } 
         }
-        let badgeHtml = sequenceNumber !== null ? `<div style="position: absolute; top: -8px; right: -8px; background: #12110d; color: #fff; font-size: 11px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #e8b84b; display: flex; align-items: center; justify-content: center; z-index: 10;">${sequenceNumber}</div>` : '';
+        let badgeHtml = sequenceNumber !== null ? `<div style="position: absolute; top: -8px; right: -8px; background: #20343b; color: #fff; font-size: 11px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; z-index: 10;">${sequenceNumber}</div>` : '';
         let customClass = `custom-pin ${idx !== null ? 'marker-idx-' + idx : ''}`;
         return L.divIcon({ className: customClass, html: `<div class="marker-inner" style="position: relative; background-color: ${color}; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid white; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.5); transition: 0.4s; ${isNavActive ? 'transform: scale(1.3); border: 3px solid #fff;' : ''}">${emoji}${badgeHtml}</div>`, iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -16] });
     }
 
     function showToast(message, type = 'success') {
+        if (type === 'success' && (storagePending || storageFailed)) return;
         const container = document.getElementById('toast-container'); const toast = document.createElement('div');
-        toast.className = `toast ${type}`; toast.innerHTML = message; container.appendChild(toast); setTimeout(() => { toast.remove(); }, 4000);
+        toast.className = `toast ${type}`; toast.textContent = message; container.appendChild(toast); setTimeout(() => { toast.remove(); }, 4000);
     }
 
     function showLoader(text) { document.getElementById('loader-text').innerText = text; document.getElementById('loader').style.display = 'flex'; }
@@ -1049,7 +1351,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     function askForApiKeyModal() {
         return new Promise(resolve => {
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,35,43,.92);z-index:10000;display:flex;align-items:center;justify-content:center;';
             overlay.innerHTML = `
                 <div style="background:var(--card-bg);padding:24px;border-radius:16px;width:90%;max-width:380px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.7);border:1px solid var(--border)">
                     <h3 style="font-family:'Playfair Display',serif;color:var(--accent-gold);font-size:22px;margin-bottom:8px">🔑 API Key richiesta</h3>
@@ -1122,6 +1424,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             return { text, sources, grounded: sources.length > 0 };
         } catch (e) {
             // Fallback trasparente: risposta senza grounding, segnalata dal badge
+            if(/429/.test(String(e?.message||e)))throw e;
             const text = await fetchGeminiWithRetry(payload, false);
             return { text, sources: [], grounded: false };
         }
@@ -1184,7 +1487,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                         if(newKey) { localStorage.setItem('travel_api_key_v1', newKey); userPersonalApiKey = newKey; return callAI(prompt, schema); }
                         throw new Error("FATAL"); 
                     }
-                    if (response.status === 429) { lastErrorMsg = "⚠️ Troppe richieste. Attendi qualche istante..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
+                    if (response.status === 429) { throw new Error("RATE_LIMIT"); }
                     if (response.status >= 500) { lastErrorMsg = "⚠️ Server Google offline. Riprovo..."; await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
                     lastErrorMsg = `⚠️ Errore HTTP ${response.status}: ${googleMsg.substring(0,50)}`; throw new Error("FATAL");
                 }
@@ -1195,6 +1498,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     throw new Error("PARSE_ERROR");
                 }
             } catch (e) { 
+                if (e.message === "RATE_LIMIT") throw e;
                 if (e.message === "FATAL") { showToast(lastErrorMsg, "error"); throw e; }
                 if (e.message === "PARSE_ERROR" || e.name === "SyntaxError") { showToast("⚠️ Il server Google sta restituendo testo illeggibile.", "error"); throw e; }
                 await new Promise(r => setTimeout(r, delay)); delay *= 2; 
@@ -1277,6 +1581,23 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         document.getElementById('dropdown-overlay').style.display = 'none';
         document.getElementById('resto-dropdown').style.display = 'none';
         document.getElementById('hotel-dropdown').style.display = 'none';
+    }
+
+    function openSettings() {
+        const input = document.getElementById('userApiKeyInput'); if (input) input.value = userPersonalApiKey;
+        calculateStorageUsage(); document.getElementById('settingsModal').style.display = 'block';
+    }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function openManual() { closeSettings(); document.getElementById('manualModal').style.display = 'block'; }
+    function closeManual() { document.getElementById('manualModal').style.display = 'none'; }
+    function printManual() {
+        const source = document.querySelector('#manualModal > div'); if (!source) return;
+        const printable = source.cloneNode(true); printable.querySelectorAll('details').forEach(section => section.open = true);
+        printable.querySelectorAll('button').forEach(button => button.remove());
+        const w = window.open('', '_blank');
+        if (!w) { showToast('⚠️ Il browser ha bloccato la finestra di stampa.', 'error'); return; }
+        w.document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Manuale Viaggi nel Mondo</title><style>body{font:15px Arial,sans-serif;max-width:820px;margin:auto;padding:32px;color:#222;line-height:1.55}h2{font-size:30px;color:#b77900}summary{font-size:19px;font-weight:bold;color:#245d73;margin-top:24px}details{display:block;border-bottom:1px solid #ddd;padding-bottom:12px}.manual-content{display:block}h4{color:#245d73}li{margin:5px 0}@page{margin:18mm}</style></head><body>'+printable.innerHTML+'</body></html>');
+        w.document.close(); w.focus(); setTimeout(()=>w.print(),250);
     }
 
     function toggleRestoMenu() { closeAllMenus(); document.getElementById('dropdown-overlay').style.display = 'block'; document.getElementById('resto-dropdown').style.display = 'block'; }
@@ -1379,16 +1700,18 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         let arr = AppState.db[city];
         if (!arr) return;
         
-        let dayItems = arr.filter(i => (i.day || 1) == day).sort((a,b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
+        let dayItems = arr.filter(i => (i.day || 1) == day);
         
         if (dayItems.length === 0) {
             showToast("⚠️ Nessuna tappa in questo giorno.", "error"); return;
         }
         if (dayItems.length === 1) {
-            openDirections(dayItems[0].lt, dayItems[0].ln); return;
+            openDirections(dayItems[0].lt, dayItems[0].ln, dayItems[0].n, getTripDestination(city)); return;
         }
 
-        let destination = `${dayItems[dayItems.length - 1].lt},${dayItems[dayItems.length - 1].ln}`;
+        const tripDestination = getTripDestination(city);
+        const lastItem = dayItems[dayItems.length - 1];
+        let destination = encodeURIComponent(googleMapsPlaceQuery(lastItem.n, lastItem.lt, lastItem.ln, tripDestination));
         let waypoints = "";
 
         let middleItems = dayItems.slice(0, dayItems.length - 1);
@@ -1397,7 +1720,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 middleItems = middleItems.slice(0, 9);
                 showToast("⚠️ Limite di Maps raggiunto. Caricate solo le prime 10 tappe.", "error");
             }
-            waypoints = "&waypoints=" + middleItems.map(p => `${p.lt},${p.ln}`).join('%7C');
+            waypoints = "&waypoints=" + middleItems.map(p => encodeURIComponent(googleMapsPlaceQuery(p.n, p.lt, p.ln, tripDestination))).join('%7C');
         }
         
         let mode = routingProfile === 'foot' ? 'walking' : 'driving';
@@ -1407,7 +1730,17 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     function openGeneralMaps() { if(!map) return; const c = map.getCenter(); window.open(`https://www.google.com/maps/@${c.lat},${c.lng},16z`, "_blank"); }
     
-    function openDirections(lat, lon) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&dir_action=navigate`, "_blank"); }
+    function googleMapsPlaceQuery(name, lat, lon, destination = '') {
+        const placeName = String(name || '').trim();
+        const area = String(destination || '').trim();
+        if (placeName) return area ? `${placeName}, ${area}` : placeName;
+        return `${lat},${lon}`;
+    }
+
+    function openDirections(lat, lon, name = '', destination = '') {
+        const query = googleMapsPlaceQuery(name, lat, lon, destination || getTripDestination());
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}&dir_action=navigate`, "_blank");
+    }
 
     function scrollToCard(idx) { let card = document.querySelector(`.card[data-idx="${idx}"]`); if (card) { if (!document.getElementById('view-itinerario').classList.contains('active')) { switchTab('itinerario'); setTimeout(() => performScroll(card), 200); } else { performScroll(card); } } }
     function performScroll(card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('highlight-card'); setTimeout(() => card.classList.remove('highlight-card'), 2000); }
@@ -1449,13 +1782,57 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         } catch(e) { console.error(e); } 
     }
     
-    function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a><button class="btn-action" style="font-size:11px; padding:7px 10px; border-color:#b05fc4; color:#b05fc4;" onclick="chiediSommelierAI('${escapeHtml(s.title).replace(/'/g, "\\'")}', '${escapeHtml((s.desc || '').split(',')[1] || '').replace(/'/g, "\\'").trim()}')">🍷 COSA ORDINO?</button>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
+    function renderSuggestions() { const l = document.getElementById('sug-list'); l.innerHTML = ""; if(map) { activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = []; routeLines.forEach(line => map.removeLayer(line)); routeLines = []; Object.values(itineraryMarkersDict).forEach(m => map.removeLayer(m)); itineraryMarkersDict = {}; Object.values(itineraryLinesDict).forEach(l => map.removeLayer(l)); itineraryLinesDict = {}; } currentSuggestions.forEach((s, idx) => { if(map) { activeMarkers.push(L.marker([s.lat, s.lon], { icon: getCustomIcon(s.type) }).addTo(map).bindPopup(escapeHtml(s.title))); } const distVal = AppState.userCoords ? calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon) : null; const distBadge = distVal !== null ? `<div style="display:inline-flex; align-items:center; gap:4px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:8px; padding:5px 10px; margin:6px 0; font-size:12px; color:var(--accent-blue); font-weight:700;">📍 <span class="live-dist-${idx}">${distVal} km da te</span></div>` : ''; const taQuery = encodeURIComponent(s.title + (s.desc ? ' ' + s.desc.split(',')[1] || '' : '')); const taUrl = `https://www.tripadvisor.it/Search?q=${taQuery}&ssrc=r`; const taBtn = s.type === 'food' ? `<a href="${taUrl}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#34e0a1; color:#34e0a1;">🌐 TripAdvisor</a><button class="btn-action" style="font-size:11px; padding:7px 10px; border-color:#b05fc4; color:#b05fc4;" onclick="chiediSommelierAI(${jsArg(s.title)}, ${jsArg(((s.desc || "").split(",")[1] || "").trim())})">🍷 COSA ORDINO?</button>` : ''; const tvQuery = encodeURIComponent(s.title); const tvBtn = s.type === 'hotel' ? `<a href="https://www.airbnb.it/s/${encodeURIComponent(s.title)}/homes" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#ff5a5f; color:#ff5a5f;">🏠 Airbnb</a> <a href="https://www.booking.com/searchresults.it.html?ss=${encodeURIComponent(s.title)}" target="_blank" class="btn-action" style="text-decoration:none; font-size:11px; padding:7px 10px; border-color:#003580; color:#003580; background:rgba(0,53,128,0.08);">🏨 Booking</a>` : ''; l.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><b>${escapeHtml(s.title)}</b></div>${distBadge}<div class="rating">${s.stars || "★★★★☆"}</div><p class="desc-preview">${escapeHtml(s.desc)}</p><div class="btn-row"><button class="btn-action primary" onclick="savePlace(${idx})">AGGIUNGI</button><button class="btn-action" onclick="openFullDesc(${idx})">DETTAGLI</button><button class="btn-action btn-maps-alt" onclick="openDirections(${s.lat}, ${s.lon}, ${jsArg(s.title)}, ${jsArg(currentActiveCity || getTripDestination())})">VAI</button>${taBtn}${tvBtn}</div></div>`; }); }
 
     function updateSuggestionsDistance() { if (!AppState.userCoords || currentSuggestions.length === 0) return; currentSuggestions.forEach((s, idx) => { const el = document.querySelector(`.live-dist-${idx}`); if (el) { const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, s.lat, s.lon); el.innerText = `${d} km da te`; } }); }
     function updateItineraryDistance() { if (!AppState.userCoords || !AppState.activeTrip || !AppState.db[AppState.activeTrip]) return; AppState.db[AppState.activeTrip].forEach((item, idx) => { const badges = document.querySelectorAll(`.itinerary-dist-badge[data-idx="${idx}"]`); const d = calculateDistance(AppState.userCoords.lat, AppState.userCoords.lon, item.lt, item.ln); badges.forEach(badge => { badge.innerHTML = `📍${d} km`; }); }); }
     
-    async function openFullDesc(idx) { const s = currentSuggestions[idx]; document.getElementById('modalTitle').innerText = s.title; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.title}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
-    async function openSavedDesc(city, idx) { const s = AppState.db[city][idx]; if (!s) return; document.getElementById('modalTitle').innerText = s.n; document.getElementById('modalBody').innerText = "Ricerca info in corso..."; document.getElementById('modalHours').innerText = "🕒 ..."; document.getElementById('descModal').style.display = 'block'; showLoader("Recupero Info..."); try { const data = await callAI(`Descrivi in modo molto dettagliato e approfondito questo luogo: "${s.n}". Includi storia, curiosità e consigli utili. Trova/stima orari.`, {type:"OBJECT", properties:{info:{type:"STRING"}, hours:{type:"STRING"}}}); document.getElementById('modalBody').innerText = data.info; document.getElementById('modalHours').innerText = data.hours ? "🕒 " + data.hours : ""; } catch(e) { document.getElementById('modalBody').innerText = "Info non disponibili. Controlla il banner di errore per i dettagli API."; document.getElementById('modalHours').innerText = ""; } hideLoader(); }
+    function detailsStore() { return AppState.meta.__placeDetails ||= {}; }
+    function hasCompletePlaceDetails(entry) {
+        if (!entry || typeof entry.info !== 'string') return false;
+        const text=entry.info.replace(/\s+/g,' ').trim();
+        if (text.length < 120) return false;
+        return !/^(?:da verificare|informazioni non disponibili|non disponibile)[.!]?$/i.test(text);
+    }
+    function showPlaceDetails(title, entry) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalBody').innerText = entry.info || 'Informazioni non disponibili.';
+        const source=entry.source==='gemini'?'✨ Aggiornato con Gemini':entry.publicSource?'🗺️ Dati da Wikipedia e mappe':'';
+        document.getElementById('modalHours').innerText = source+(entry.hours?(source?' · ':'')+'🕒 '+entry.hours:'')+(entry.savedAt?' · salvato '+new Date(entry.savedAt).toLocaleDateString('it-IT'):'');
+        const modal=document.getElementById('descModal');modal.scrollTop=0;modal.style.display='block';
+    }
+    async function fetchPublicPlaceDetails(place,destination) {
+        const name=place.n||place.title,parts=[];let address='';
+        try{
+            const search=await fetchTimeout(`https://it.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name+' '+destination)}&srlimit=1&format=json&origin=*`),searchData=await search.json(),title=searchData.query?.search?.[0]?.title;
+            if(title){const summary=await fetchTimeout(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`),wiki=await summary.json();if(wiki.extract)parts.push(wiki.extract);}
+        }catch(e){}
+        try{
+            const geo=await throttledFetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name+', '+destination)}&limit=1&addressdetails=1&accept-language=it`),items=await geo.json();address=items?.[0]?.display_name||place.verifiedAddress||'';
+        }catch(e){address=place.verifiedAddress||'';}
+        if(place.note&&String(place.note).trim())parts.push('Indicazioni per la visita: '+String(place.note).trim());
+        if(address)parts.push('Indirizzo verificato: '+address+'.');
+        parts.push('Orari e condizioni di accesso possono cambiare: verifica sempre il sito ufficiale prima della visita.');
+        return {info:parts.join('\n\n'),hours:'da verificare sulla fonte ufficiale',savedAt:new Date().toISOString(),destination,publicSource:true};
+    }
+    async function fetchAndCacheDetails(place, destination, display = true) {
+        const key=placeKey(place.n||place.title,place.lt??place.lat,place.ln??place.lon), cached=detailsStore()[key];
+        const publicTrip=['public-sources','hybrid-sources'].includes(AppState.meta[AppState.activeTrip]?.generationSource),shouldUpgrade=publicTrip&&cached?.publicSource;
+        if(hasCompletePlaceDetails(cached)&&!shouldUpgrade){if(display)showPlaceDetails(place.n||place.title,cached);return cached;}
+        if(cached&&!shouldUpgrade)delete detailsStore()[key];
+        showLoader(shouldUpgrade?'Aggiornamento del contenuto con Gemini…':'Recupero informazioni…');
+        try {
+            const name=place.n||place.title;
+            const payload={contents:[{parts:[{text:'Crea una guida completa per "'+name+'" nella destinazione "'+destination+'". Scrivi un racconto chiaro, approfondito e coinvolgente con storia, contesto culturale, elementi da osservare, curiosità e consigli pratici. Aggiungi in fondo una riga "Orari: ..." solo se trovi orari verificabili; altrimenti scrivi "Orari: da verificare sulla fonte ufficiale". Non usare formattazione speciale.'}]}],systemInstruction:{parts:[{text:'Sei una guida turistica globale esperta. '+PROMPT_ANTI_ALLUCINAZIONE}]}};
+            const result=await fetchGeminiGrounded(payload);
+            const entry={info:(result.text||'').replace(/\*/g,''),hours:'',savedAt:new Date().toISOString(),destination,source:'gemini',publicSource:false};detailsStore()[key]=entry;await saveAllData();if(display)showPlaceDetails(name,entry);return entry;
+        } catch(e){
+            if(cached?.publicSource){if(display)showPlaceDetails(place.n||place.title,cached);return cached;}
+            const entry=await fetchPublicPlaceDetails(place,destination);detailsStore()[key]=entry;await saveAllData();if(display)showPlaceDetails(place.n||place.title,entry);return entry;
+        } finally{hideLoader();}
+    }
+    async function openFullDesc(idx) { const s=currentSuggestions[idx];if(!s)return;try{await fetchAndCacheDetails({title:s.title,lat:s.lat,lon:s.lon},getTripDestination());}catch(e){} }
+    async function openSavedDesc(city, idx) { const s=AppState.db[city]?.[idx];if(!s)return;try{await fetchAndCacheDetails(s,getTripDestination(city));}catch(e){} }
 
     function openAddModal(placeObj) { pendingPlaceToAdd = placeObj; document.getElementById('addModalPlaceName').innerText = "📍 " + placeObj.n; const select = document.getElementById('addModalSelect'); const trips = Object.keys(AppState.db); let optionsHtml = trips.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join(''); optionsHtml += `<option value="_new_" style="color: var(--accent-gold); font-weight: bold;">+ Nuovo Itinerario...</option>`; select.innerHTML = optionsHtml; if (AppState.activeTrip && trips.includes(AppState.activeTrip)) { select.value = AppState.activeTrip; } else if (trips.length === 0) { select.value = "_new_"; } handleAddModalChange(); document.getElementById('addPlaceModal').style.display = 'flex'; }
     function handleAddModalChange() { const val = document.getElementById('addModalSelect').value; const inputField = document.getElementById('addModalNewInput'); if (val === '_new_') { inputField.style.display = 'block'; inputField.value = ''; inputField.focus(); } else { inputField.style.display = 'none'; } }
@@ -1589,12 +1966,40 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     
     function removePhoto(city, idx) { delete AppState.db[city][idx].photo; saveAllData(); refreshList(); showToast("🗑️ Rimossa."); }
 
-    function findIndoorAlternatives() { document.getElementById('aiQuery').value = `Cosa fare al coperto a ${AppState.activeTrip} (musei, mostre, attività indoor)?`; switchTab('scopri'); askAI(); }
+    function findIndoorAlternatives() { document.getElementById('aiQuery').value = `Cosa fare al coperto a ${getTripDestination()} (musei, mostre, attività indoor)?`; switchTab('scopri'); askAI(); }
 
     function findAlternative(city, idx) {
-        document.getElementById('aiQuery').value = `Consigliami un'alternativa simile a ${AppState.db[city][idx].n} a ${city}`;
+        document.getElementById('aiQuery').value = `Consigliami un'alternativa simile a ${AppState.db[city][idx].n} a ${getTripDestination(city)}`;
         switchTab('scopri');
         askAI();
+    }
+
+    async function verifyItineraryPlaces() {
+        const trip=AppState.activeTrip,items=AppState.db[trip]||[];if(!items.length)return showToast('Nessuna tappa da verificare.','error');
+        showLoader('Verifica delle tappe sul web…');
+        try{
+            const list=items.map((p,i)=>(i+1)+'. '+p.n+' ['+p.lt+', '+p.ln+']').join('\n');
+            const payload={contents:[{parts:[{text:'Verifica questi luoghi per la destinazione '+getTripDestination(trip)+'. Controlla esistenza, nome e compatibilità approssimativa delle coordinate. Elenca prima i problemi; se non trovi problemi dichiaralo. Non inventare dati.\n\n'+list}]}],systemInstruction:{parts:[{text:PROMPT_ANTI_ALLUCINAZIONE}]}};
+            const result=await fetchGeminiGrounded(payload),entry={text:result.text||'',checkedAt:new Date().toISOString()};
+            (AppState.meta[trip] ||= {}).verification=entry;await saveAllData();
+            document.getElementById('modalTitle').innerText='Verifica tappe · '+trip;
+            document.getElementById('modalBody').innerHTML=escapeHtml(entry.text).replace(/\n/g,'<br>')+renderGroundingBadge(result);
+            document.getElementById('modalHours').innerText='Controllato '+new Date(entry.checkedAt).toLocaleString('it-IT');document.getElementById('descModal').style.display='block';
+        }catch(e){showToast('⚠️ Verifica non riuscita: '+(e.message||'errore di rete'),'error');}finally{hideLoader();}
+    }
+    async function createPlanB() {
+        const trip=AppState.activeTrip,items=AppState.db[trip]||[];if(!items.length)return showToast('Nessun itinerario da convertire.','error');
+        showLoader('Creo un Piano B al coperto…');
+        try{
+            const schema={type:'OBJECT',properties:{alternatives:{type:'ARRAY',items:{type:'OBJECT',properties:{index:{type:'INTEGER'},replace:{type:'BOOLEAN'},n:{type:'STRING'},lt:{type:'NUMBER'},ln:{type:'NUMBER'},note:{type:'STRING'},type:{type:'STRING'}},required:['index','replace']}}},required:['alternatives']};
+            const prompt='Per la destinazione '+getTripDestination(trip)+' crea alternative al coperto solo per le tappe esposte al meteo. Usa gli indici esatti. Mantieni le tappe già al coperto. Non inventare strutture: se non sei sicuro imposta replace=false. Tappe: '+JSON.stringify(items.map((p,index)=>({index,n:p.n,type:p.type,lat:p.lt,lon:p.ln,day:p.day,time:p.time})));
+            const data=await callAI(prompt,schema),copy=JSON.parse(JSON.stringify(items));let replacements=0;
+            for(const a of data.alternatives||[]){if(!a.replace)continue;if(!Number.isInteger(a.index)||!copy[a.index]||!a.n||!Number.isFinite(Number(a.lt))||!Number.isFinite(Number(a.ln))||Math.abs(Number(a.lt))>90||Math.abs(Number(a.ln))>180)continue;copy[a.index]={...copy[a.index],n:a.n,lt:Number(a.lt),ln:Number(a.ln),note:(a.note||'Alternativa al coperto. Verificare apertura e prenotazione.'),type:a.type||'monument',done:false,verified:false};replacements++;}
+            if(!replacements)throw new Error('Nessuna alternativa sufficientemente affidabile trovata.');
+            let name=trip+' – Piano B',n=2;while(AppState.db[name])name=trip+' – Piano B '+n++;
+            AppState.db[name]=copy;AppState.meta[name]=JSON.parse(JSON.stringify(AppState.meta[trip]||{}));AppState.meta[name].sourceTrip=trip;AppState.meta[name].destination=getTripDestination(trip);delete AppState.meta[name].verification;AppState.activeTrip=name;
+            await saveAllData();refreshList();showItineraryMarkers();showToast('☔ Piano B creato con '+replacements+' sostituzione/i. Usa Verifica tappe prima di partire.');
+        }catch(e){showToast('⚠️ '+(e.message||'Piano B non creato.'),'error');}finally{hideLoader();}
     }
 
     // Cache meteo: evita di richiamare Open-Meteo per le stesse coordinate
@@ -1641,6 +2046,168 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     
     function updateTravelMeta(field, value) { if(!AppState.activeTrip) return; if(!AppState.meta[AppState.activeTrip]) AppState.meta[AppState.activeTrip] = {}; AppState.meta[AppState.activeTrip][field] = parseFloat(value) || 0; saveAllData(); refreshStatsUI(); }
 
+    function getTravelerProfile() {
+        return AppState.meta.__travelerProfile || { who:'Coppia', maxWalk:10, budget:'Medio', indoor:'mixed', stroller:false, pets:false, needs:'' };
+    }
+    async function saveTravelerProfile() {
+        AppState.meta.__travelerProfile = {
+            who: document.getElementById('profile-who').value,
+            maxWalk: Math.max(1, Math.min(50, Number(document.getElementById('profile-walk').value) || 10)),
+            budget: document.getElementById('profile-budget').value,
+            indoor: document.getElementById('profile-indoor').value,
+            stroller: document.getElementById('profile-stroller').checked,
+            pets: document.getElementById('profile-pets').checked,
+            needs: document.getElementById('profile-needs').value.trim().slice(0,300)
+        };
+        const saved = await saveAllData();
+        renderTripFeasibility();
+        if (saved) showToast('✅ Profilo salvato e applicato.');
+    }
+    function applyTravelerProfile() {
+        const p = getTravelerProfile();
+        const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+        set('profile-who', p.who || 'Coppia'); set('profile-walk', p.maxWalk || 10);
+        set('profile-budget', p.budget || 'Medio'); set('profile-indoor', p.indoor || 'mixed'); set('profile-needs', p.needs || '');
+        const stroller = document.getElementById('profile-stroller'), pets = document.getElementById('profile-pets');
+        if (stroller) stroller.checked = !!p.stroller; if (pets) pets.checked = !!p.pets;
+    }
+    function visitMinutes(item) {
+        const n = Number(item.duration);
+        if (Number.isFinite(n) && n >= 15 && n <= 720) return n;
+        if (item.type === 'food') return 90;
+        if (item.type === 'nature') return 120;
+        if (item.type === 'hotel') return 30;
+        return 60;
+    }
+    function minutesOf(value) {
+        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value || '')) return null;
+        const [h,m] = value.split(':').map(Number); return h * 60 + m;
+    }
+    function analyzeDay(items) {
+        let distance = 0, visits = 0, transfers = 0, cursor = 9 * 60, previous = null;
+        const warnings = [], speed = routingProfile === 'foot' ? 4.5 : 40;
+        for (const item of items) {
+            if (previous) {
+                const km = Number(calculateDistance(previous.lt, previous.ln, item.lt, item.ln));
+                if (Number.isFinite(km)) { distance += km; const travel = Math.ceil(km / speed * 60); transfers += travel; cursor += travel; }
+            }
+            const fixed = minutesOf(item.time), open = minutesOf(item.opening), close = minutesOf(item.closing);
+            if (fixed !== null) { if (fixed < cursor) warnings.push('orario stretto per ' + item.n); cursor = Math.max(cursor, fixed); }
+            if (open !== null && cursor < open) cursor = open;
+            const duration = visitMinutes(item); visits += duration;
+            if (close !== null && cursor + duration > close) warnings.push(item.n + ' oltre la chiusura inserita');
+            if (item.booking && !safeUrl(item.link)) warnings.push(item.n + ': prenotazione senza collegamento');
+            cursor += duration; previous = item;
+        }
+        const pause = items.length > 3 ? 60 : (items.length ? 30 : 0), total = visits + transfers + pause;
+        if (items.length > 5) warnings.push('giornata molto fitta');
+        if (total > 10 * 60) warnings.push('programma superiore a 10 ore');
+        if (routingProfile === 'foot' && distance > getTravelerProfile().maxWalk) warnings.push('distanza a piedi oltre il limite personale');
+        return { distance, visits, transfers, pause, total, finish: 9 * 60 + total, warnings:[...new Set(warnings)] };
+    }
+    function formatMinutes(value) { return Math.floor(value / 60) + 'h ' + String(value % 60).padStart(2,'0') + 'm'; }
+    function formatClock(value) { return String(Math.floor(value / 60) % 24).padStart(2,'0') + ':' + String(value % 60).padStart(2,'0'); }
+    function renderTripFeasibility() {
+        const el = document.getElementById('tripFeasibility'); if (!el) return;
+        const items = AppState.db[AppState.activeTrip] || [], days = {};
+        items.forEach(item => (days[item.day || 1] ||= []).push(item));
+        el.innerHTML = Object.keys(days).sort((a,b)=>a-b).map(day => {
+            const s = analyzeDay(days[day]);
+            return '<div id="feasibility-day-' + day + '" class="feasibility' + (s.warnings.length ? ' warn' : '') + '"><b>Giorno ' + day + '</b> · <span class="route-estimate">stima: ' + s.distance.toFixed(1) + ' km · trasferimenti ' + formatMinutes(s.transfers) + '</span> · visite ' + formatMinutes(s.visits) + ' · pausa ' + formatMinutes(s.pause) + '<br><b>Totale ' + formatMinutes(s.total) + ' · fine stimata ' + formatClock(s.finish) + '</b>' + (s.warnings.length ? '<br>⚠️ ' + s.warnings.map(escapeHtml).join(' · ') : '<br>✅ Programma compatibile con una giornata ordinaria') + '</div>';
+        }).join('');
+        refineTripFeasibility(AppState.activeTrip, days);
+    }
+    const routeMetricsCache = new Map();
+    async function fetchRouteMetrics(a,b) {
+        const profile=routingProfile==='foot'?'foot':'driving',key=[profile,Number(a.lt).toFixed(5),Number(a.ln).toFixed(5),Number(b.lt).toFixed(5),Number(b.ln).toFixed(5)].join('|');
+        if(routeMetricsCache.has(key))return routeMetricsCache.get(key);
+        const response=await fetchTimeout('https://router.project-osrm.org/route/v1/'+profile+'/'+a.ln+','+a.lt+';'+b.ln+','+b.lt+'?overview=false',{},10000);
+        if(!response.ok)throw new Error('Routing non disponibile');const data=await response.json();if(!data.routes?.[0])throw new Error('Percorso non trovato');
+        const result={km:data.routes[0].distance/1000,minutes:Math.ceil(data.routes[0].duration/60)};routeMetricsCache.set(key,result);return result;
+    }
+    async function refineTripFeasibility(trip,days) {
+        for(const day of Object.keys(days)){
+            let km=0,minutes=0,ok=true;const list=days[day];
+            for(let i=1;i<list.length;i++){try{const r=await fetchRouteMetrics(list[i-1],list[i]);km+=r.km;minutes+=r.minutes;}catch(e){ok=false;break;}}
+            if(trip!==AppState.activeTrip)return;const box=document.getElementById('feasibility-day-'+day),span=box?.querySelector('.route-estimate');
+            if(ok&&span)span.textContent='percorso: '+km.toFixed(1)+' km · trasferimenti '+formatMinutes(minutes);
+        }
+    }
+    function updateOperational(city, index, field, value) {
+        const item = AppState.db[city] && AppState.db[city][index]; if (!item) return;
+        item[field] = field === 'booking' ? !!value : value;
+        item.operationalCheckedAt = new Date().toISOString(); saveAllData(); renderTripFeasibility();
+    }
+    function updateAccessibility(city, index, field, value) {
+        const item = AppState.db[city] && AppState.db[city][index]; if (!item) return;
+        if (!item.accessibility) item.accessibility = {};
+        item.accessibility[field] = String(value).slice(0,300);
+        item.accessibility.checkedAt = new Date().toISOString(); saveAllData();
+    }
+    function getTripDestination(trip = AppState.activeTrip) {
+        return (AppState.meta[trip] && AppState.meta[trip].destination) || trip || '';
+    }
+    function generationSourceInfo(trip=AppState.activeTrip) {
+        const meta=AppState.meta[trip]||{},date=meta.generatedAt&&Number.isFinite(Date.parse(meta.generatedAt))?' · '+new Date(meta.generatedAt).toLocaleString('it-IT'):'';
+        if(meta.generationSource==='ai-verified')return {kind:'ai',label:'✨ AI + mappe verificate'+date};
+        if(meta.generationSource==='hybrid-sources')return {kind:'public',label:'✨ AI completata con Mappe e Wikipedia'+date};
+        if(meta.generationSource==='public-sources')return {kind:'public',label:'🗺️ Mappe + Wikipedia, senza AI'+date};
+        return {kind:'unknown',label:'ℹ️ Origine non registrata (itinerario precedente)'};
+    }
+    function renderGenerationSource(trip=AppState.activeTrip){const source=generationSourceInfo(trip),interests=AppState.meta[trip]?.selectedInterests;return `<div class="generation-source ${source.kind}">${escapeHtml(source.label)}</div>${Array.isArray(interests)&&interests.length?`<div class="generation-source public">🎯 Interessi usati: ${escapeHtml(interests.join(', '))}</div>`:''}`;}
+    function updateTripDestination(value) {
+        const trip = AppState.activeTrip; if (!trip) return;
+        if (!AppState.meta[trip]) AppState.meta[trip] = {};
+        AppState.meta[trip].destination = String(value).trim().slice(0,120);
+        lastWeatherTrip = ''; saveAllData(); updateWeatherWidget();
+    }
+
+    function exportOfflineTrip() {
+        const trip = AppState.activeTrip, items = AppState.db[trip];
+        if (!trip || !Array.isArray(items) || !items.length) { showToast('Nessun itinerario da esportare.', 'error'); return; }
+        const p = getTravelerProfile(), days = {};
+        items.forEach(item => (days[item.day || 1] ||= []).push(item));
+        const rows = Object.keys(days).sort((a,b)=>a-b).map(day => '<section><h2>Giorno ' + day + '</h2><ol>' + days[day].map(item => '<li><h3>' + escapeHtml(item.time ? item.time + ' · ' + item.n : item.n) + (item.done?' ✓':'') + '</h3><p>' + escapeHtml(item.note || '') + '</p><p>Visita: ' + visitMinutes(item) + ' min' + (item.opening || item.closing ? ' · apertura inserita ' + escapeHtml(item.opening || '—') + '–' + escapeHtml(item.closing || '—') : '') + (item.booking ? ' · prenotazione necessaria' : '') + '</p>' + (item.accessibility ? '<p>Accessibilità osservata: ' + escapeHtml([item.accessibility.level,item.accessibility.steps,item.accessibility.lift,item.accessibility.toilet,item.accessibility.parking,item.accessibility.stroller,item.accessibility.notes].filter(Boolean).join(' · ')) + '</p>' : '') + (safeUrl(item.link) ? '<p><a href="' + safeUrl(item.link) + '">Sito o prenotazione</a></p>' : '') + '<p><a href="https://www.google.com/maps/dir/?api=1&destination=' + Number(item.lt) + ',' + Number(item.ln) + '">Apri indicazioni</a></p></li>').join('') + '</ol></section>').join('');
+        const documentHtml = '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>' + escapeHtml(trip) + ' offline</title><style>body{font:16px system-ui;max-width:800px;margin:auto;padding:20px;color:#24303b}h1,h2{color:#245d73}li{border-bottom:1px solid #ddd;padding:8px 0}input{position:sticky;top:0;width:100%;box-sizing:border-box;padding:12px;background:white}small{color:#666}</style><h1>' + escapeHtml(trip) + '</h1><small>Creato ' + escapeHtml(new Date().toLocaleString('it-IT')) + '. Orari e disponibilità vanno verificati sulle fonti ufficiali.</small><p>Profilo: ' + escapeHtml(p.who) + ' · budget ' + escapeHtml(p.budget) + (p.needs ? ' · ' + escapeHtml(p.needs) : '') + '</p><input aria-label="Cerca" placeholder="Cerca nelle tappe…" oninput="document.querySelectorAll(\'li\').forEach(x=>x.hidden=!x.innerText.toLowerCase().includes(this.value.toLowerCase()))">' + rows + '</html>';
+        const url = URL.createObjectURL(new Blob([documentHtml], {type:'text/html;charset=utf-8'})), a = document.createElement('a');
+        a.href = url; a.download = trip.replace(/[^a-z0-9]+/gi,'_') + '_offline.html'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+        showToast('📴 Pacchetto offline creato.');
+    }
+    function downloadTextFile(name, content, type) {
+        const url = URL.createObjectURL(new Blob([content], {type})), a = document.createElement('a');
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    function calendarDate(day, time) {
+        const base = AppState.meta[AppState.activeTrip]?.startDate || new Date().toISOString().slice(0,10);
+        const d = new Date(base + 'T00:00:00'); d.setDate(d.getDate() + Number(day || 1) - 1);
+        const [h,m] = /^\d\d:\d\d$/.test(time || '') ? time.split(':').map(Number) : [9,0]; d.setHours(h,m,0,0);
+        return d;
+    }
+    function icsDate(date, floating = false) {
+        if (!floating) return date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+        const pad=n=>String(n).padStart(2,'0');
+        return date.getFullYear()+pad(date.getMonth()+1)+pad(date.getDate())+'T'+pad(date.getHours())+pad(date.getMinutes())+'00';
+    }
+    function icsEscape(value) { return String(value || '').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/[,;]/g,m=>'\\'+m); }
+    function exportICS() {
+        const trip=AppState.activeTrip, items=AppState.db[trip]||[]; if(!items.length)return showToast('Nessuna tappa da esportare.','error');
+        const events=items.map((p,i)=>{const start=calendarDate(p.day,p.time),end=new Date(start.getTime()+visitMinutes(p)*60000);return ['BEGIN:VEVENT','UID:'+Date.now()+'-'+i+'@viaggi','DTSTAMP:'+icsDate(new Date()),'DTSTART:'+icsDate(start,true),'DTEND:'+icsDate(end,true),'SUMMARY:'+icsEscape(p.n),'DESCRIPTION:'+icsEscape((p.note||'')+(p.booking?' · Prenotazione necessaria':'')),'LOCATION:'+icsEscape(getTripDestination(trip)),'GEO:'+Number(p.lt)+';'+Number(p.ln),'END:VEVENT'].join('\r\n')}).join('\r\n');
+        downloadTextFile(trip.replace(/[^a-z0-9]+/gi,'_')+'.ics','BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Viaggi//IT\r\n'+events+'\r\nEND:VCALENDAR','text/calendar;charset=utf-8');
+    }
+    function exportGPX() {
+        const trip=AppState.activeTrip, items=(AppState.db[trip]||[]).filter(p=>Number.isFinite(Number(p.lt))&&Number.isFinite(Number(p.ln))); if(!items.length)return showToast('Nessuna coordinata da esportare.','error');
+        const points=items.map(p=>'<wpt lat="'+Number(p.lt)+'" lon="'+Number(p.ln)+'"><name>'+escapeXml(p.n)+'</name><desc>'+escapeXml(p.note||'')+'</desc></wpt>').join('');
+        const route='<rte><name>'+escapeXml(trip)+'</name>'+items.map(p=>'<rtept lat="'+Number(p.lt)+'" lon="'+Number(p.ln)+'"><name>'+escapeXml(p.n)+'</name></rtept>').join('')+'</rte>';
+        downloadTextFile(trip.replace(/[^a-z0-9]+/gi,'_')+'.gpx','<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Viaggi" xmlns="http://www.topografix.com/GPX/1/1">'+points+route+'</gpx>','application/gpx+xml');
+    }
+    function escapeXml(value){return String(value||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]));}
+    function exportKML() {
+        const trip=AppState.activeTrip, items=(AppState.db[trip]||[]).filter(p=>Number.isFinite(Number(p.lt))&&Number.isFinite(Number(p.ln))); if(!items.length)return showToast('Nessuna coordinata da esportare.','error');
+        const marks=items.map(p=>'<Placemark><name>'+escapeXml(p.n)+'</name><description>'+escapeXml(p.note||'')+'</description><Point><coordinates>'+Number(p.ln)+','+Number(p.lt)+',0</coordinates></Point></Placemark>').join('');
+        const line=items.map(p=>Number(p.ln)+','+Number(p.lt)+',0').join(' ');
+        downloadTextFile(trip.replace(/[^a-z0-9]+/gi,'_')+'.kml','<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>'+escapeXml(trip)+'</name>'+marks+'<Placemark><name>Percorso</name><LineString><tessellate>1</tessellate><coordinates>'+line+'</coordinates></LineString></Placemark></Document></kml>','application/vnd.google-earth.kml+xml');
+    }
+
     function refreshStatsUI() {
         const statsBox = document.getElementById('tripStats');
         const survivalWidget = document.getElementById('survivalWidget');
@@ -1667,7 +2234,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         statsBox.style.display = 'block'; 
         statsBox.innerHTML = `📍 <b>${currentTripItems.length}</b> tappe <span style="margin:0 5px; opacity:0.3">|</span> 📅 <b>${daysCount.size}</b> giorni
-        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        ${renderGenerationSource(AppState.activeTrip)}
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px; background: rgba(48,71,79,.72); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);">
             <div style="position: relative; width: 75px; height: 75px; flex-shrink: 0;"><canvas id="budgetChart" width="75" height="75"></canvas></div>
             <div style="flex: 1; font-size: 11px; line-height: 1.6; font-weight: 600;">
                 <div style="display:flex; justify-content:space-between; color: var(--accent-blue)"><span>✈️ Viaggio:</span> <span>${expenses.travel.toFixed(2)}€</span></div>
@@ -1693,13 +2261,16 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             <span>⏳ Da pagare: <b style="color:#e8b84b;">${remainingCost.toFixed(2)} €</b></span>
         </div>`;
         drawBudgetChart(expenses);
+        renderTripFeasibility();
     }
 
     function createPlaceCard(i, vIdx, sCity, d, conflictingIndices, userCoords) {
-        let photoHtml = i.photo ? `<div class="photo-preview-container active"><img src="${i.photo}" class="photo-preview" onclick="window.open('${i.photo}', '_blank')"><button class="remove-photo-btn" onclick="removePhoto('${sCity}', ${i.idx})" aria-label="Rimuovi foto">×</button></div>` : '';
+        let photoHtml = i.photo ? `<div class="photo-preview-container active"><img src="${i.photo}" class="photo-preview" onclick="window.open('${i.photo}', '_blank')"><button class="remove-photo-btn" onclick="removePhoto(${jsArg(sCity)}, ${i.idx})" aria-label="Rimuovi foto">×</button></div>` : '';
         let timeBadge = i.time ? `<span class="badge-time">🕒 ${i.time}</span>` : '';
         let costBadge = i.cost ? `<span class="badge-cost badge-cost-live" style="${i.paid ? 'opacity:0.5; text-decoration:line-through;' : ''}">💰 ${i.cost} €</span>` : '';
         let paidBadge = `<span class="badge-paid-live" style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; margin-left:4px; display:${i.paid ? 'inline-block' : 'none'};">✅ PAGATO</span>`;
+        let operationalBadge = i.operationalCheckedAt ? `<span class="ops-badge" title="Dati controllati personalmente il ${escapeHtml(new Date(i.operationalCheckedAt).toLocaleDateString('it-IT'))}">✓ controllo personale</span>` : '';
+        let doneBadge = i.done ? `<span class="ops-badge" style="color:var(--accent-green)">✓ completata</span>` : '';
         let notePreview = (i.note && i.note.trim()) ? `<div style="font-size:12px; color:#a59781; margin:6px 0 0 0; padding:6px 8px; background:rgba(255,255,255,0.04); border-left:2px solid var(--border); border-radius:4px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📝 ${escapeHtml(i.note.trim())}</div>` : '';
         const gpsDist = userCoords ? calculateDistance(userCoords.lat, userCoords.lon, i.lt, i.ln) : null;
         const gpsDistBadge = gpsDist !== null ? `<span class="itinerary-dist-badge" data-idx="${i.idx}" style="display:inline-flex; align-items:center; gap:3px; background:rgba(74,158,187,0.15); border:1px solid rgba(74,158,187,0.4); border-radius:6px; padding:2px 7px; font-size:10px; color:var(--accent-blue); font-weight:700; margin-left:6px;">📍${gpsDist} km</span>` : '';
@@ -1712,52 +2283,77 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="display:flex; align-items:center; cursor: pointer; flex: 1;" onclick="panToMarker(${i.idx}, ${i.lt}, ${i.ln})" title="Mostra sulla mappa">
                     <span class="drag-handle" title="Trascina per spostare" aria-label="Trascina per spostare" onclick="event.stopPropagation()">☰</span>
-                    <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${conflictBadge} ${costBadge}${paidBadge}${gpsDistBadge}</b>
+                    <b style="transition: color 0.3s;" onmouseover="this.style.color='var(--accent-gold)'" onmouseout="this.style.color='inherit'">${vIdx + 1}. ${escapeHtml(i.n)} ${timeBadge} ${conflictBadge} ${costBadge}${paidBadge}${gpsDistBadge}${operationalBadge}${doneBadge}</b>
                 </div>
                 <div style="display:flex; gap:5px; position:relative; z-index: 5;">
-                    <button class="day-ctrl" onclick="moveItem('${sCity}', ${i.idx}, 'up')" style="background:none; border:none; color:#888;" aria-label="Sposta in alto">▲</button>
-                    <button class="day-ctrl" onclick="moveItem('${sCity}', ${i.idx}, 'down')" style="background:none; border:none; color:#888;" aria-label="Sposta in basso">▼</button>
-                    <button onclick="removeItem('${sCity}', ${i.idx})" style="color:red; background:none; border:none; font-size:20px;" aria-label="Rimuovi tappa">×</button>
+                    <button class="day-ctrl" onclick="moveItem(${jsArg(sCity)}, ${i.idx}, 'up')" style="background:none; border:none; color:#888;" aria-label="Sposta in alto">▲</button>
+                    <button class="day-ctrl" onclick="moveItem(${jsArg(sCity)}, ${i.idx}, 'down')" style="background:none; border:none; color:#888;" aria-label="Sposta in basso">▼</button>
+                    <button onclick="removeItem(${jsArg(sCity)}, ${i.idx})" style="color:red; background:none; border:none; font-size:20px;" aria-label="Rimuovi tappa">×</button>
                 </div>
             </div>
             ${notePreview}
             <div class="day-ctrl" style="margin-top:8px">
-                <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)-1})" aria-label="Sposta al giorno precedente">-</button>
-                <button class="day-btn" onclick="changeDay('${sCity}', ${i.idx}, ${parseInt(d)+1})" aria-label="Sposta al giorno successivo">+</button>
+                <button class="day-btn" onclick="changeDay(${jsArg(sCity)}, ${i.idx}, ${parseInt(d)-1})" aria-label="Sposta al giorno precedente">-</button>
+                <button class="day-btn" onclick="changeDay(${jsArg(sCity)}, ${i.idx}, ${parseInt(d)+1})" aria-label="Sposta al giorno successivo">+</button>
             </div>
             <div class="btn-row" style="margin-top: 10px; margin-bottom: 10px;">
-                <button class="btn-action" onclick="openSavedDesc('${sCity}', ${i.idx})">DETTAGLI</button>
-                <button class="btn-action" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="generaEAscolta('${escapeHtml(i.n)}', '${escapeHtml(i.type)}', '${escapeHtml(i.note || '')}')">🎧 ASCOLTA</button>
-                <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln})">VAI</button>
-                <button class="btn-action" style="border-color: #8a7a62; color: #8a7a62;" onclick="findAlternative('${sCity}', ${i.idx})">🔄 ALT</button>
-                ${isCheckedIn(i.n)
+                <button class="btn-action" onclick="openSavedDesc(${jsArg(sCity)}, ${i.idx})">DETTAGLI</button>
+                <button class="btn-action" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="generaEAscolta(${jsArg(i.n)}, ${jsArg(i.type)}, ${jsArg(i.note || "")})">🎧 ASCOLTA</button>
+                <button class="btn-action btn-maps-alt" onclick="openDirections(${i.lt}, ${i.ln}, ${jsArg(i.n)}, ${jsArg(getTripDestination(sCity))})">VAI</button>
+                <button class="btn-action" style="border-color: var(--text-muted); color: var(--text-muted);" onclick="findAlternative(${jsArg(sCity)}, ${i.idx})">🔄 ALT</button>
+                ${isCheckedIn(i.n, i.lt, i.ln)
                     ? `<button class="btn-action" style="border-color: var(--accent-green); color: var(--accent-green);" disabled>✅ Visitato</button>`
-                    : `<button class="btn-action" style="border-color: var(--accent-blue); color: var(--accent-blue);" onclick="eseguiCheckIn('${escapeHtml(i.n).replace(/'/g, "\\'")}', ${i.lt}, ${i.ln}, this)">📍 CHECK-IN</button>`}
+                    : `<button class="btn-action" style="border-color: var(--accent-blue); color: var(--accent-blue);" onclick="eseguiCheckIn(${jsArg(i.n)}, ${i.lt}, ${i.ln}, this)">📍 CHECK-IN</button>`}
             </div>
-            <div style="margin-top:2px; font-size:11px; color:#a59781;">La tua valutazione: ${renderRatingBtns(i.n)}</div>
+            <div style="margin-top:2px; font-size:11px; color:#a59781;">La tua valutazione: ${renderRatingBtns(i.n, i.lt, i.ln)}</div>
             <div class="wallet-box">
                 <div class="wallet-row">
-                    <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime('${sCity}', ${i.idx}, this.value)" title="Orario" aria-label="Orario tappa">
-                    <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost('${sCity}', ${i.idx}, this.value)" title="Costo stimato in Euro" aria-label="Costo stimato in Euro">
+                    <input type="time" class="wallet-input" value="${i.time || ''}" onchange="updateTime(${jsArg(sCity)}, ${i.idx}, this.value)" title="Orario" aria-label="Orario tappa">
+                    <input type="number" step="0.01" class="wallet-input" placeholder="€ Costo" value="${i.cost || ''}" onchange="updateCost(${jsArg(sCity)}, ${i.idx}, this.value)" title="Costo stimato in Euro" aria-label="Costo stimato in Euro">
                 </div>
+
+                <details class="travel-panel">
+                    <summary>🕒 Apertura, durata e prenotazione</summary>
+                    <div class="travel-grid">
+                        <label>Apertura<input type="time" class="wallet-input" value="${escapeHtml(i.opening || '')}" onchange="updateOperational(${jsArg(sCity)}, ${i.idx}, 'opening', this.value)"></label>
+                        <label>Chiusura<input type="time" class="wallet-input" value="${escapeHtml(i.closing || '')}" onchange="updateOperational(${jsArg(sCity)}, ${i.idx}, 'closing', this.value)"></label>
+                        <label>Durata visita (min)<input type="number" min="15" max="720" step="15" class="wallet-input" value="${escapeHtml(i.duration || visitMinutes(i))}" onchange="updateOperational(${jsArg(sCity)}, ${i.idx}, 'duration', Math.max(15,Math.min(720,Number(this.value)||60)))"></label>
+                        <label><span><input type="checkbox" ${i.booking ? 'checked' : ''} onchange="updateOperational(${jsArg(sCity)}, ${i.idx}, 'booking', this.checked)"> Prenotazione necessaria</span></label>
+                    </div>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:7px">Dati inseriti dall’utente: verifica sempre apertura e disponibilità sulla fonte ufficiale.</div>
+                </details>
+
+                <details class="travel-panel">
+                    <summary>♿ Accessibilità osservata</summary>
+                    <div class="travel-grid">
+                        <label>Accesso<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'level',this.value)"><option value="unknown" ${!i.accessibility?.level || i.accessibility.level==='unknown'?'selected':''}>Da verificare</option><option value="autonomous" ${i.accessibility?.level==='autonomous'?'selected':''}>Autonomo</option><option value="assistance" ${i.accessibility?.level==='assistance'?'selected':''}>Con assistenza</option><option value="no" ${i.accessibility?.level==='no'?'selected':''}>Non accessibile</option></select></label>
+                        <label>Gradini<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'steps',this.value)"><option value="unknown">Da verificare</option><option value="none" ${i.accessibility?.steps==='none'?'selected':''}>Nessuno</option><option value="present" ${i.accessibility?.steps==='present'?'selected':''}>Presenti</option></select></label>
+                        <label>Ascensore<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'lift',this.value)"><option value="unknown">Da verificare</option><option value="yes" ${i.accessibility?.lift==='yes'?'selected':''}>Sì</option><option value="no" ${i.accessibility?.lift==='no'?'selected':''}>No</option><option value="not-needed" ${i.accessibility?.lift==='not-needed'?'selected':''}>Non necessario</option></select></label>
+                        <label>Bagno accessibile<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'toilet',this.value)"><option value="unknown">Da verificare</option><option value="yes" ${i.accessibility?.toilet==='yes'?'selected':''}>Sì</option><option value="no" ${i.accessibility?.toilet==='no'?'selected':''}>No</option></select></label>
+                        <label>Parcheggio riservato<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'parking',this.value)"><option value="unknown">Da verificare</option><option value="yes" ${i.accessibility?.parking==='yes'?'selected':''}>Sì</option><option value="no" ${i.accessibility?.parking==='no'?'selected':''}>No</option></select></label>
+                        <label>Passeggino<select class="wallet-input" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'stroller',this.value)"><option value="unknown">Da verificare</option><option value="easy" ${i.accessibility?.stroller==='easy'?'selected':''}>Facile</option><option value="assistance" ${i.accessibility?.stroller==='assistance'?'selected':''}>Con assistenza</option><option value="no" ${i.accessibility?.stroller==='no'?'selected':''}>Sconsigliato</option></select></label>
+                    </div>
+                    <label style="font-size:10px;color:#a59781">Fondo, pendenze e note<textarea class="note-area" maxlength="300" onchange="updateAccessibility(${jsArg(sCity)},${i.idx},'notes',this.value)">${escapeHtml(i.accessibility?.notes || '')}</textarea></label>
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:7px">Informazioni personali, non certificazione ufficiale.</div>
+                </details>
                 
                 <div class="wallet-row" style="margin-top: 5px;">
-                    <input type="file" id="gallery-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
-                    <input type="file" id="camera-${i.idx}" accept="image/*" capture="environment" style="display:none" onchange="compressAndSavePhoto(event, '${sCity}', ${i.idx})">
-                    <button class="btn-action" style="flex:1; border-style: dashed; color: #bbb; border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('gallery-${i.idx}').click()">🖼️ GALLERIA</button>
+                    <input type="file" id="gallery-${i.idx}" accept="image/*" style="display:none" onchange="compressAndSavePhoto(event, ${jsArg(sCity)}, ${i.idx})">
+                    <input type="file" id="camera-${i.idx}" accept="image/*" capture="environment" style="display:none" onchange="compressAndSavePhoto(event, ${jsArg(sCity)}, ${i.idx})">
+                    <button class="btn-action" style="flex:1; border-style: dashed; color: var(--text-muted); border-color: rgba(255,255,255,0.2);" onclick="document.getElementById('gallery-${i.idx}').click()">🖼️ GALLERIA</button>
                     <button class="btn-action primary" style="flex:1;" onclick="document.getElementById('camera-${i.idx}').click()">📸 SCATTA FOTO</button>
                 </div>
 
                 <div class="wallet-row" style="align-items:center; gap:10px; margin-top: 5px;">
-                    <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink('${sCity}', ${i.idx}, this.value)" style="flex:1;">
-                    <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : '#8a7a62'}; user-select:none;" title="Segna come pagato">
-                        <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid('${sCity}', ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;"> Pagato
+                    <input type="text" class="wallet-input" placeholder="🔗 Incolla Link Sito / Biglietto..." value="${escapeHtml(i.link || '')}" onchange="updateLink(${jsArg(sCity)}, ${i.idx}, this.value)" style="flex:1;">
+                    <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; font-size:12px; color:${i.paid ? '#2ecc71' : 'var(--text-muted)'}; user-select:none;" title="Segna come pagato">
+                        <input type="checkbox" ${i.paid ? 'checked' : ''} onchange="updatePaid(${jsArg(sCity)}, ${i.idx}, this.checked)" style="width:16px; height:16px; accent-color:#2ecc71; cursor:pointer;"> Pagato
                     </label>
                 </div>
             </div>
             ${safeUrl(i.link) ? `<a href="${safeUrl(i.link)}" target="_blank" rel="noopener" class="ticket-btn">🎫 APRI BIGLIETTO / LINK</a>` : ''}
             ${photoHtml}
-            <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote('${sCity}', ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
+            <div class="note-box"><textarea class="note-area" placeholder="Note (es. prenotare tavolo)..." onchange="updateNote(${jsArg(sCity)}, ${i.idx}, this.value)">${escapeHtml(i.note || "")}</textarea></div>
         </div>`;
     }
 
@@ -1775,6 +2371,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 selector.style.display = actionsBox.style.display = aiActions.style.display = navBtn.style.display = routingToggleBox.style.display = 'none';
                 document.getElementById('btnCompactToggle').style.display = 'none';
                 document.getElementById('tripStats').style.display = document.getElementById('weatherWidget').style.display = document.getElementById('survivalWidget').style.display = document.getElementById('tripManageBtn').style.display = 'none';
+                document.getElementById('geo-exports').style.display = 'none';
                 b.innerHTML = `<div class="empty-state">Nessuna tappa salvata. Clicca su "🪄 AI Wizard" o "Esplora" per iniziare.</div>`; 
                 calculateStorageUsage();
                 return;
@@ -1783,6 +2380,8 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             selector.style.display = 'block'; selector.innerHTML = availableCities.map(c => `<option value="${escapeHtml(c)}" ${c === AppState.activeTrip ? 'selected' : ''}>${escapeHtml(c.toUpperCase())}</option>`).join("");
             document.getElementById('tripManageBtn').style.display = 'block';
             document.getElementById('btnCompactToggle').style.display = 'block';
+            document.getElementById('geo-exports').style.display = 'grid';
+            document.getElementById('tripDestination').value = getTripDestination();
             
             updateWeatherWidget(); 
             refreshStatsUI();
@@ -1794,22 +2393,22 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             
             Object.keys(days).sort((a,b) => a-b).forEach(d => {
                 const timedInDay = days[d].filter(p => p.time).sort((a,b) => getEffectiveMins(a.time) - getEffectiveMins(b.time));
-                let dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe</span>`;
+                let dayHoursSummary = `<span style="font-size:9px; color:var(--text-muted); margin-left:8px;">· ${days[d].length} tappe</span>`;
                 if (timedInDay.length >= 2) {
                     const diffH = ((getEffectiveMins(timedInDay[timedInDay.length-1].time) - getEffectiveMins(timedInDay[0].time)) / 60).toFixed(1);
-                    dayHoursSummary = `<span style="font-size:9px; color:#8a7a62; margin-left:8px;">· ${days[d].length} tappe · ~${diffH}h</span>`;
+                    dayHoursSummary = `<span style="font-size:9px; color:var(--text-muted); margin-left:8px;">· ${days[d].length} tappe · ~${diffH}h</span>`;
                 }
 
                 b.innerHTML += `<div class="day-label" style="align-items: flex-end;">
                     <span style="margin-bottom: 4px;">GIORNO ${d}${dayHoursSummary}</span>
                     <div style="display:flex; gap:6px;">
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
-                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="openDayInGoogleMaps('${AppState.activeTrip.replace(/'/g, "\\'")}', ${d})" title="Apri percorso in Google Maps">🗺️ APRI IN MAPS</button>
-                            <span style="font-size:8px; color:#8a7a62;">(Max 10 tappe)</span>
+                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="openDayInGoogleMaps(${jsArg(AppState.activeTrip)}, ${d})" title="Apri percorso in Google Maps">🗺️ APRI IN MAPS</button>
+                            <span style="font-size:8px; color:var(--text-muted);">(Max 10 tappe)</span>
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
-                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder('${AppState.activeTrip.replace(/'/g, "\\'")}', ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA</button>
-                            <span style="font-size:8px; color:#8a7a62;">GPS + ora</span>
+                            <button class="btn-action" style="font-size:9px; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="optimizeDayOrder(${jsArg(AppState.activeTrip)}, ${d})" title="Usa GPS e ora corrente per ottimizzare l'ordine delle tappe di oggi">🧭 OTTIMIZZA</button>
+                            <span style="font-size:8px; color:var(--text-muted);">GPS + ora</span>
                         </div>
                     </div>
                 </div><div id="day-cont-${d}" class="day-container"></div>`;
@@ -1851,7 +2450,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                 if (timelineHtml) container.innerHTML += timelineHtml;
 
                 days[d].forEach((i, vIdx) => {
-                    container.innerHTML += createPlaceCard(i, vIdx, AppState.activeTrip.replace(/'/g, "\\'"), d, conflictingIndices, AppState.userCoords);
+                    container.innerHTML += createPlaceCard(i, vIdx, AppState.activeTrip, d, conflictingIndices, AppState.userCoords);
                 });
             });
 
@@ -1869,7 +2468,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                                 });
                             });
                             AppState.db[cTrip].forEach(item => { if(!newOrder.includes(item)) newOrder.push(item); });
-                            AppState.db[cTrip] = newOrder; saveAllData(); refreshList();
+                            AppState.db[cTrip] = newOrder; saveAllData(); refreshList(); showItineraryMarkers();
                         }
                     });
                 });
@@ -1903,10 +2502,10 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             for (let seq = 0; seq < pts.length; seq++) {
                 let p = pts[seq]; let mKey = `m_${p.originalIdx}`; targetMarkerKeys.add(mKey);
                 if (!itineraryMarkersDict[mKey]) {
-                    let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, seq + 1, false, p.originalIdx) }).addTo(map).bindPopup(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`); 
+                    let marker = L.marker([p.lt, p.ln], { icon: getCustomIcon(p.type, seq + 1, false, p.originalIdx) }).addTo(map).bindPopup(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${escapeHtml(p.n)}`); 
                     marker.on('click', function() { scrollToCard(p.originalIdx); }); itineraryMarkersDict[mKey] = marker;
                 } else {
-                    itineraryMarkersDict[mKey].setLatLng([p.lt, p.ln]); itineraryMarkersDict[mKey].setIcon(getCustomIcon(p.type, seq + 1, false, p.originalIdx)); itineraryMarkersDict[mKey].getPopup().setContent(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${p.n}`);
+                    itineraryMarkersDict[mKey].setLatLng([p.lt, p.ln]); itineraryMarkersDict[mKey].setIcon(getCustomIcon(p.type, seq + 1, false, p.originalIdx)); itineraryMarkersDict[mKey].getPopup().setContent(`<b>Tappa ${seq + 1}</b> ${p.time ? '| '+p.time : ''}<br>${escapeHtml(p.n)}`);
                 }
                 latlngs.push([p.lt, p.ln]); 
             }
@@ -1914,8 +2513,9 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             if (latlngs.length > 1) { 
                 for(let i=0; i < latlngs.length - 1; i++) {
                     if (signal.aborted) return;
-                    let p1 = pts[i]; let p2 = pts[i+1]; let lKey = `l_${p1.originalIdx}_${p2.originalIdx}_${routingProfile}`; targetLineKeys.add(lKey);
+                    let p1 = pts[i]; let p2 = pts[i+1]; let lKey = JSON.stringify([AppState.activeTrip, day, p1.originalIdx, p2.originalIdx, p1.lt, p1.ln, p2.lt, p2.ln, routingProfile]); targetLineKeys.add(lKey);
                     
+                    if (itineraryLinesDict[lKey] && !itineraryLinesDict[lKey]._routeReady) { map.removeLayer(itineraryLinesDict[lKey]); delete itineraryLinesDict[lKey]; }
                     if (!itineraryLinesDict[lKey]) {
                         let line = L.polyline([latlngs[i], latlngs[i+1]], { color: '#4a9ebb', weight: 4, opacity: 0.9, dashArray: '5, 5' }).addTo(map);
                         itineraryLinesDict[lKey] = line;
@@ -1925,6 +2525,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                             if(routeCoords && itineraryLinesDict[lKey]) {
                                 itineraryLinesDict[lKey].setLatLngs(routeCoords);
                                 itineraryLinesDict[lKey].setStyle({dashArray: null});
+                                itineraryLinesDict[lKey]._routeReady = true;
                             }
                         });
                     }
@@ -1936,14 +2537,38 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         Object.keys(itineraryLinesDict).forEach(k => { if (!targetLineKeys.has(k)) { map.removeLayer(itineraryLinesDict[k]); delete itineraryLinesDict[k]; } });
     }
 
-    async function organizeDaysAI() { if (!AppState.activeTrip) return; let all = AppState.db[AppState.activeTrip].map((p, idx) => ({...p, idx})); showLoader("Organizzo giorni..."); try { const prompt = `Dividi in tappe sensate sui vari giorni: ${JSON.stringify(all.map(p => p.n))}.`; const schema = { type: "OBJECT", properties: { assignments: { type: "ARRAY", items: { type: "OBJECT", properties: { name: {type:"STRING"}, day: {type:"NUMBER"} } } } } }; const data = await callAI(prompt, schema); data.assignments.forEach(a => { const t = all.find(p => p.n === a.name); if(t) AppState.db[AppState.activeTrip][t.idx].day = a.day; }); saveAllData(); refreshList(); } catch(e) {} hideLoader(); }
+    async function organizeDaysAI() {
+        const trip = AppState.activeTrip;
+        if (!trip || !Array.isArray(AppState.db[trip])) return;
+        const original = JSON.stringify(AppState.db[trip]), all = JSON.parse(original);
+        showLoader('Organizzo giorni…');
+        try {
+            const prompt = 'Dividi in tappe sensate sui vari giorni. Restituisci per ogni tappa il suo id numerico e il giorno, senza cambiare id: ' + JSON.stringify(all.map((p, id) => ({ id, name: p.n, lat: p.lt, lon: p.ln })));
+            const schema = { type: 'OBJECT', properties: { assignments: { type: 'ARRAY', items: { type: 'OBJECT', properties: { id: { type: 'INTEGER' }, day: { type: 'INTEGER' } }, required: ['id', 'day'] } } }, required: ['assignments'] };
+            const data = await callAI(prompt, schema), seen = new Set();
+            if (!Array.isArray(data.assignments) || data.assignments.length !== all.length) throw new Error('Risposta incompleta: giorni lasciati invariati.');
+            for (const a of data.assignments) {
+                if (!Number.isInteger(a.id) || a.id < 0 || a.id >= all.length || seen.has(a.id) || !Number.isInteger(a.day) || a.day < 1) throw new Error('Risposta non valida: giorni lasciati invariati.');
+                seen.add(a.id); all[a.id].day = a.day;
+            }
+            if (JSON.stringify(AppState.db[trip]) !== original) throw new Error('Il viaggio è stato modificato: risultato non applicato.');
+            AppState.db[trip] = all;
+            const saved = await saveAllData(); refreshList(); showItineraryMarkers();
+            if (saved) showToast('✅ Giorni organizzati: ' + trip);
+        } catch (e) { showToast('⚠️ ' + e.message, 'error'); }
+        finally { hideLoader(); }
+    }
+
     async function optimizeItinerary() {
         if (!AppState.activeTrip) return;
+        const trip = AppState.activeTrip;
+        const original = JSON.stringify(AppState.db[trip]);
+        let failedDays = 0;
         showLoader("Ottimizzazione per giorno...");
         try {
             // Raggruppa le tappe per giorno mantenendo l'assegnazione originale
             let daysMap = {};
-            AppState.db[AppState.activeTrip].forEach((p, idx) => {
+            AppState.db[trip].forEach((p, idx) => {
                 const d = p.day || 1;
                 if (!daysMap[d]) daysMap[d] = [];
                 daysMap[d].push({ ...p, _origIdx: idx });
@@ -1965,16 +2590,18 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
                     });
                     newFullArr.push(...orderedDay, ...remaining); // append eventuali non trovati
                 } catch(e) {
+                    failedDays++;
                     newFullArr.push(...dayPlaces); // fallback: ordine invariato per questo giorno
                 }
             }
 
             // Ricostruisce l'array pulito (rimuove _origIdx aggiunto temporaneamente)
-            AppState.db[AppState.activeTrip] = newFullArr.map(({ _origIdx, ...p }) => p);
-            saveAllData(); refreshList(); showItineraryMarkers();
-            showToast("✅ Itinerario ottimizzato per ogni giorno!");
+            if (JSON.stringify(AppState.db[trip]) !== original) throw new Error('Il viaggio è stato modificato: risultato non applicato.');
+            AppState.db[trip] = newFullArr.map(({ _origIdx, ...p }) => p);
+            const saved = await saveAllData(); refreshList(); showItineraryMarkers();
+            if (saved) showToast(failedDays ? '⚠️ Ottimizzazione parziale: ' + failedDays + ' giorno/i mantenuti invariati.' : '✅ Itinerario ottimizzato: ' + trip, failedDays ? 'error' : 'success');
         } catch(e) {
-            showToast("⚠️ Errore ottimizzazione.", "error");
+            showToast("⚠️ " + (e.message || "Errore ottimizzazione."), "error");
         }
         hideLoader();
     }
@@ -1987,7 +2614,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         saveAllData(); refreshList(); showItineraryMarkers(); showToast("🗑️ Tappa eliminata.");
     }
     
-    function moveItem(city, index, direction) { let arr = AppState.db[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; saveAllData(); refreshList(); showItineraryMarkers(); } }
+    function moveItem(city, index, direction) { let arr = AppState.db[city]; if (!arr || arr.length <= 1) return; let day = arr[index].day || 1; let swap = -1; if (direction === 'up') { for (let j = index - 1; j >= 0; j--) { if ((arr[j].day || 1) == day) { swap = j; break; } } } else { for (let j = index + 1; j < arr.length; j++) { if ((arr[j].day || 1) == day) { swap = j; break; } } } if (swap !== -1) { [arr[index], arr[swap]] = [arr[swap], arr[index]]; saveAllData(); refreshList(); showItineraryMarkers(); showItineraryMarkers(); } }
     
     function updateTime(c, i, v) { 
         if (v && !/^([01]?\d|2[0-3]):([0-5]\d)$/.test(v)) {
@@ -1996,10 +2623,20 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         }
         AppState.db[c][i].time = v; saveAllData(); refreshList(); showItineraryMarkers(); 
     } 
-    function updateLink(c, i, v) { AppState.db[c][i].link = safeUrl(v) || v.trim(); saveAllData(); } 
+    function updateLink(c, i, v) {
+        const url = safeUrl(v);
+        if (v.trim() && !url) { showToast('⚠️ Inserisci un indirizzo http o https valido.', 'error'); return; }
+        AppState.db[c][i].link = url; saveAllData();
+        const card = document.querySelector('.card[data-idx="' + i + '"]');
+        if (!card || AppState.activeTrip !== c) return;
+        let button = card.querySelector('.ticket-btn');
+        if (!url) { if (button) button.remove(); return; }
+        if (!button) { button = document.createElement('a'); button.className = 'ticket-btn'; button.textContent = '🎫 APRI BIGLIETTO / LINK'; card.appendChild(button); }
+        button.href = url; button.target = '_blank'; button.rel = 'noopener';
+    } 
     function updateNote(c, i, v) { AppState.db[c][i].note = v; saveAllData(); }
     function updateCost(c, i, v) { 
-        AppState.db[c][i].cost = v; saveAllData(); refreshStatsUI(); 
+        AppState.db[c][i].cost = v; AppState.db[c][i].costManuallySet = true; saveAllData(); refreshStatsUI(); 
         let card = document.querySelector(`.card[data-idx="${i}"]`);
         if(card) { let costBadge = card.querySelector('.badge-cost-live'); if(costBadge) costBadge.innerText = v ? `💰 ${v} €` : ''; }
     }
@@ -2027,7 +2664,11 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
     async function downloadPDF() { 
         if (!AppState.activeTrip || typeof window.jspdf === 'undefined') { showToast("Attendere caricamento modulo PDF...", "error"); return; }
         const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y = 20; 
-        doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(0, 0, 0); doc.text(`PIANO: ${AppState.activeTrip.toUpperCase()}`, 20, y); y += 15; 
+        doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(25, 48, 58); doc.text(`PIANO: ${AppState.activeTrip.toUpperCase()}`, 20, y); y += 9;
+        const tripMeta=AppState.meta[AppState.activeTrip]||{},tripItems=AppState.db[AppState.activeTrip];
+        doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(80,100,108);doc.text(`${getTripDestination(AppState.activeTrip)} · ${tripItems.length} tappe${tripMeta.startDate?' · partenza '+tripMeta.startDate:''}`,20,y);y+=5;
+        const pdfSource=tripMeta.generationSource==='ai-verified'?'Origine: AI + mappe verificate':tripMeta.generationSource==='hybrid-sources'?'Origine: AI completata con mappe + Wikipedia':tripMeta.generationSource==='public-sources'?'Origine: mappe + Wikipedia, senza AI':'Origine: non registrata (itinerario precedente)';doc.text(pdfSource+(tripMeta.generatedAt?' · '+new Date(tripMeta.generatedAt).toLocaleString('it-IT'):''),20,y);y+=10;
+        if(Array.isArray(tripMeta.selectedInterests)&&tripMeta.selectedInterests.length){doc.text(`Interessi usati: ${tripMeta.selectedInterests.join(', ')}`,20,y);y+=7;}
         let days = {}; let tot = 0; 
         AppState.db[AppState.activeTrip].forEach(i => { const d = i.day || 1; if(!days[d]) days[d] = []; days[d].push(i); if(i.cost) tot += parseFloat(i.cost); }); 
         let tCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.travelCost) || 0; let hCostNum = parseFloat(AppState.meta[AppState.activeTrip]?.hotelCost) || 0; tot += tCostNum + hCostNum;
@@ -2037,8 +2678,9 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             days[d].forEach(item => { 
                 if(y > 270) { doc.addPage(); y = 20; } 
                 doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 0, 0); 
-                let timeStr = item.time ? ` (${item.time})` : ''; let costStr = item.cost ? ` [Euro ${item.cost}]` : '';
-                doc.text(`• ${item.n}${timeStr}${costStr}`, 25, y); y += 7; 
+                let timeStr = item.time ? ` (${item.time}${item.duration?' · '+item.duration+' min':''})` : (item.duration?` (${item.duration} min)`: ''); let costStr = item.cost ? ` [Euro ${item.cost}]` : '';
+                const titleLines=doc.splitTextToSize(`• ${item.n}${timeStr}${costStr}`,165);doc.text(titleLines,25,y);y+=titleLines.length*6+1;
+                if(item.verifiedAddress){doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(45,115,140);const addressLines=doc.splitTextToSize(`Indirizzo verificato: ${item.verifiedAddress}`,155);doc.text(addressLines,30,y);y+=addressLines.length*4+2;}
                 if(item.note && item.note.trim() !== "") { doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100); const splitNotes = doc.splitTextToSize(`Nota: ${item.note}`, 160); doc.text(splitNotes, 30, y); y += (splitNotes.length * 5) + 3; } else { y += 3; }
                 if(item.photo) { try { if(y > 240) { doc.addPage(); y = 20; } doc.addImage(item.photo, 'JPEG', 30, y, 40, 25); y += 30; } catch(e) {} } 
             }); y += 5; 
@@ -2063,16 +2705,95 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         showToast("✅ Backup scaricato! (Nota: la tua API Key non viene esportata per sicurezza)");
     }
     
+    function validateBackup(data) {
+        const record = x => x !== null && typeof x === 'object' && !Array.isArray(x);
+        const fail = message => { throw new Error(message); };
+        function safeTree(value) {
+            if (!value || typeof value !== 'object') return;
+            for (const key of Object.keys(value)) {
+                if (['__proto__', 'prototype', 'constructor'].includes(key)) fail('Chiave non consentita nel backup');
+                safeTree(value[key]);
+            }
+        }
+        safeTree(data);
+        if (!record(data) || !record(data.db)) fail('Il backup deve contenere un elenco di itinerari valido');
+        if (data.meta !== undefined && !record(data.meta)) fail('Metadati non validi');
+        const clean = JSON.parse(JSON.stringify({ db: data.db, meta: data.meta || {} }));
+        for (const [name, stops] of Object.entries(clean.db)) {
+            if (!name.trim() || ['checkins', 'ratings', '__places_v2'].includes(name)) fail('Nome itinerario non valido: ' + name);
+            if (!Array.isArray(stops)) fail('Le tappe di ' + name + ' non sono un elenco');
+            for (const p of stops) {
+                if (!record(p) || typeof p.n !== 'string' || !p.n.trim()) fail('Nome tappa mancante in ' + name);
+                for (const [key, max] of [['lt', 90], ['ln', 180]]) {
+                    if (!['number', 'string'].includes(typeof p[key]) || String(p[key]).trim() === '' || !Number.isFinite(Number(p[key])) || Math.abs(Number(p[key])) > max) fail('Coordinate non valide per ' + p.n);
+                    p[key] = Number(p[key]);
+                }
+                if (p.day === undefined) p.day = 1;
+                if (!Number.isInteger(Number(p.day)) || Number(p.day) < 1) fail('Giorno non valido per ' + p.n);
+                p.day = Number(p.day);
+                for (const key of ['note', 'time', 'link', 'photo', 'type', 'opening', 'closing']) if (p[key] !== undefined && typeof p[key] !== 'string') fail('Campo ' + key + ' non valido per ' + p.n);
+                if (p.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(p.time)) fail('Orario non valido per ' + p.n);
+                if (p.opening && !/^([01]\d|2[0-3]):[0-5]\d$/.test(p.opening)) fail('Apertura non valida per ' + p.n);
+                if (p.closing && !/^([01]\d|2[0-3]):[0-5]\d$/.test(p.closing)) fail('Chiusura non valida per ' + p.n);
+                if (p.duration !== undefined && (!Number.isFinite(Number(p.duration)) || Number(p.duration) < 15 || Number(p.duration) > 720)) fail('Durata non valida per ' + p.n);
+                if (p.booking !== undefined && typeof p.booking !== 'boolean') fail('Prenotazione non valida per ' + p.n);
+                if (p.operationalCheckedAt !== undefined && (typeof p.operationalCheckedAt !== 'string' || !Number.isFinite(Date.parse(p.operationalCheckedAt)))) fail('Data del controllo non valida per ' + p.n);
+                if (p.done !== undefined && typeof p.done !== 'boolean') fail('Avanzamento non valido per ' + p.n);
+                if (p.accessibility !== undefined) {
+                    if (!record(p.accessibility)) fail('Accessibilità non valida per ' + p.n);
+                    const allowed={level:['unknown','autonomous','assistance','no'],steps:['unknown','none','present'],lift:['unknown','yes','no','not-needed'],toilet:['unknown','yes','no'],parking:['unknown','yes','no'],stroller:['unknown','easy','assistance','no']};
+                    for(const [field,values] of Object.entries(allowed))if(p.accessibility[field]!==undefined&&!values.includes(p.accessibility[field]))fail('Campo accessibilità non valido per '+p.n);
+                    if(p.accessibility.notes!==undefined&&(typeof p.accessibility.notes!=='string'||p.accessibility.notes.length>300))fail('Note accessibilità non valide per '+p.n);
+                    if(p.accessibility.checkedAt!==undefined&&(typeof p.accessibility.checkedAt!=='string'||!Number.isFinite(Date.parse(p.accessibility.checkedAt))))fail('Data accessibilità non valida per '+p.n);
+                }
+                if (p.cost !== undefined && p.cost !== '' && (!['number', 'string'].includes(typeof p.cost) || !Number.isFinite(Number(p.cost)) || Number(p.cost) < 0)) fail('Costo non valido per ' + p.n);
+                if (p.paid !== undefined && typeof p.paid !== 'boolean') fail('Stato pagamento non valido');
+                if (p.photo && !/^data:image\/(jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/=\s]+$/.test(p.photo)) fail('Foto non valida per ' + p.n);
+                p.link = safeUrl(p.link || '');
+            }
+        }
+        if (clean.meta.checkins !== undefined && (!Array.isArray(clean.meta.checkins) || clean.meta.checkins.some(n => typeof n !== 'string'))) fail('Check-in non validi');
+        const ratingsValid = r => record(r) && Object.values(r).every(v => Number.isInteger(v) && v >= 1 && v <= 5);
+        if (clean.meta.ratings !== undefined && !ratingsValid(clean.meta.ratings)) fail('Valutazioni non valide');
+        const p = clean.meta.__places_v2;
+        if (p !== undefined && (!record(p) || !record(p.visited) || Object.values(p.visited).some(n => typeof n !== 'string') || !ratingsValid(p.ratings) || !Array.isArray(p.legacyCheckins) || p.legacyCheckins.some(n => typeof n !== 'string') || !ratingsValid(p.legacyRatings))) fail('Archivio personale non valido');
+        for (const [key, value] of Object.entries(clean.meta)) {
+            if (['checkins', 'ratings', '__places_v2'].includes(key)) continue;
+            if (key === '__placeDetails') {
+                if (!record(value)) fail('Archivio descrizioni non valido');
+                for(const entry of Object.values(value))if(!record(entry)||typeof entry.info!=='string'||typeof entry.hours!=='string'||typeof entry.savedAt!=='string'||!Number.isFinite(Date.parse(entry.savedAt))||typeof entry.destination!=='string')fail('Descrizione salvata non valida');
+                continue;
+            }
+            if (key === '__travelerProfile') {
+                if (!record(value) || !['Solo','Coppia','Famiglia','Amici'].includes(value.who) || !Number.isFinite(Number(value.maxWalk)) || Number(value.maxWalk) < 1 || Number(value.maxWalk) > 50 || !['Basso','Medio','Alto'].includes(value.budget) || !['mixed','indoor','outdoor'].includes(value.indoor) || typeof value.stroller !== 'boolean' || typeof value.pets !== 'boolean' || typeof value.needs !== 'string' || value.needs.length > 300) fail('Profilo viaggiatore non valido');
+                continue;
+            }
+            if (!record(value)) fail('Metadati itinerario non validi');
+            if (value.survival !== undefined && (!record(value.survival) || Object.values(value.survival).some(v => typeof v !== 'string'))) fail('Informazioni di viaggio non valide');
+            for (const field of ['travelCost', 'hotelCost']) if (value[field] !== undefined && (!['number', 'string'].includes(typeof value[field]) || !Number.isFinite(Number(value[field])) || Number(value[field]) < 0)) fail('Spese non valide');
+        }
+        return clean;
+    }
     function handleRestore(e) {
-        const file = e.target.files[0];
-        if(!file) return;
+        const input = e.target, file = input.files[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = async event => {
             try {
-                const data = JSON.parse(event.target.result);
-                if(data.db) { AppState.db = data.db; if(data.meta) AppState.meta = data.meta; saveAllData(); refreshList(); showToast("✅ Dati ripristinati! (Ricorda di rimettere la tua API Key se necessaria)"); }
-            } catch(err) { showToast("⚠️ File non valido.", "error"); }
+                const data = validateBackup(JSON.parse(event.target.result));
+                const unchanged = JSON.stringify({ db: AppState.db, meta: AppState.meta });
+                if (!confirm('Il backup è valido. Sostituire tutti gli itinerari e i dati personali con quelli del file? Esporta prima un backup se vuoi conservare i dati attuali.')) return;
+                showLoader('Ripristino del backup…');
+                await storageQueue;
+                if (JSON.stringify({ db: AppState.db, meta: AppState.meta }) !== unchanged) throw new Error('I dati sono cambiati durante il ripristino. Riprova.');
+                if (!(await persistSnapshot(data))) return;
+                if (gpsWatchId) stopNavigation();
+                storageRecoveryNeeded = false;
+                AppState.db = data.db; AppState.meta = data.meta; AppState.activeTrip = '';
+                applyTravelerProfile(); refreshList(); showItineraryMarkers(); showToast('✅ Backup verificato e ripristinato.');
+            } catch (err) { showToast('⚠️ Ripristino non eseguito: ' + err.message, 'error'); }
+            finally { hideLoader(); input.value = ''; }
         };
+        reader.onerror = () => { showToast('⚠️ Impossibile leggere il backup.', 'error'); input.value = ''; };
         reader.readAsText(file);
     }
 
@@ -2104,13 +2825,13 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         if (!navigator.geolocation) { showToast("GPS non supportato dal browser.", "error"); return; }
         
         let allPlaces = [...AppState.db[AppState.activeTrip]];
-        allPlaces.sort((a,b) => {
-            if (a.day !== b.day) return (a.day || 1) - (b.day || 1);
-            return getEffectiveMins(a.time) - getEffectiveMins(b.time);
-        });
+        // Preserve the saved order within each day.
+        allPlaces.sort((a,b) => (a.day || 1) - (b.day || 1));
 
         navPlaces = allPlaces;
-        navIndex = 0;
+        const savedIndex = Number(AppState.meta[AppState.activeTrip]?.navigationIndex);
+        const firstIncomplete = navPlaces.findIndex(p => !p.done);
+        navIndex = Number.isInteger(savedIndex) && savedIndex >= 0 && savedIndex < navPlaces.length && !navPlaces[savedIndex].done ? savedIndex : (firstIncomplete >= 0 ? firstIncomplete : 0);
         document.body.classList.add('nav-active');
         document.getElementById('nav-dashboard').classList.add('active');
         showItineraryMarkers();
@@ -2133,15 +2854,35 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         if (map) setTimeout(() => map.invalidateSize(), 400);
     }
 
-    function nextNavStep() {
+    function saveNavigationProgress() {
+        if (!AppState.activeTrip) return;
+        (AppState.meta[AppState.activeTrip] ||= {}).navigationIndex = navIndex;
+        saveAllData();
+    }
+    function completeNavStep() {
+        if (!navPlaces[navIndex]) return;
+        navPlaces[navIndex].done = true;
+        nextNavStep(false);
+    }
+    function skipNavStep() {
+        if(!navPlaces.length||navIndex>=navPlaces.length-1){showToast('Questa è l’ultima tappa: non ci sono tappe successive.','error');return;}
+        nextNavStep(true);
+    }
+    function nextNavStep(skipped = false) {
+        if (!skipped && navPlaces[navIndex]) navPlaces[navIndex].done = true;
         if (navIndex < navPlaces.length - 1) {
             navIndex++;
+            saveNavigationProgress();
             reachedDestinationAlerted = false;
             lastRouteDest = null; 
             renderNavStep();
+            refreshList();
             if (AppState.userCoords) { updateLiveGPS({coords: {latitude: AppState.userCoords.lat, longitude: AppState.userCoords.lon}}); }
         } else {
-            showToast("🎉 Hai completato tutte le tappe!");
+            if (!skipped && navPlaces[navIndex]) navPlaces[navIndex].done = true;
+            if (AppState.meta[AppState.activeTrip]) AppState.meta[AppState.activeTrip].navigationIndex = 0;
+            saveAllData(); refreshList();
+            showToast(skipped ? "Fine dell’itinerario: sei passato oltre l’ultima tappa senza completarla." : "🎉 Hai completato tutte le tappe!");
             stopNavigation();
         }
     }
@@ -2150,6 +2891,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         if (navIndex >= navPlaces.length) return;
         
         const current = navPlaces[navIndex];
+        const nextButton=document.getElementById('nav-next-btn');if(nextButton){nextButton.disabled=navIndex>=navPlaces.length-1;nextButton.style.opacity=nextButton.disabled?'.45':'1';nextButton.title=nextButton.disabled?'Nessuna tappa successiva':'Vai alla tappa successiva';}
         document.getElementById('nav-dash-step').innerText = `TAPPA ${navIndex + 1} DI ${navPlaces.length} - GIORNO ${current.day || 1}`;
         document.getElementById('name-stop-1').innerText = current.n;
         document.getElementById('note-stop-1').innerText = current.note ? escapeHtml(current.note) : '';
@@ -2163,7 +2905,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
         if(map) {
             activeMarkers.forEach(m => map.removeLayer(m)); activeMarkers = [];
-            let m = L.marker([current.lt, current.ln], { icon: getCustomIcon(current.type, navIndex + 1, true) }).addTo(map).bindPopup(`<b>Destinazione</b><br>${current.n}`);
+            let m = L.marker([current.lt, current.ln], { icon: getCustomIcon(current.type, navIndex + 1, true) }).addTo(map).bindPopup(`<b>Destinazione</b><br>${escapeHtml(current.n)}`);
             activeMarkers.push(m);
             if (AppState.userCoords) {
                 let bounds = L.latLngBounds([[AppState.userCoords.lat, AppState.userCoords.lon], [current.lt, current.ln]]);
@@ -2241,7 +2983,17 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         return JSON.stringify(AppState.db);
     }
 
-    function toggleChat() { document.getElementById('chat-panel').classList.toggle('open'); }
+    let audioGuideRequest = 0;
+    function stopAudioGuide() {
+        audioGuideRequest++;
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+    function toggleChat() {
+        const panel=document.getElementById('chat-panel'),wasOpen=panel.classList.contains('open');
+        panel.classList.toggle('open');
+        if(wasOpen) stopAudioGuide();
+    }
+    function closeDetails() { stopAudioGuide(); document.getElementById('descModal').style.display='none'; }
 
     async function inviaMessaggioAI() {
         if (aiBusy) { showToast("⏳ Attendi la risposta precedente..."); return; }
@@ -2295,15 +3047,15 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
 
     async function generaEAscolta(nome, tipo, desc) {
         if (aiBusy) { showToast("⏳ Attendi la risposta precedente..."); return; }
+        const request = ++audioGuideRequest;
         aiLock(true);
         showToast(`🎧 Genero audioguida per ${nome}...`);
         try {
-            const payload = {
-                contents: [{ parts: [{ text: `L'utente si trova a "${nome}" (tipo: ${tipo}). Note dell'utente: "${desc}". Scrivi un racconto evocativo, approfondito e appassionante (circa un paragrafo ricco di dettagli storici o curiosità) su questo luogo senza formattazione speciale.` }] }],
-                systemInstruction: { parts: [{ text: `Sei una guida turistica esperta. ${PROMPT_ANTI_ALLUCINAZIONE}` }] }
-            };
-            const result = await fetchGeminiGrounded(payload);
-            leggiAdAltaVoce(result.text.replace(/\*/g, ''));
+            const trip=AppState.activeTrip,item=(AppState.db[trip]||[]).find(p=>p.n===nome&&p.type===tipo)||(AppState.db[trip]||[]).find(p=>p.n===nome);
+            const place=item||{n:nome,lt:null,ln:null,type:tipo,note:desc};
+            const entry=await fetchAndCacheDetails(place,getTripDestination(trip),false);
+            if(request!==audioGuideRequest){aiLock(false);return;}
+            leggiAdAltaVoce(entry.info);
             showToast("🔊 Riproduzione audioguida in corso...");
             // Mostra testo + badge fonti nel pannello chat, così l'utente sa
             // se l'audio è basato su fonti verificate da Google Search
@@ -2311,7 +3063,7 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
             const msgBox = document.getElementById('chat-messages');
             if (chatPanel && msgBox) {
                 chatPanel.classList.add('open');
-                msgBox.innerHTML += `<div class="chat-bubble ai">🎧 <b>Audioguida — ${escapeHtml(nome)}</b><br>${escapeHtml(result.text).replace(/\n/g, '<br>')}${renderGroundingBadge(result)}</div>`;
+                msgBox.innerHTML += `<div class="chat-bubble ai">🎧 <b>Audioguida — ${escapeHtml(nome)}</b><br>${escapeHtml(entry.info).replace(/\n/g, '<br>')}</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
             }
         } catch (e) {
@@ -2377,61 +3129,96 @@ Includi circa 3 o 4 tappe per ogni giorno. Assicurati che le coordinate lt e ln 
         reader.readAsDataURL(file);
     }
 
+    async function loadStoredData() {
+        let migrated = false;
+        async function readValue(key, fallback) {
+            const current = await idbGet(key);
+            if (current !== undefined && current !== null) return current;
+            const old = localStorage.getItem(key);
+            if (old !== null) { migrated = true; return JSON.parse(old); }
+            const legacy = await migraDaLocalforage(key);
+            if (legacy !== null) { migrated = true; return legacy; }
+            return fallback;
+        }
+        try {
+            const db = await readValue('travel_db_v18', {});
+            const meta = await readValue('travel_meta_v1', {});
+            const clean = validateBackup({ db, meta });
+            AppState.db = clean.db; AppState.meta = clean.meta;
+            if (migrated) {
+                const saved = await saveAllData();
+                // Preserve legacy copies even after a successful migration.
+                if (!saved) return false;
+            }
+            storageRecoveryNeeded = false; return true;
+        } catch (err) {
+            console.error('Caricamento archivio:', err);
+            storageRecoveryNeeded = true;
+            storageNotice('⚠️ Archivio non caricato. I dati precedenti sono conservati. Ricarica la pagina o importa un backup valido; il salvataggio è sospeso.', true);
+            return false;
+        }
+    }
+
+    async function removeConfirmedInvalidPlaces() {
+        let changed=false;
+        for(const [trip,items] of Object.entries(AppState.db)){
+            const destination=String(AppState.meta[trip]?.destination||trip).toLowerCase();
+            if(!destination.includes('nonantola')||!Array.isArray(items))continue;
+            const filtered=items.filter(p=>String(p.n||'').trim().toLowerCase()!=='trattoria del campione');
+            if(filtered.length!==items.length){AppState.db[trip]=filtered;changed=true;}
+        }
+        if(changed){await saveAllData();showToast('⚠️ Rimossa una tappa risultata inesistente: Trattoria del Campione.','error');}
+        return changed;
+    }
+    async function removeUnverifiedReligiousCosts() {
+        let changed=false;
+        for(const [trip,items] of Object.entries(AppState.db)){
+            const generated=['ai-verified','public-sources','hybrid-sources'].includes(AppState.meta[trip]?.generationSource);if(!generated||!Array.isArray(items))continue;
+            for(const place of items)if(isReligiousPlace(place)&&place.cost!==''&&place.cost!==undefined&&!place.costManuallySet){place.cost='';changed=true;}
+        }
+        if(changed){await saveAllData();showToast('ℹ️ Rimossi i costi non verificati dai luoghi di culto.');}
+        return changed;
+    }
+    async function normalizeExistingGeneratedOrder() {
+        let changed=false;
+        for(const [trip,items] of Object.entries(AppState.db)){
+            const meta=AppState.meta[trip]||{},generated=['ai-verified','public-sources','hybrid-sources'].includes(meta.generationSource);
+            if(!generated||!Array.isArray(items)||meta.chronologicalOrderVersion===1)continue;
+            for(const place of items)place.time=normalizeGeneratedTime(place.time);
+            AppState.db[trip]=sortTripChronologically(items);meta.chronologicalOrderVersion=1;AppState.meta[trip]=meta;changed=true;
+        }
+        if(changed)await saveAllData();
+        return changed;
+    }
+
     // NUOVO CARICAMENTO SICURO CON RECINTI ANTI-CRASH
     document.addEventListener("DOMContentLoaded", async () => {
         try {
             if (typeof L !== 'undefined') {
-                map = L.map('map', {zoomControl: false}).setView([44.647, 10.925], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+                map = L.map('map', {zoomControl: false, minZoom: 2, maxZoom: 20}).setView([44.647, 10.925], 13);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxNativeZoom: 19,
+                    maxZoom: 20,
+                    updateWhenIdle: true,
+                    updateWhenZooming: false,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
             } else {
                 console.error("Leaflet non caricato correttamente.");
             }
-        } catch (e) { console.error("Errore Mappa:", e); }
+        } catch (e) {
+            console.error("Errore Mappa:", e);
+            showToast('Mappa non caricata: controlla la connessione e il supporto grafico del browser, poi ricarica la pagina.', 'error');
+        }
 
         setupModalA11y();
+        applyTravelerProfile();
 
-        // MIGRAZIONE E CARICAMENTO INDEXEDDB NATIVO (nessuna dipendenza CDN)
-        try {
-            if (!window.indexedDB) {
-                setTimeout(() => {
-                    showToast("⚠️ Salvataggio dati NON disponibile su questo browser.", "error");
-                }, 1500);
-            } else {
-                // Migrazione da vecchio localStorage (versioni molto vecchie)
-                let oldDb = localStorage.getItem('travel_db_v18');
-                if (oldDb) {
-                    try {
-                        AppState.db = JSON.parse(oldDb);
-                        await idbSet('travel_db_v18', AppState.db);
-                        localStorage.removeItem('travel_db_v18');
-                    } catch (errDb) {
-                        console.error("Database corrotto, reset forzato per evitare blocchi.");
-                        AppState.db = {};
-                        localStorage.removeItem('travel_db_v18'); // Rimuove il "veleno"
-                    }
-                } else {
-                    // Migrazione da localforage (chiavi con prefisso interno) o lettura diretta
-                    AppState.db = await idbGet('travel_db_v18') || await migraDaLocalforage('travel_db_v18') || {};
-                }
-
-                let oldMeta = localStorage.getItem('travel_meta_v1');
-                if (oldMeta) {
-                    try {
-                        AppState.meta = JSON.parse(oldMeta);
-                        await idbSet('travel_meta_v1', AppState.meta);
-                        localStorage.removeItem('travel_meta_v1');
-                    } catch (errMeta) {
-                        AppState.meta = {};
-                        localStorage.removeItem('travel_meta_v1');
-                    }
-                } else {
-                    AppState.meta = await idbGet('travel_meta_v1') || await migraDaLocalforage('travel_meta_v1') || {};
-                }
-            }
-        } catch (e) {
-            console.error("Errore grave DB:", e);
-            AppState.db = {};
-        }
+        // Read and validate before exposing stored data; never delete a failed legacy copy.
+        await loadStoredData();
+        await removeConfirmedInvalidPlaces();
+        await removeUnverifiedReligiousCosts();
+        await normalizeExistingGeneratedOrder();
 
         // L'UI DEVE AVVIARSI SEMPRE, ANCHE SE IL DB FOSSE ROTTO
         try {
